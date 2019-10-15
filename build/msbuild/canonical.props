@@ -1,0 +1,6 @@
+<Project>
+  <PropertyGroup>
+    <CanonicalName>bouncybox-vorpalengine</CanonicalName>
+    <CanonicalRootNamespace>BouncyBox.VorpalEngine</CanonicalRootNamespace>
+  </PropertyGroup>
+</Project>

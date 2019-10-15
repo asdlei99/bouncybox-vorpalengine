@@ -1,0 +1,12 @@
+<Project>
+  <PropertyGroup>
+    <Company>Bouncy Box LLC</Company>
+    <Authors>Bouncy Box LLC</Authors>
+    <Copyright>Copyright 2019 Bouncy Box LLC</Copyright>
+    <Product>Vorpal Engine</Product>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <AssemblyName>$(CanonicalRootNamespace).$(MSBuildProjectName)</AssemblyName>
+    <RootNamespace>$(CanonicalRootNamespace).$(MSBuildProjectName)</RootNamespace>
+    <AssemblyTitle>$(CanonicalRootNamespace).$(MSBuildProjectName)</AssemblyTitle>
+  </PropertyGroup>
+</Project>
