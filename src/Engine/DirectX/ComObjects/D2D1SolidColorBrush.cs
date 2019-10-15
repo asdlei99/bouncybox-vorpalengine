@@ -6,7 +6,7 @@ namespace BouncyBox.VorpalEngine.Engine.DirectX.ComObjects
     /// <summary>
     ///     Proxies the <see cref="ID2D1SolidColorBrush" /> COM interface.
     /// </summary>
-    public unsafe class D2D1SolidColorBrush : ComObject<ID2D1SolidColorBrush>, ID2D1Brush
+    public unsafe class D2D1SolidColorBrush : ComObject<ID2D1SolidColorBrush>
     {
         private readonly D2D1Brush _d2d1Brush;
         private ComPtr<ID2D1SolidColorBrush> _d2d1SolidColorBrush;
@@ -18,7 +18,7 @@ namespace BouncyBox.VorpalEngine.Engine.DirectX.ComObjects
         public D2D1SolidColorBrush(ComPtr<ID2D1SolidColorBrush> d2d1SolidColorBrush)
         {
             _d2d1SolidColorBrush = d2d1SolidColorBrush;
-            _d2d1Brush = new D2D1Brush(new ComPtr<TerraFX.Interop.ID2D1Brush>(_d2d1SolidColorBrush));
+            _d2d1Brush = new D2D1Brush(new ComPtr<ID2D1Brush>(_d2d1SolidColorBrush));
         }
 
         /// <inheritdoc />
@@ -33,7 +33,9 @@ namespace BouncyBox.VorpalEngine.Engine.DirectX.ComObjects
             set => Pointer->SetColor(&value);
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        ///     Proxies <see cref="ID2D1Brush.GetOpacity" /> and <see cref="ID2D1Brush.SetOpacity" />.
+        /// </summary>
         public float Opacity
         {
             get => _d2d1Brush.Opacity;
