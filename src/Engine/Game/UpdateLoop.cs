@@ -81,7 +81,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
         /// <param name="updateDelegate">A delegate that is invoked to update the game state.</param>
         /// <param name="cancellationToken">A cancellation token that, upon cancellation, will cause the loop to exit.</param>
         /// <exception cref="InvalidOperationException">Thrown when the thread executing this method is not the update thread.</exception>
-        public void Update(Action updateDelegate, CancellationToken cancellationToken)
+        public void Run(Action updateDelegate, CancellationToken cancellationToken)
         {
             _interfaces.ThreadManager.VerifyProcessThread(ProcessThread.Update);
 
@@ -93,6 +93,9 @@ namespace BouncyBox.VorpalEngine.Engine.Game
 
             while (!cancellationToken.IsCancellationRequested)
             {
+                // Handle dispatched messages
+                _globalMessagePublisherSubscriber.HandleDispatched();
+
                 // If the render window is minimized then don't update the game state
                 if (_isMinimized)
                 {
@@ -107,9 +110,6 @@ namespace BouncyBox.VorpalEngine.Engine.Game
 
                     continue;
                 }
-
-                // Handle dispatched messages
-                _globalMessagePublisherSubscriber.HandleDispatched();
 
                 long timestamp = Stopwatch.GetTimestamp();
 

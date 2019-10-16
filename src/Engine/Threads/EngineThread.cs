@@ -11,7 +11,12 @@
         Update,
 
         /// <summary>
-        ///     The render thread is used to render entities.
+        ///     The DirectX thread is used to initialize and release DirectX resources.
+        /// </summary>
+        DirectX,
+
+        /// <summary>
+        ///     The render thread is used to render render states.
         /// </summary>
         Render
     }

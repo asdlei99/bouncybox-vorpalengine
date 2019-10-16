@@ -24,7 +24,7 @@ namespace BouncyBox.VorpalEngine.Engine.Scenes
         bool Render(TRenderState renderState, IEngineStats engineStats);
 
         /// <summary>
-        ///     Instructs the global message publisher/subscriber to handle messages to which this object subscribed.
+        ///     Handles dispatched messages.
         /// </summary>
         void HandleDispatchedMessages();
     }

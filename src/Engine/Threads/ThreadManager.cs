@@ -22,6 +22,8 @@ namespace BouncyBox.VorpalEngine.Engine.Threads
         /// <exception cref="InvalidOperationException">Thrown when the thread executing this method is not the main thread.</exception>
         public ThreadManager(Thread mainThread)
         {
+            mainThread.Name = "Main Thread";
+
             _threadsByEngineThread.Add(ProcessThread.Main, mainThread);
 
             VerifyProcessThread(ProcessThread.Main);
@@ -75,7 +77,7 @@ namespace BouncyBox.VorpalEngine.Engine.Threads
             }
             if (currentThread != expectedThread)
             {
-                throw new InvalidOperationException($"Current thread should be {expectedThread.Name} but is actually {currentThread.Name}.");
+                throw new InvalidOperationException($"Current thread should be {expectedThread.Name} but is actually {currentThread.Name ?? "an unknown thread"}.");
             }
 #endif
         }

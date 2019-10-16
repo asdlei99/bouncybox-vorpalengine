@@ -447,8 +447,8 @@ namespace BouncyBox.VorpalEngine.Engine.Forms
         ///     </para>
         ///     <para>Publishes the <see cref="DisplayChangedMessage" /> global message.</para>
         /// </summary>
-        /// <exception>Thrown when <see cref="User32.GetMonitorInfo" /> failed.</exception>
-        /// <exception>Thrown when <see cref="User32.EnumDisplayDevices" /> failed.</exception>
+        /// <exception>Thrown when <see cref="User32.GetMonitorInfoW" /> failed.</exception>
+        /// <exception>Thrown when <see cref="User32.EnumDisplayDevicesW" /> failed.</exception>
         private unsafe void SetMonitorHandle()
         {
             IntPtr monitorHandle = User32.MonitorFromWindow(Handle, User32.MONITOR_DEFAULTTONEAREST);
@@ -462,27 +462,27 @@ namespace BouncyBox.VorpalEngine.Engine.Forms
 
             // Get display information
 
-            MONITORINFOEX monitorInfoEx;
+            MONITORINFOEXW monitorInfoExW;
 
-            monitorInfoEx._base.cbSize = (uint)sizeof(MONITORINFOEX);
+            monitorInfoExW._base.cbSize = (uint)sizeof(MONITORINFOEXW);
 
-            if (User32.GetMonitorInfo(monitorHandle, &monitorInfoEx._base) == Windows.FALSE)
+            if (User32.GetMonitorInfoW(monitorHandle, &monitorInfoExW._base) == Windows.FALSE)
             {
                 throw Win32ExceptionHelper.GetException();
             }
 
             // Get display device information for logging purposes
 
-            DISPLAY_DEVICE displayDevice;
+            DISPLAY_DEVICEW displayDeviceW;
 
-            displayDevice.cb = (uint)sizeof(DISPLAY_DEVICE);
+            displayDeviceW.cb = (uint)sizeof(DISPLAY_DEVICEW);
 
-            if (User32.EnumDisplayDevices(monitorInfoEx.szDevice, 0, &displayDevice, 0) == Windows.FALSE)
+            if (User32.EnumDisplayDevicesW(monitorInfoExW.szDevice, 0, &displayDeviceW, 0) == Windows.FALSE)
             {
                 throw Win32ExceptionHelper.GetException();
             }
 
-            var deviceString = new string((char*)displayDevice.DeviceString);
+            var deviceString = new string((char*)displayDeviceW.DeviceString);
 
             _serilogLogger.LogInformation("Display changed to {DeviceName} (0x{MonitorHandle})", deviceString, monitorHandle.ToString("X8"));
 

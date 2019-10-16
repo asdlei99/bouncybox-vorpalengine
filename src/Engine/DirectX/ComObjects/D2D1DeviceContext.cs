@@ -57,7 +57,8 @@ namespace BouncyBox.VorpalEngine.Engine.DirectX.ComObjects
         }
 
         /// <summary>
-        ///     Proxies <see cref="ID2D1DeviceContext.CreateSolidColorBrush" />.
+        ///     Proxies
+        ///     <see cref="ID2D1DeviceContext.CreateSolidColorBrush(TerraFX.Interop.DXGI_RGBA*,TerraFX.Interop.ID2D1SolidColorBrush**)" />.
         /// </summary>
         public D2D1SolidColorBrush CreateSolidColorBrush(DXGI_RGBA color, D2D1_BRUSH_PROPERTIES* brushProperties = null)
         {

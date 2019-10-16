@@ -84,7 +84,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
         /// <param name="cancellationToken">A cancellation token that, upon cancellation, will cause the loop to exit.</param>
         /// <exception cref="InvalidOperationException">Thrown when the thread executing this method is not the render thread.</exception>
         /// <exception>Thrown when <see cref="TerraFX.Interop.User32.GetClientRect" /> failed.</exception>
-        public unsafe void Render(IntPtr windowHandle, Action<TRenderState> renderDelegate, CancellationToken cancellationToken)
+        public unsafe void Run(IntPtr windowHandle, Action<TRenderState> renderDelegate, CancellationToken cancellationToken)
         {
             _interfaces.ThreadManager.VerifyProcessThread(ProcessThread.Render);
 

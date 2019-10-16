@@ -116,14 +116,14 @@ namespace BouncyBox.VorpalEngine.Engine.Game
 
             // Start tasks (cancellation is handled by the methods themselves)
 
-            _serilogLogger.LogDebug("Starting update and render tasks");
+            _serilogLogger.LogDebug("Starting threads");
 
             // ReSharper disable AccessToDisposedClosure
             // ReSharper disable ImplicitlyCapturedClosure
-            Interfaces.ThreadManager.StartEngineThread(EngineThread.Update, () => updateLoop.Update(() => _sceneManager.Update(), cancellationToken));
+            Interfaces.ThreadManager.StartEngineThread(EngineThread.Update, () => updateLoop.Run(() => _sceneManager.Update(), cancellationToken));
             Interfaces.ThreadManager.StartEngineThread(
                 EngineThread.Render,
-                () => renderLoop.Render(windowHandle, a => _sceneManager.Render(a, _engineStats), cancellationToken));
+                () => renderLoop.Run(windowHandle, a => _sceneManager.Render(a, _engineStats), cancellationToken));
             // ReSharper restore ImplicitlyCapturedClosure
             // ReSharper restore AccessToDisposedClosure
 
@@ -192,7 +192,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
         {
             MSG msg;
 
-            while (User32.PeekMessage(&msg, IntPtr.Zero, 0, 0, User32.PM_REMOVE) == Windows.TRUE)
+            while (User32.PeekMessageW(&msg, IntPtr.Zero, 0, 0, User32.PM_REMOVE) == Windows.TRUE)
             {
                 if (msg.message == User32.WM_QUIT)
                 {
@@ -200,7 +200,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
                 }
 
                 User32.TranslateMessage(&msg);
-                User32.DispatchMessage(&msg);
+                User32.DispatchMessageW(&msg);
             }
 
             return null;
