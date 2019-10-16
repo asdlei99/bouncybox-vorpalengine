@@ -6,51 +6,44 @@ using BouncyBox.VorpalEngine.Engine.Input.XInput;
 using BouncyBox.VorpalEngine.Engine.Logging;
 using BouncyBox.VorpalEngine.Engine.Messaging;
 using BouncyBox.VorpalEngine.Engine.Messaging.GlobalMessages;
+using BouncyBox.VorpalEngine.Engine.Threads;
 using ProcessThread = BouncyBox.VorpalEngine.Engine.Threads.ProcessThread;
 
 namespace BouncyBox.VorpalEngine.Engine.Game
 {
     /// <summary>
-    ///     Runs the update loop.
+    ///     An engine thread worker that updates the game state.
     /// </summary>
-    internal sealed class UpdateLoop : IDisposable
+    internal sealed class UpdateLoop : IEngineThreadWorker
     {
         private const double UpdatesPerSecondMultiplier = 1.15;
         private readonly EngineStats _engineStats;
-        private readonly ConcurrentMessagePublisherSubscriber<IGlobalMessage> _globalMessagePublisherSubscriber;
+        private readonly TimeSpan _engineStatsFrequency = TimeSpan.FromSeconds(1);
+        private readonly Stopwatch _engineStatsStopwatch = Stopwatch.StartNew();
         private readonly IInterfaces _interfaces;
+        private readonly TimeSpan _minimizedRenderWindowSleepDuration = TimeSpan.FromMilliseconds(100);
+        private readonly TimeSpan _renderWindowDeactivatedUpdatePeriod = TimeSpan.FromSeconds(1) / (30 * UpdatesPerSecondMultiplier);
         private readonly ContextSerilogLogger _serilogLogger;
-        private bool _isDisposed;
+        private readonly Action _updateDelegate;
+        private readonly EventFrequencyCalculator _upsCalculator = new EventFrequencyCalculator(true);
         private bool _isMinimized;
-        private bool _isRenderFormActivated;
+        private bool _isRenderWindowActivated;
         private TimeSpan _updatePeriod = TimeSpan.FromSeconds(1) / (60 * UpdatesPerSecondMultiplier); // Default to 60 Hz
 
         /// <summary>
-        ///     <para>Initializes a new instance of the <see cref="UpdateLoop" /> type.</para>
-        ///     <para>Subscribes to the <see cref="RefreshPeriodChangedMessage" /> global message.</para>
-        ///     <para>Subscribes to the <see cref="RenderWindowActivatedMessage" /> global message.</para>
-        ///     <para>Subscribes to the <see cref="RenderWindowDeactivatedMessage" /> global message.</para>
-        ///     <para>Subscribes to the <see cref="RenderWindowMinimizedMessage" /> global message.</para>
-        ///     <para>Subscribes to the <see cref="RenderWindowRestoredMessage" /> global message.</para>
+        ///     Initializes a new instance of the <see cref="UpdateLoop" /> type.
         /// </summary>
         /// <param name="interfaces">An <see cref="IInterfaces" /> implementation.</param>
         /// <param name="engineStats">An <see cref="IEngineStats" /> implementation.</param>
+        /// <param name="updateDelegate">A delegate that is invoked to update the game state.</param>
         /// <param name="context">A nested context.</param>
-        public UpdateLoop(IInterfaces interfaces, EngineStats engineStats, NestedContext context)
+        public UpdateLoop(IInterfaces interfaces, EngineStats engineStats, Action updateDelegate, NestedContext context)
         {
-            context = context.CopyAndPush(nameof(UpdateLoop));
-
             _interfaces = interfaces;
             _engineStats = engineStats;
+            _updateDelegate = updateDelegate;
             _serilogLogger = new ContextSerilogLogger(interfaces.SerilogLogger, context);
-            _globalMessagePublisherSubscriber =
-                ConcurrentMessagePublisherSubscriber<IGlobalMessage>
-                    .Create(interfaces, context)
-                    .Subscribe<RefreshPeriodChangedMessage>(HandleRefreshRateChangedMessage)
-                    .Subscribe<RenderWindowActivatedMessage>(HandleRenderWindowActivatedMessage)
-                    .Subscribe<RenderWindowDeactivatedMessage>(HandleRenderWindowDeactivatedMessage)
-                    .Subscribe<RenderWindowMinimizedMessage>(HandleRenderWindowMinimizedMessage)
-                    .Subscribe<RenderWindowRestoredMessage>(HandleRenderWindowRestoredMessage);
+            Context = context.CopyAndPush(nameof(UpdateLoop));
         }
 
         /// <summary>
@@ -63,85 +56,87 @@ namespace BouncyBox.VorpalEngine.Engine.Game
         /// </summary>
         /// <param name="interfaces">An <see cref="IInterfaces" /> implementation.</param>
         /// <param name="engineStats">An <see cref="IEngineStats" /> implementation.</param>
-        public UpdateLoop(IInterfaces interfaces, EngineStats engineStats)
-            : this(interfaces, engineStats, NestedContext.None())
+        /// <param name="updateDelegate">A delegate that is invoked to update the game state.</param>
+        public UpdateLoop(IInterfaces interfaces, EngineStats engineStats, Action updateDelegate)
+            : this(interfaces, engineStats, updateDelegate, NestedContext.None())
         {
         }
 
         /// <inheritdoc />
-        /// <exception cref="InvalidOperationException">Thrown when the thread executing this method is not the main thread.</exception>
-        public void Dispose()
+        public NestedContext Context { get; }
+
+        /// <summary>
+        ///     <para>Subscribes to global messages.</para>
+        ///     <para>Subscribes to the <see cref="RefreshPeriodChangedMessage" /> global message.</para>
+        ///     <para>Subscribes to the <see cref="RenderWindowActivatedMessage" /> global message.</para>
+        ///     <para>Subscribes to the <see cref="RenderWindowDeactivatedMessage" /> global message.</para>
+        ///     <para>Subscribes to the <see cref="RenderWindowMinimizedMessage" /> global message.</para>
+        ///     <para>Subscribes to the <see cref="RenderWindowRestoredMessage" /> global message.</para>
+        /// </summary>
+        /// <param name="globalMessagePublisherSubscriber">A global message publisher/subscriber.</param>
+        public void SubscribeToMessages(ConcurrentMessagePublisherSubscriber<IGlobalMessage> globalMessagePublisherSubscriber)
         {
-            DisposeHelper.Dispose(() => { _globalMessagePublisherSubscriber?.Dispose(); }, ref _isDisposed, _interfaces.ThreadManager, ProcessThread.Main);
+            globalMessagePublisherSubscriber
+                .Subscribe<RefreshPeriodChangedMessage>(HandleRefreshRateChangedMessage)
+                .Subscribe<RenderWindowActivatedMessage>(HandleRenderWindowActivatedMessage)
+                .Subscribe<RenderWindowDeactivatedMessage>(HandleRenderWindowDeactivatedMessage)
+                .Subscribe<RenderWindowMinimizedMessage>(HandleRenderWindowMinimizedMessage)
+                .Subscribe<RenderWindowRestoredMessage>(HandleRenderWindowRestoredMessage);
         }
 
+        /// <inheritdoc />
         /// <summary>
         ///     Executes the loop that updates the game state. The loop is exited via cancellation of the provided cancellation token.
         /// </summary>
-        /// <param name="updateDelegate">A delegate that is invoked to update the game state.</param>
-        /// <param name="cancellationToken">A cancellation token that, upon cancellation, will cause the loop to exit.</param>
         /// <exception cref="InvalidOperationException">Thrown when the thread executing this method is not the update thread.</exception>
-        public void Run(Action updateDelegate, CancellationToken cancellationToken)
+        public void DoWork(CancellationToken cancellationToken)
         {
             _interfaces.ThreadManager.VerifyProcessThread(ProcessThread.Update);
 
-            TimeSpan renderFormDeactivatedUpdatePeriod = TimeSpan.FromSeconds(1) / (30 * UpdatesPerSecondMultiplier); // 30 Hz
-            var upsCalculator = new EventFrequencyCalculator(true);
-            Stopwatch engineStatsStopwatch = Stopwatch.StartNew();
-            TimeSpan engineStatsFrequency = TimeSpan.FromSeconds(1);
-            TimeSpan minimizedRenderFormSleepDuration = TimeSpan.FromMilliseconds(100);
-
-            while (!cancellationToken.IsCancellationRequested)
+            // If the render window is minimized then don't update the game state
+            if (_isMinimized)
             {
-                // Handle dispatched messages
-                _globalMessagePublisherSubscriber.HandleDispatched();
+                // Reduce CPU utilization
+                Thread.Sleep(_minimizedRenderWindowSleepDuration);
 
-                // If the render window is minimized then don't update the game state
-                if (_isMinimized)
-                {
-                    do
-                    {
-                        // Handle dispatched messages
-                        _globalMessagePublisherSubscriber.HandleDispatched();
-
-                        // Reduce CPU utilization
-                        Thread.Sleep(minimizedRenderFormSleepDuration);
-                    } while (_isMinimized);
-
-                    continue;
-                }
-
-                long timestamp = Stopwatch.GetTimestamp();
-
-                // Update
-                updateDelegate();
-
-                // Throttle updating if the render window is deactivated
-                TimeSpan sleepDuration =
-                    (_isRenderFormActivated ? _updatePeriod : renderFormDeactivatedUpdatePeriod) - TimeSpan.FromTicks(Stopwatch.GetTimestamp() - timestamp);
-
-                if (sleepDuration > TimeSpan.Zero)
-                {
-                    // Sleep until the next update period
-                    Thread.Sleep(sleepDuration);
-                }
-
-                // Calculate engine stats
-                upsCalculator.IncrementEvents();
-
-                if (engineStatsStopwatch.Elapsed < engineStatsFrequency)
-                {
-                    continue;
-                }
-
-                // Update engine stats
-                _engineStats.UpdatesPerSecond = upsCalculator.GetFrequency();
-
-                // Reset engine stats
-
-                upsCalculator.Restart();
-                engineStatsStopwatch.Restart();
+                return;
             }
+
+            long timestamp = Stopwatch.GetTimestamp();
+
+            // Update
+            _updateDelegate();
+
+            // Throttle updating if the render window is deactivated
+            TimeSpan sleepDuration =
+                (_isRenderWindowActivated ? _updatePeriod : _renderWindowDeactivatedUpdatePeriod) - TimeSpan.FromTicks(Stopwatch.GetTimestamp() - timestamp);
+
+            if (sleepDuration > TimeSpan.Zero)
+            {
+                // Sleep until the next update period
+                Thread.Sleep(sleepDuration);
+            }
+
+            // Calculate engine stats
+            _upsCalculator.IncrementEvents();
+
+            if (_engineStatsStopwatch.Elapsed < _engineStatsFrequency)
+            {
+                return;
+            }
+
+            // Update engine stats
+            _engineStats.UpdatesPerSecond = _upsCalculator.GetFrequency();
+
+            // Reset engine stats
+
+            _upsCalculator.Restart();
+            _engineStatsStopwatch.Restart();
+        }
+
+        /// <inheritdoc />
+        public void CleanUp()
+        {
         }
 
         /// <summary>
@@ -164,7 +159,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
             // The underlying XInputEnable API is technically obsolete
             Gamepad.Enable();
 
-            _isRenderFormActivated = true;
+            _isRenderWindowActivated = true;
         }
 
         /// <summary>
@@ -176,7 +171,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
             // The underlying XInputEnable API is technically obsolete
             Gamepad.Disable();
 
-            _isRenderFormActivated = false;
+            _isRenderWindowActivated = false;
         }
 
         /// <summary>

@@ -28,6 +28,7 @@ namespace BouncyBox.VorpalEngine.Engine.Forms
         private readonly ContextSerilogLogger _serilogLogger;
         private bool _isActivated;
         private bool _isMinimized;
+        private bool _isRenderingStopped;
         private bool _isUserMovingOrResizing;
         private IntPtr? _monitorHandle;
         private Size _requestedResolution;
@@ -44,6 +45,7 @@ namespace BouncyBox.VorpalEngine.Engine.Forms
         ///     </para>
         ///     <para>Subscribes to the <see cref="ResolutionRequestedMessage" /> global message.</para>
         ///     <para>Subscribes to the <see cref="WindowedModeRequestedMessage" /> global message.</para>
+        ///     <para>Publishes to the <see cref="RenderWindowHandleCreatedMessage" /> global message.</para>
         /// </summary>
         /// <param name="interfaces">An <see cref="IInterfaces" /> implementation.</param>
         /// <param name="programOptions">Parsed command line arguments.</param>
@@ -60,21 +62,24 @@ namespace BouncyBox.VorpalEngine.Engine.Forms
                 ConcurrentMessagePublisherSubscriber<IGlobalMessage>
                     .Create(interfaces, context)
                     .Subscribe<ResolutionRequestedMessage>(HandleResolutionRequestedMessage)
-                    .Subscribe<WindowedModeRequestedMessage>(HandleWindowedModeRequestedMessage);
-
-            SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.Opaque, true);
-
-            Icon = interfaces.CommonGameSettings.Icon;
-            StartPosition = FormStartPosition.Manual;
-            Text = interfaces.CommonGameSettings.Title;
-            MaximizeBox = interfaces.CommonGameSettings.AllowUserResizing;
-            SetFormBorderStyle();
+                    .Subscribe<WindowedModeRequestedMessage>(HandleWindowedModeRequestedMessage)
+                    .Subscribe<EngineThreadsTerminatedMessage>(HandleEngineThreadsTerminatedMessage);
 
             using (_ignoreWmSize.Set())
             {
+                SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.Opaque, true);
+
+                Icon = interfaces.CommonGameSettings.Icon;
+                StartPosition = FormStartPosition.Manual;
+                Text = interfaces.CommonGameSettings.Title;
+                MaximizeBox = interfaces.CommonGameSettings.AllowUserResizing;
+                SetFormBorderStyle();
+
                 SetWindowedMode(interfaces.CommonGameSettings.WindowedMode);
                 SetResolution(interfaces.CommonGameSettings.RequestedResolution, false);
             }
+
+            _globalMessagePublisherSubscriber.Publish(new RenderWindowHandleCreatedMessage(Handle));
 
             SetMonitorHandle();
 
@@ -152,6 +157,12 @@ namespace BouncyBox.VorpalEngine.Engine.Forms
                 case User32.WM_ACTIVATEAPP:
                     HandleWindowActivation(ref m);
                     break;
+                case User32.WM_CLOSE:
+                    if (HandleClose(ref m) == HandleResult.Return)
+                    {
+                        return;
+                    }
+                    break;
                 case User32.WM_DESTROY:
                     HandleWindowDestruction();
                     return;
@@ -211,6 +222,28 @@ namespace BouncyBox.VorpalEngine.Engine.Forms
 
             // Reset keyboard state to prevent "key up" messages with no earlier "key down" message
             _interfaces.Keyboard.Reset();
+        }
+
+        /// <summary>
+        ///     <para>Handles the <see cref="User32.WM_CLOSE" /> message.</para>
+        ///     <para>Publishes the <see cref="RenderWindowClosingMessage" /> global message.</para>
+        /// </summary>
+        private HandleResult HandleClose(ref Message message)
+        {
+            message.Result = IntPtr.Zero;
+
+            // Only allow the window to close if engine threads have been terminated
+            if (_isRenderingStopped)
+            {
+                return HandleResult.InvokeBaseWndProc;
+            }
+
+            // Hide the window while waiting for engine threads to terminate
+            Visible = false;
+
+            _globalMessagePublisherSubscriber.Publish<RenderWindowClosingMessage>();
+
+            return HandleResult.Return;
         }
 
         /// <summary>
@@ -609,6 +642,17 @@ namespace BouncyBox.VorpalEngine.Engine.Forms
         private void HandleWindowedModeRequestedMessage(WindowedModeRequestedMessage message)
         {
             SetWindowedMode(message.Mode);
+        }
+
+        /// <summary>
+        ///     Handles the <see cref="EngineThreadsTerminatedMessage" /> global message.
+        /// </summary>
+        /// <param name="message">The message being handled.</param>
+        private void HandleEngineThreadsTerminatedMessage(EngineThreadsTerminatedMessage message)
+        {
+            _isRenderingStopped = true;
+
+            Close();
         }
 
         /// <summary>

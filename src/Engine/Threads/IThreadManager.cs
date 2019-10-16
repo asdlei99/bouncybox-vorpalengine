@@ -9,12 +9,19 @@ namespace BouncyBox.VorpalEngine.Engine.Threads
     public interface IThreadManager : IDisposable
     {
         /// <summary>
-        ///     Starts and tracks an engine thread.
+        ///     Starts an engine thread.
         /// </summary>
-        /// <param name="thread">The engine thread to start and track.</param>
-        /// <param name="delegate">A delegate to invoke when the thread spawns.</param>
+        /// <param name="interfaces">An <see cref="IInterfaces" /> implementation.</param>
+        /// <param name="threadWorker">A thread worker.</param>
+        /// <param name="thread">The engine thread to start.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        void StartEngineThread(EngineThread thread, Action @delegate);
+        void StartEngineThread(IInterfaces interfaces, IEngineThreadWorker threadWorker, EngineThread thread);
+
+        /// <summary>
+        ///     Stops all engine threads.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        void StopEngineThreads();
 
         /// <summary>
         ///     Verifies that the currently-executing thread is the specified thread.

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
-using System.Threading;
 using BouncyBox.VorpalEngine.Engine.Bootstrap;
 using BouncyBox.VorpalEngine.Engine.Forms;
 using BouncyBox.VorpalEngine.Engine.Logging;
@@ -19,7 +18,6 @@ namespace BouncyBox.VorpalEngine.Engine.Game
         where TRenderState : class, new()
         where TSceneKey : struct, Enum
     {
-        private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
         private readonly EngineStats _engineStats = new EngineStats();
         private readonly IGameExecutionStateManager _gameExecutionStateManager;
         private readonly ConcurrentMessagePublisherSubscriber<IGlobalMessage> _globalMessagePublisherSubscriber;
@@ -55,7 +53,10 @@ namespace BouncyBox.VorpalEngine.Engine.Game
             _sceneManager = sceneManager;
             _programOptions = programOptions;
             _serilogLogger = new ContextSerilogLogger(interfaces.SerilogLogger, context);
-            _globalMessagePublisherSubscriber = ConcurrentMessagePublisherSubscriber<IGlobalMessage>.Create(interfaces, context);
+            _globalMessagePublisherSubscriber =
+                ConcurrentMessagePublisherSubscriber<IGlobalMessage>
+                    .Create(interfaces, context)
+                    .Subscribe<RenderWindowClosingMessage>(HandleRenderWindowClosingMessage);
         }
 
         /// <summary>
@@ -88,7 +89,6 @@ namespace BouncyBox.VorpalEngine.Engine.Game
                 () =>
                 {
                     _globalMessagePublisherSubscriber.Dispose();
-                    _cancellationTokenSource.Dispose();
                     _renderForm?.Dispose();
                 },
                 ref _isDisposed);
@@ -102,8 +102,8 @@ namespace BouncyBox.VorpalEngine.Engine.Game
         /// <returns>Returns the result of the run.</returns>
         public RunResult Run(TSceneKey initialSceneKey)
         {
-            using var updateLoop = new UpdateLoop(Interfaces, _engineStats);
-            using var renderLoop = new RenderLoop<TRenderState>(Interfaces, _renderStateManager, _engineStats);
+            var updateLoop = new UpdateLoop(Interfaces, _engineStats, () => _sceneManager.Update());
+            var renderLoop = new RenderLoop<TRenderState>(Interfaces, _renderStateManager, _engineStats, a => _sceneManager.Render(a, _engineStats));
 
             // Create render window
 
@@ -111,34 +111,17 @@ namespace BouncyBox.VorpalEngine.Engine.Game
 
             _renderForm = new RenderForm(Interfaces, _programOptions);
 
-            IntPtr windowHandle = _renderForm.Handle;
-            CancellationToken cancellationToken = _cancellationTokenSource.Token;
-
             // Start tasks (cancellation is handled by the methods themselves)
 
             _serilogLogger.LogDebug("Starting threads");
 
-            // ReSharper disable AccessToDisposedClosure
-            // ReSharper disable ImplicitlyCapturedClosure
-            Interfaces.ThreadManager.StartEngineThread(EngineThread.Update, () => updateLoop.Run(() => _sceneManager.Update(), cancellationToken));
-            Interfaces.ThreadManager.StartEngineThread(
-                EngineThread.Render,
-                () => renderLoop.Run(windowHandle, a => _sceneManager.Render(a, _engineStats), cancellationToken));
-            // ReSharper restore ImplicitlyCapturedClosure
-            // ReSharper restore AccessToDisposedClosure
+            Interfaces.ThreadManager.StartEngineThread(Interfaces, updateLoop, EngineThread.Update);
+            Interfaces.ThreadManager.StartEngineThread(Interfaces, renderLoop, EngineThread.Render);
 
-            // Attach event handlers
+            // Show the render window
 
             _serilogLogger.LogDebug("Showing render window");
 
-            void RenderFormOnClosed(object? sender, EventArgs e)
-            {
-                _cancellationTokenSource.Cancel();
-            }
-
-            _renderForm.Closed += RenderFormOnClosed;
-
-            // Show the render window
             _renderForm.Show();
 
             // Load the initial scene
@@ -168,10 +151,6 @@ namespace BouncyBox.VorpalEngine.Engine.Game
                 _gameExecutionStateManager.HandleDispatchedMessages();
                 _sceneManager.HandleDispatchedMessages();
             } while (wParam == null);
-
-            // Detach event handlers
-
-            _renderForm.Closed -= RenderFormOnClosed;
 
             return RunResult.Success;
         }
@@ -204,6 +183,18 @@ namespace BouncyBox.VorpalEngine.Engine.Game
             }
 
             return null;
+        }
+
+        /// <summary>
+        ///     <para>Handles the <see cref="RenderWindowClosingMessage" /> global message.</para>
+        ///     <para>Publishes the <see cref="EngineThreadsTerminatedMessage" /> global message.</para>
+        /// </summary>
+        /// <param name="message">The message being handled.</param>
+        private void HandleRenderWindowClosingMessage(RenderWindowClosingMessage message)
+        {
+            Interfaces.ThreadManager.StopEngineThreads();
+
+            Interfaces.GlobalConcurrentMessageQueue.Publish<EngineThreadsTerminatedMessage>();
         }
     }
 }

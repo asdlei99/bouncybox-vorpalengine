@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using BouncyBox.VorpalEngine.Engine.Messaging;
 using EnumsNET;
 
 namespace BouncyBox.VorpalEngine.Engine.Threads
@@ -12,7 +13,8 @@ namespace BouncyBox.VorpalEngine.Engine.Threads
     /// </summary>
     public class ThreadManager : IThreadManager
     {
-        private readonly Dictionary<ProcessThread, Thread> _threadsByEngineThread = new Dictionary<ProcessThread, Thread>();
+        private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+        private readonly Dictionary<ProcessThread, ThreadWrapper> _threadsByEngineThread = new Dictionary<ProcessThread, ThreadWrapper>();
         private bool _isDisposed;
 
         /// <summary>
@@ -24,7 +26,7 @@ namespace BouncyBox.VorpalEngine.Engine.Threads
         {
             mainThread.Name = "Main Thread";
 
-            _threadsByEngineThread.Add(ProcessThread.Main, mainThread);
+            _threadsByEngineThread.Add(ProcessThread.Main, new ThreadWrapper(mainThread));
 
             VerifyProcessThread(ProcessThread.Main);
         }
@@ -33,29 +35,32 @@ namespace BouncyBox.VorpalEngine.Engine.Threads
         /// <exception cref="InvalidOperationException">Thrown when the specified thread is already started.</exception>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void StartEngineThread(EngineThread thread, Action @delegate)
+        public void StartEngineThread(IInterfaces interfaces, IEngineThreadWorker threadWorker, EngineThread thread)
         {
             VerifyProcessThread(ProcessThread.Main);
 
             var processThread = Enums.Parse<ProcessThread>(thread.GetName());
-            string threadName = thread.GetName();
+            string name = thread.GetName();
 
             if (_threadsByEngineThread.ContainsKey(processThread))
             {
-                throw new InvalidOperationException($"{threadName} thread is already started.");
+                throw new InvalidOperationException($"{name} thread is already started.");
             }
 
-            var newThread =
-                new Thread(
-                    () =>
-                    {
-                        Thread.CurrentThread.Name = $"{threadName} Thread";
-                        @delegate();
-                    });
+            _threadsByEngineThread.Add(processThread, new ThreadWrapper(interfaces, threadWorker, name, _cancellationTokenSource.Token));
+        }
 
-            _threadsByEngineThread.Add(processThread, newThread);
+        /// <inheritdoc />
+        [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void StopEngineThreads()
+        {
+            _cancellationTokenSource.Cancel();
 
-            newThread.Start();
+            foreach (ThreadWrapper threadWrapper in _threadsByEngineThread.Values)
+            {
+                threadWrapper.WaitForCompletion();
+            }
         }
 
         /// <summary>
@@ -69,23 +74,83 @@ namespace BouncyBox.VorpalEngine.Engine.Threads
         public void VerifyProcessThread(ProcessThread thread)
         {
 #if DEBUG
-            Thread currentThread = Thread.CurrentThread;
-
-            if (!_threadsByEngineThread.TryGetValue(thread, out Thread? expectedThread))
+            if (!_threadsByEngineThread.TryGetValue(thread, out ThreadWrapper? expectedThreadWrapper))
             {
                 throw new InvalidOperationException($"{thread} thread has not been started.");
             }
-            if (currentThread != expectedThread)
-            {
-                throw new InvalidOperationException($"Current thread should be {expectedThread.Name} but is actually {currentThread.Name ?? "an unknown thread"}.");
-            }
+
+            expectedThreadWrapper.Verify();
 #endif
         }
 
         /// <inheritdoc />
         public void Dispose()
         {
-            DisposeHelper.Dispose(_threadsByEngineThread.Clear, ref _isDisposed);
+            DisposeHelper.Dispose(
+                () =>
+                {
+                    _threadsByEngineThread.Clear();
+                    _cancellationTokenSource.Dispose();
+                },
+                ref _isDisposed,
+                this,
+                ProcessThread.Main);
+        }
+
+        private class ThreadWrapper
+        {
+            private readonly ManualResetEventSlim _manualResetEvent = new ManualResetEventSlim();
+            private readonly Thread _thread;
+
+            public ThreadWrapper(Thread thread)
+            {
+                _thread = thread;
+                _manualResetEvent.Set();
+            }
+
+            public ThreadWrapper(IInterfaces interfaces, IEngineThreadWorker threadWorker, string name, CancellationToken cancellationToken)
+            {
+                _thread = new Thread(
+                    () =>
+                    {
+                        ConcurrentMessagePublisherSubscriber<IGlobalMessage> globalMessagePublisherSubscriber =
+                            ConcurrentMessagePublisherSubscriber<IGlobalMessage>
+                                .Create(interfaces, threadWorker.Context);
+
+                        Thread.CurrentThread.Name = $"{name} Thread";
+
+                        threadWorker.SubscribeToMessages(globalMessagePublisherSubscriber);
+
+                        while (!cancellationToken.IsCancellationRequested)
+                        {
+                            // Handle dispatched messages
+                            globalMessagePublisherSubscriber.HandleDispatched();
+
+                            threadWorker.DoWork(cancellationToken);
+                        }
+
+                        threadWorker.CleanUp();
+
+                        _manualResetEvent.Set();
+                    });
+
+                _thread.Start();
+            }
+
+            public void Verify()
+            {
+                Thread actualThread = Thread.CurrentThread;
+
+                if (actualThread != _thread)
+                {
+                    throw new InvalidOperationException($"Current thread should be {_thread.Name} but is actually {actualThread.Name ?? "an unknown thread"}.");
+                }
+            }
+
+            public void WaitForCompletion()
+            {
+                _manualResetEvent.Wait();
+            }
         }
     }
 }
