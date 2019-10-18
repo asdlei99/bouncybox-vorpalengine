@@ -13,9 +13,7 @@ namespace BouncyBox.VorpalEngine.Engine.Logging
         private readonly NestedContext _context;
         private readonly ISerilogLogger _serilogLogger;
 
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="ContextSerilogLogger" /> type.
-        /// </summary>
+        /// <summary>Initializes a new instance of the <see cref="ContextSerilogLogger" /> type.</summary>
         /// <param name="serilogLogger">An <see cref="ISerilogLogger" /> implementation.</param>
         /// <param name="context">A nested context.</param>
         public ContextSerilogLogger(ISerilogLogger serilogLogger, NestedContext context)
@@ -114,9 +112,7 @@ namespace BouncyBox.VorpalEngine.Engine.Logging
             _serilogLogger.CloseAndFlush();
         }
 
-        /// <summary>
-        ///     Formats the message template to include a prepended nested context string.
-        /// </summary>
+        /// <summary>Formats the message template to include a prepended nested context string.</summary>
         /// <param name="messageTemplate">A Serilog message template.</param>
         /// <returns>Returns the new message template.</returns>
         private string FormatMessageTemplate(string? messageTemplate)

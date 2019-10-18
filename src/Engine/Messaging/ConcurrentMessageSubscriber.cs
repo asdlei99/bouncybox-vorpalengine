@@ -3,9 +3,7 @@ using System.Collections.Generic;
 
 namespace BouncyBox.VorpalEngine.Engine.Messaging
 {
-    /// <summary>
-    ///     Proxies subscriptions to a concurrent message queue in order to make unsubscription easier.
-    /// </summary>
+    /// <summary>Proxies subscriptions to a concurrent message queue in order to make unsubscription easier.</summary>
     public class ConcurrentMessageSubscriber<TMessageBase> : IDisposable
         where TMessageBase : IGlobalMessage
     {
@@ -14,9 +12,7 @@ namespace BouncyBox.VorpalEngine.Engine.Messaging
         private readonly HashSet<SubscriptionToken> _tokens = new HashSet<SubscriptionToken>();
         private bool _isDisposed;
 
-        /// <summary>
-        ///     Initializes a new instance of <see cref="ConcurrentMessageSubscriber{TMessageBase}" />.
-        /// </summary>
+        /// <summary>Initializes a new instance of <see cref="ConcurrentMessageSubscriber{TMessageBase}" />.</summary>
         /// <param name="messageQueue">A concurrent message queue.</param>
         /// <param name="context">A nested context.</param>
         public ConcurrentMessageSubscriber(IConcurrentMessageQueue<TMessageBase> messageQueue, NestedContext context)

@@ -22,9 +22,7 @@ namespace BouncyBox.VorpalEngine.Engine
 
         private string DebuggerDisplay => "Flag = " + Flag;
 
-        /// <summary>
-        ///     Decrements the counter by one.
-        /// </summary>
+        /// <summary>Decrements the counter by one.</summary>
         public void Dispose()
         {
             DisposeHelper.Dispose(() => { _counter = System.Math.Max(0, _counter - 1); }, ref _isDisposed);
@@ -42,9 +40,7 @@ namespace BouncyBox.VorpalEngine.Engine
             return this;
         }
 
-        /// <summary>
-        ///     Returns the flag.
-        /// </summary>
+        /// <summary>Returns the flag.</summary>
         public static implicit operator bool(ContextFlag contextFlag)
         {
             return contextFlag.Flag;

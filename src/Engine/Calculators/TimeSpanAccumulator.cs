@@ -2,22 +2,16 @@
 
 namespace BouncyBox.VorpalEngine.Engine.Calculators
 {
-    /// <summary>
-    ///     Accumulates <see cref="TimeSpan" /> values.
-    /// </summary>
+    /// <summary>Accumulates <see cref="TimeSpan" /> values.</summary>
     public class TimeSpanAccumulator : Accumulator<TimeSpan>
     {
         /// <inheritdoc />
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="TimeSpanAccumulator" /> type.
-        /// </summary>
+        /// <summary>Initializes a new instance of the <see cref="TimeSpanAccumulator" /> type.</summary>
         public TimeSpanAccumulator(int capacity) : base(capacity)
         {
         }
 
-        /// <summary>
-        ///     Gets the mean of the accumulated values.
-        /// </summary>
+        /// <summary>Gets the mean of the accumulated values.</summary>
         public TimeSpan? Mean
         {
             get
@@ -34,9 +28,7 @@ namespace BouncyBox.VorpalEngine.Engine.Calculators
             }
         }
 
-        /// <summary>
-        ///     Gets the minimum accumulated value.
-        /// </summary>
+        /// <summary>Gets the minimum accumulated value.</summary>
         public TimeSpan? Minimum
         {
             get
@@ -56,9 +48,7 @@ namespace BouncyBox.VorpalEngine.Engine.Calculators
             }
         }
 
-        /// <summary>
-        ///     Gets the maximum accumulated value.
-        /// </summary>
+        /// <summary>Gets the maximum accumulated value.</summary>
         public TimeSpan? Maximum
         {
             get

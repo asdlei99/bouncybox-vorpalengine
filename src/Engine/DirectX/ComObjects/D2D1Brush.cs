@@ -9,9 +9,7 @@ namespace BouncyBox.VorpalEngine.Engine.DirectX.ComObjects
         private ComPtr<ID2D1Brush> _d2d1Brush;
 
         /// <inheritdoc />
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="D2D1Brush" /> type.
-        /// </summary>
+        /// <summary>Initializes a new instance of the <see cref="D2D1Brush" /> type.</summary>
         public D2D1Brush(ComPtr<ID2D1Brush> d2d1Brush)
         {
             _d2d1Brush = d2d1Brush;
@@ -20,9 +18,7 @@ namespace BouncyBox.VorpalEngine.Engine.DirectX.ComObjects
         /// <inheritdoc />
         public override ID2D1Brush* Pointer => _d2d1Brush;
 
-        /// <summary>
-        ///     Proxies <see cref="ID2D1Brush.GetOpacity" /> and <see cref="ID2D1Brush.SetOpacity" />.
-        /// </summary>
+        /// <summary>Proxies <see cref="ID2D1Brush.GetOpacity" /> and <see cref="ID2D1Brush.SetOpacity" />.</summary>
         public float Opacity
         {
             get => Pointer->GetOpacity();

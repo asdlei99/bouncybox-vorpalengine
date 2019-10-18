@@ -5,16 +5,15 @@ using TerraFX.Interop;
 
 namespace BouncyBox.VorpalEngine.Engine.DirectX.ComObjects
 {
-    /// <summary>
-    ///     Proxies the <see cref="IDWriteFactory1" /> COM interface.
-    /// </summary>
+    /// <summary>Proxies the <see cref="IDWriteFactory1" /> COM interface.</summary>
     public unsafe class DWriteFactory1 : ComObject<IDWriteFactory1>
     {
         private ComPtr<IDWriteFactory1> _dWriteFactory1;
 
         /// <inheritdoc />
         /// <summary>
-        ///     Initializes a new instance of the <see cref="DWriteFactory1" /> type by proxying <see cref="DWrite.DWriteCreateFactory" />.
+        ///     Initializes a new instance of the <see cref="DWriteFactory1" /> type by proxying
+        ///     <see cref="DWrite.DWriteCreateFactory" />.
         /// </summary>
         public DWriteFactory1()
         {
@@ -32,9 +31,7 @@ namespace BouncyBox.VorpalEngine.Engine.DirectX.ComObjects
         /// <inheritdoc />
         public override IDWriteFactory1* Pointer => _dWriteFactory1;
 
-        /// <summary>
-        ///     Proxies <see cref="IDWriteFactory1.CreateTextFormat" />.
-        /// </summary>
+        /// <summary>Proxies <see cref="IDWriteFactory1.CreateTextFormat" />.</summary>
         public DWriteTextFormat CreateTextFormat(
             ReadOnlySpan<char> fontFamilyName,
             float fontSize,

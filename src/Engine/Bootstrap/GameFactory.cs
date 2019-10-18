@@ -23,9 +23,7 @@ using Serilog;
 
 namespace BouncyBox.VorpalEngine.Engine.Bootstrap
 {
-    /// <summary>
-    ///     Creates and runs games.
-    /// </summary>
+    /// <summary>Creates and runs games.</summary>
     public static class GameFactory
     {
         private static readonly IReadOnlyDictionary<RunResult, int> ExitCodesByRunResult =
@@ -158,9 +156,7 @@ namespace BouncyBox.VorpalEngine.Engine.Bootstrap
             return exitCode;
         }
 
-        /// <summary>
-        ///     Creates the application's Serilog logger.
-        /// </summary>
+        /// <summary>Creates the application's Serilog logger.</summary>
         /// <param name="options">Program options.</param>
         /// <returns>Returns the Serilog logger.</returns>
         private static ISerilogLogger CreateLogger(ProgramOptions options)

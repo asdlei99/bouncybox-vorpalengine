@@ -14,9 +14,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities.Updaters
     {
         private bool _isDisposed;
 
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="Updater{TRenderState}" /> type.
-        /// </summary>
+        /// <summary>Initializes a new instance of the <see cref="Updater{TRenderState}" /> type.</summary>
         /// <param name="interfaces">An <see cref="IInterfaces" /> implementation.</param>
         /// <param name="context">A nested context.</param>
         /// <param name="order">The entity order. The order must be unique for all updaters in an <see cref="EntityCollection{TEntity}" />.</param>
@@ -29,23 +27,17 @@ namespace BouncyBox.VorpalEngine.Engine.Entities.Updaters
             UpdateMessagePublisherSubscriber = MessagePublisherSubscriber<IUpdateMessage>.Create(interfaces.UpdateMessageQueue, context);
         }
 
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="Updater{TRenderState}" /> type.
-        /// </summary>
+        /// <summary>Initializes a new instance of the <see cref="Updater{TRenderState}" /> type.</summary>
         /// <param name="interfaces">An <see cref="IInterfaces" /> implementation.</param>
         /// <param name="order">The entity order. The order must be unique for all updaters in an <see cref="EntityCollection{TEntity}" />.</param>
         protected Updater(IInterfaces interfaces, uint order = 0) : this(interfaces, new NestedContext("Updater"), order)
         {
         }
 
-        /// <summary>
-        ///     Gets the nested context.
-        /// </summary>
+        /// <summary>Gets the nested context.</summary>
         protected NestedContext Context { get; }
 
-        /// <summary>
-        ///     Gets the <see cref="IInterfaces" /> implementation.
-        /// </summary>
+        /// <summary>Gets the <see cref="IInterfaces" /> implementation.</summary>
         protected IInterfaces Interfaces { get; }
 
         /// <summary>
@@ -74,29 +66,19 @@ namespace BouncyBox.VorpalEngine.Engine.Entities.Updaters
         /// </summary>
         protected MessagePublisherSubscriber<IUpdateMessage> UpdateMessagePublisherSubscriber { get; }
 
-        /// <summary>
-        ///     Gets a value indicating if the updater is neither paused nor suspended.
-        /// </summary>
+        /// <summary>Gets a value indicating if the updater is neither paused nor suspended.</summary>
         protected bool IsRunning => !IsPaused && !IsSuspended;
 
-        /// <summary>
-        ///     Gets a value indicating if the updater is paused.
-        /// </summary>
+        /// <summary>Gets a value indicating if the updater is paused.</summary>
         protected bool IsPaused { get; private set; }
 
-        /// <summary>
-        ///     Gets a value indicating if the updater is suspended.
-        /// </summary>
+        /// <summary>Gets a value indicating if the updater is suspended.</summary>
         protected bool IsSuspended { get; private set; }
 
-        /// <summary>
-        ///     Gets or sets a value that determines whether to update when the game execution state is paused.
-        /// </summary>
+        /// <summary>Gets or sets a value that determines whether to update when the game execution state is paused.</summary>
         protected virtual bool UpdateWhenPaused { get; set; } = true;
 
-        /// <summary>
-        ///     Gets or sets a value that determines whether to update when the game execution state is suspended.
-        /// </summary>
+        /// <summary>Gets or sets a value that determines whether to update when the game execution state is suspended.</summary>
         protected virtual bool UpdateWhenSuspended { get; set; } = false;
 
         /// <inheritdoc />
@@ -264,9 +246,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities.Updaters
         {
         }
 
-        /// <summary>
-        ///     Determines if the entity should update game state and prepare render state.
-        /// </summary>
+        /// <summary>Determines if the entity should update game state and prepare render state.</summary>
         /// <returns>Returns a value indicating whether the entity should update game state and prepare render state.</returns>
         private bool ShouldUpdateGameStateAndPrepareRenderState()
         {

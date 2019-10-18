@@ -3,14 +3,10 @@ using System.Diagnostics;
 
 namespace BouncyBox.VorpalEngine.Engine.Math
 {
-    /// <summary>
-    ///     A sine wave that makes it easier to calculate a Y-axis value as a function of wave shape and time.
-    /// </summary>
+    /// <summary>A sine wave that makes it easier to calculate a Y-axis value as a function of wave shape and time.</summary>
     public class SineWave : Wave
     {
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="SineWave" /> type.
-        /// </summary>
+        /// <summary>Initializes a new instance of the <see cref="SineWave" /> type.</summary>
         /// <param name="trough">The Y-axis value for the trough of the wave.</param>
         /// <param name="crest">The Y-axis value for the crest of the wave.</param>
         /// <param name="wavelength">The wavelength.</param>
@@ -27,9 +23,7 @@ namespace BouncyBox.VorpalEngine.Engine.Math
         {
         }
 
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="SineWave" /> type.
-        /// </summary>
+        /// <summary>Initializes a new instance of the <see cref="SineWave" /> type.</summary>
         /// <param name="trough">The Y-axis value for the trough of the wave.</param>
         /// <param name="crest">The Y-axis value for the crest of the wave.</param>
         /// <param name="wavelength">The wavelength.</param>

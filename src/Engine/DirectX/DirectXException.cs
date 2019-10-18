@@ -4,9 +4,7 @@ using System.Runtime.Serialization;
 namespace BouncyBox.VorpalEngine.Engine.DirectX
 {
     /// <inheritdoc />
-    /// <summary>
-    ///     Exception thrown when an error occurs interacting with DirectX COM objects.
-    /// </summary>
+    /// <summary>Exception thrown when an error occurs interacting with DirectX COM objects.</summary>
     [Serializable]
     internal class DirectXException : Exception
     {

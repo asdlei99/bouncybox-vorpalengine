@@ -4,9 +4,7 @@ using EnumsNET;
 
 namespace BouncyBox.VorpalEngine.Engine.Input.XInput
 {
-    /// <summary>
-    ///     A stateful XInput gamepad.
-    /// </summary>
+    /// <summary>A stateful XInput gamepad.</summary>
     public class StatefulGamepad : IStatefulGamepad
     {
         private readonly HashSet<XInputVirtualKey> _downKeys = new HashSet<XInputVirtualKey>();
@@ -14,9 +12,7 @@ namespace BouncyBox.VorpalEngine.Engine.Input.XInput
         private readonly HashSet<XInputVirtualKey> _repeatKeys = new HashSet<XInputVirtualKey>();
         private readonly HashSet<XInputVirtualKey> _upKeys = new HashSet<XInputVirtualKey>();
 
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="StatefulGamepad" /> type.
-        /// </summary>
+        /// <summary>Initializes a new instance of the <see cref="StatefulGamepad" /> type.</summary>
         /// <param name="user">A user.</param>
         public StatefulGamepad(XInputUser user = XInputUser.Any)
         {

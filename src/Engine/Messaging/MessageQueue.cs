@@ -20,9 +20,7 @@ namespace BouncyBox.VorpalEngine.Engine.Messaging
         private readonly ContextSerilogLogger _serilogLogger;
         private readonly Dictionary<Type, Subscriptions> _subscriptionsByMessageType = new Dictionary<Type, Subscriptions>();
 
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="MessageQueue{TMessageBase}" /> type.
-        /// </summary>
+        /// <summary>Initializes a new instance of the <see cref="MessageQueue{TMessageBase}" /> type.</summary>
         /// <param name="serilogLogger">An <see cref="ISerilogLogger" /> implementation.</param>
         /// <param name="context">A nested context.</param>
         /// <param name="queueName">The name of the queue, to be included in the nested context.</param>
@@ -32,9 +30,7 @@ namespace BouncyBox.VorpalEngine.Engine.Messaging
             _serilogLogger = new ContextSerilogLogger(serilogLogger, _context);
         }
 
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="MessageQueue{TMessageBase}" /> type.
-        /// </summary>
+        /// <summary>Initializes a new instance of the <see cref="MessageQueue{TMessageBase}" /> type.</summary>
         /// <param name="serilogLogger">An <see cref="ISerilogLogger" /> implementation.</param>
         /// <param name="queueName">The name of the queue, to be used in a new nested context.</param>
         public MessageQueue(ISerilogLogger serilogLogger, string queueName = nameof(MessageQueue<TMessageBase>))

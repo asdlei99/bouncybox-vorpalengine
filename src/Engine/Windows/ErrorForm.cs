@@ -9,9 +9,7 @@ using CommandLine.Text;
 
 namespace BouncyBox.VorpalEngine.Engine.Windows
 {
-    /// <summary>
-    ///     A window used to display fatal error messages.
-    /// </summary>
+    /// <summary>A window used to display fatal error messages.</summary>
     public sealed class ErrorForm : Form
     {
         private ErrorForm(string windowCaption, string label, string message)
@@ -77,9 +75,7 @@ namespace BouncyBox.VorpalEngine.Engine.Windows
             exitButton.Select();
         }
 
-        /// <summary>
-        ///     Creates a window that will display a message about invalid command line arguments.
-        /// </summary>
+        /// <summary>Creates a window that will display a message about invalid command line arguments.</summary>
         /// <param name="parserResult">The result of command line parameter parsing.</param>
         /// <param name="windowCaption">A window caption.</param>
         /// <returns>Returns the error window.</returns>
@@ -119,9 +115,7 @@ namespace BouncyBox.VorpalEngine.Engine.Windows
             return errorForm;
         }
 
-        /// <summary>
-        ///     Creates a window that will display a message about an unhandled exception.
-        /// </summary>
+        /// <summary>Creates a window that will display a message about an unhandled exception.</summary>
         /// <param name="exception">The unhandled exception.</param>
         /// <param name="windowCaption">A window caption.</param>
         /// <returns>Returns the error window.</returns>

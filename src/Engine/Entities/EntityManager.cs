@@ -13,9 +13,7 @@ using ProcessThread = BouncyBox.VorpalEngine.Engine.Threads.ProcessThread;
 
 namespace BouncyBox.VorpalEngine.Engine.Entities
 {
-    /// <summary>
-    ///     Manages all entities and their interactions with the engine.
-    /// </summary>
+    /// <summary>Manages all entities and their interactions with the engine.</summary>
     public class EntityManager<TGameState, TRenderState> : IEntityManager<TGameState, TRenderState>
         where TGameState : class
         where TRenderState : class, new()
@@ -29,9 +27,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         private readonly object _updatersLockObject = new object();
         private DirectXResources? _directXResources;
 
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="EntityManager{TGameState,TRenderState}" /> type.
-        /// </summary>
+        /// <summary>Initializes a new instance of the <see cref="EntityManager{TGameState,TRenderState}" /> type.</summary>
         /// <param name="interfaces">An <see cref="IInterfaces" /> implementation.</param>
         /// <param name="gameExecutionStateManager">An <see cref="IGameExecutionStateManager" /> implementation.</param>
         /// <param name="renderStateManager">An <see cref="IRenderStateManager{TRenderState}" /> implementation.</param>
@@ -295,9 +291,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
             _updaters?.Dispose();
         }
 
-        /// <summary>
-        ///     Prepares entities for adding by informing them of game execution state changes.
-        /// </summary>
+        /// <summary>Prepares entities for adding by informing them of game execution state changes.</summary>
         /// <param name="entities"></param>
         private void PrepareForAdd(IEnumerable<IEntity> entities)
         {

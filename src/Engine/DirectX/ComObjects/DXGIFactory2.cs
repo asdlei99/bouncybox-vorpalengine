@@ -4,18 +4,14 @@ using TerraFX.Interop;
 
 namespace BouncyBox.VorpalEngine.Engine.DirectX.ComObjects
 {
-    /// <summary>
-    ///     Proxies the <see cref="IDXGIFactory2" /> COM interface.
-    /// </summary>
+    /// <summary>Proxies the <see cref="IDXGIFactory2" /> COM interface.</summary>
     // ReSharper disable once InconsistentNaming
     public unsafe class DXGIFactory2 : ComObject<IDXGIFactory2>
     {
         private ComPtr<IDXGIFactory2> _dxgiFactory2;
 
         /// <inheritdoc />
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="DXGIFactory2" /> type.
-        /// </summary>
+        /// <summary>Initializes a new instance of the <see cref="DXGIFactory2" /> type.</summary>
         public DXGIFactory2(ComPtr<IDXGIFactory2> dxgiFactory2)
         {
             _dxgiFactory2 = dxgiFactory2;
@@ -24,9 +20,7 @@ namespace BouncyBox.VorpalEngine.Engine.DirectX.ComObjects
         /// <inheritdoc />
         public override IDXGIFactory2* Pointer => _dxgiFactory2.Get();
 
-        /// <summary>
-        ///     Proxies <see cref="IDXGIFactory2.CreateSwapChainForHwnd" />.
-        /// </summary>
+        /// <summary>Proxies <see cref="IDXGIFactory2.CreateSwapChainForHwnd" />.</summary>
         public DXGISwapChain1 CreateSwapChainForHwnd(D3D11Device d3d11Device, IntPtr windowHandle, DXGI_FORMAT format = DXGI_FORMAT.DXGI_FORMAT_R8G8B8A8_UNORM)
         {
             var dxgiSwapChain1 = new ComPtr<IDXGISwapChain1>();
@@ -65,9 +59,7 @@ namespace BouncyBox.VorpalEngine.Engine.DirectX.ComObjects
             return new DXGISwapChain1(dxgiSwapChain1);
         }
 
-        /// <summary>
-        ///     Proxies <see cref="IDXGIFactory2.MakeWindowAssociation" />.
-        /// </summary>
+        /// <summary>Proxies <see cref="IDXGIFactory2.MakeWindowAssociation" />.</summary>
         public void MakeWindowAssociation(IntPtr windowHandle, uint flags)
         {
             CheckResultHandle(Pointer->MakeWindowAssociation(windowHandle, flags), "Failed to make window association.");

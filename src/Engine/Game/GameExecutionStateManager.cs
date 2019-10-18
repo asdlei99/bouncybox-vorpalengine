@@ -4,9 +4,7 @@ using BouncyBox.VorpalEngine.Engine.Messaging.GlobalMessages;
 
 namespace BouncyBox.VorpalEngine.Engine.Game
 {
-    /// <summary>
-    ///     Manages game execution state changes.
-    /// </summary>
+    /// <summary>Manages game execution state changes.</summary>
     internal class GameExecutionStateManager : IGameExecutionStateManager
     {
         private readonly ConcurrentMessagePublisherSubscriber<IGlobalMessage> _globalMessagePublisherSubscriber;
@@ -15,9 +13,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
         private bool _isGamePaused;
         private bool _isGameSuspended;
 
-        /// <summary>
-        ///     <para>Initializes a new instance of the <see cref="GameExecutionStateManager" /> type.</para>
-        /// </summary>
+        /// <summary>Initializes a new instance of the <see cref="GameExecutionStateManager" /> type.</summary>
         /// <remarks>
         ///     <para>Subscribes to the <see cref="PauseGameMessage" /> global message.</para>
         ///     <para>Subscribes to the <see cref="UnpauseGameMessage" /> global message.</para>
@@ -40,9 +36,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
                     .Subscribe<ResumeGameMessage>(HandleResumeGameMessage);
         }
 
-        /// <summary>
-        ///     <para>Initializes a new instance of the <see cref="GameExecutionStateManager" /> type.</para>
-        /// </summary>
+        /// <summary>Initializes a new instance of the <see cref="GameExecutionStateManager" /> type.</summary>
         /// <remarks>
         ///     <para>Subscribes to the <see cref="PauseGameMessage" /> global message.</para>
         ///     <para>Subscribes to the <see cref="UnpauseGameMessage" /> global message.</para>
@@ -70,9 +64,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
             DisposeHelper.Dispose(() => { _globalMessagePublisherSubscriber?.Dispose(); }, ref _isDisposed);
         }
 
-        /// <summary>
-        ///     Handles the <see cref="PauseGameMessage" /> global message.
-        /// </summary>
+        /// <summary>Handles the <see cref="PauseGameMessage" /> global message.</summary>
         /// <param name="message">The message being handled.</param>
         private void HandlePauseGameMessage(PauseGameMessage message)
         {
@@ -85,9 +77,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
             _isGamePaused = true;
         }
 
-        /// <summary>
-        ///     Handles the <see cref="UnpauseGameMessage" /> global message.
-        /// </summary>
+        /// <summary>Handles the <see cref="UnpauseGameMessage" /> global message.</summary>
         /// <param name="message">The message being handled.</param>
         private void HandleUnpauseGameMessage(UnpauseGameMessage message)
         {
@@ -100,9 +90,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
             _isGamePaused = false;
         }
 
-        /// <summary>
-        ///     Handles the <see cref="SuspendGameMessage" /> global message.
-        /// </summary>
+        /// <summary>Handles the <see cref="SuspendGameMessage" /> global message.</summary>
         /// <param name="message">The message being handled.</param>
         private void HandleSuspendGameMessage(SuspendGameMessage message)
         {
@@ -115,9 +103,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
             _isGameSuspended = true;
         }
 
-        /// <summary>
-        ///     Handles the <see cref="ResumeGameMessage" /> global message.
-        /// </summary>
+        /// <summary>Handles the <see cref="ResumeGameMessage" /> global message.</summary>
         /// <param name="message">The message being handled.</param>
         private void HandleResumeGameMessage(ResumeGameMessage message)
         {

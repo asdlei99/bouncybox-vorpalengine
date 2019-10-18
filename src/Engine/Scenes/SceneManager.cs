@@ -8,9 +8,7 @@ using EnumsNET;
 
 namespace BouncyBox.VorpalEngine.Engine.Scenes
 {
-    /// <summary>
-    ///     Manages a collection of scenes.
-    /// </summary>
+    /// <summary>Manages a collection of scenes.</summary>
     public class SceneManager<TGameState, TRenderState, TSceneKey> : ISceneManager
         where TGameState : class
         where TRenderState : class, new()
@@ -26,9 +24,7 @@ namespace BouncyBox.VorpalEngine.Engine.Scenes
         private readonly ContextSerilogLogger _serilogLogger;
         private bool _isDisposed;
 
-        /// <summary>
-        ///     <para>Initializes a new instance of the <see cref="SceneManager{TGameState,TRenderState,TSceneKey}" /> type.</para>
-        /// </summary>
+        /// <summary>Initializes a new instance of the <see cref="SceneManager{TGameState,TRenderState,TSceneKey}" /> type.</summary>
         /// <remarks>
         ///     <para>Subscribes to the <see cref="LoadSceneMessage{TSceneKey}" /> global message.</para>
         ///     <para>Subscribes to the <see cref="UnloadSceneMessage{TSceneKey}" /> global message.</para>
@@ -50,9 +46,7 @@ namespace BouncyBox.VorpalEngine.Engine.Scenes
                     .Subscribe<UnloadSceneMessage<TSceneKey>>(HandleUnloadSceneMessage);
         }
 
-        /// <summary>
-        ///     <para>Initializes a new instance of the <see cref="SceneManager{TGameState,TRenderState,TSceneKey}" /> type.</para>
-        /// </summary>
+        /// <summary>Initializes a new instance of the <see cref="SceneManager{TGameState,TRenderState,TSceneKey}" /> type.</summary>
         /// <remarks>
         ///     <para>Subscribes to the <see cref="LoadSceneMessage{TSceneKey}" /> global message.</para>
         ///     <para>Subscribes to the <see cref="UnloadSceneMessage{TSceneKey}" /> global message.</para>
@@ -80,9 +74,7 @@ namespace BouncyBox.VorpalEngine.Engine.Scenes
             DisposeHelper.Dispose(() => { _globalMessagePublisherSubscriber?.Dispose(); }, ref _isDisposed, _interfaces.ThreadManager, ProcessThread.Main);
         }
 
-        /// <summary>
-        ///     Handles the <see cref="LoadSceneMessage{TSceneKey}" /> global message.
-        /// </summary>
+        /// <summary>Handles the <see cref="LoadSceneMessage{TSceneKey}" /> global message.</summary>
         /// <param name="message">The message being handled.</param>
         /// <exception cref="InvalidOperationException">Thrown when a scene with the same update order was already loaded.</exception>
         /// <exception cref="InvalidOperationException">Thrown when a scene with the same render order was already loaded.</exception>
@@ -107,9 +99,7 @@ namespace BouncyBox.VorpalEngine.Engine.Scenes
             _serilogLogger.LogDebug("Loaded scene {Scene}", sceneKeyName);
         }
 
-        /// <summary>
-        ///     Handles the <see cref="LoadSceneMessage{TSceneKey}" /> global message.
-        /// </summary>
+        /// <summary>Handles the <see cref="LoadSceneMessage{TSceneKey}" /> global message.</summary>
         /// <param name="message">The message being handled.</param>
         private void HandleUnloadSceneMessage(UnloadSceneMessage<TSceneKey> message)
         {

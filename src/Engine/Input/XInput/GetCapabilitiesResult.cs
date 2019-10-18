@@ -4,9 +4,7 @@
 
 namespace BouncyBox.VorpalEngine.Engine.Input.XInput
 {
-    /// <summary>
-    ///     Wraps the result of a call to <see cref="XInput14.XInputGetCapabilities" />.
-    /// </summary>
+    /// <summary>Wraps the result of a call to <see cref="XInput14.XInputGetCapabilities" />.</summary>
     public enum GetCapabilitiesResult
     {
         Success,

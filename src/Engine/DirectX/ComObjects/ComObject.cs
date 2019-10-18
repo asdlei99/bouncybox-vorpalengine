@@ -5,14 +5,10 @@ using TerraFX.Interop;
 
 namespace BouncyBox.VorpalEngine.Engine.DirectX.ComObjects
 {
-    /// <summary>
-    ///     Base class that contains COM object helper methods.
-    /// </summary>
+    /// <summary>Base class that contains COM object helper methods.</summary>
     public abstract class ComObject
     {
-        /// <summary>
-        ///     Throws a <see cref="ComObjectException" /> for failure HRESULTs.
-        /// </summary>
+        /// <summary>Throws a <see cref="ComObjectException" /> for failure HRESULTs.</summary>
         /// <param name="hr">An HRESULT.</param>
         /// <param name="exceptionMessage">The exception message to use if <see cref="ComObjectException" /> is thrown.</param>
         /// <param name="allowNoInterface">
@@ -30,9 +26,7 @@ namespace BouncyBox.VorpalEngine.Engine.DirectX.ComObjects
         }
     }
 
-    /// <summary>
-    ///     Base class for all COM interface proxies.
-    /// </summary>
+    /// <summary>Base class for all COM interface proxies.</summary>
     public abstract unsafe class ComObject<T> : ComObject, IComObject<T>
         where T : unmanaged
     {
@@ -56,33 +50,25 @@ namespace BouncyBox.VorpalEngine.Engine.DirectX.ComObjects
                 ref _isDisposed);
         }
 
-        /// <summary>
-        ///     Casts the COM pointer to a pointer to <typeparamref name="T" />.
-        /// </summary>
+        /// <summary>Casts the COM pointer to a pointer to <typeparamref name="T" />.</summary>
         public static implicit operator T*(ComObject<T> comObject)
         {
             return comObject.Pointer;
         }
 
-        /// <summary>
-        ///     Casts the COM pointer to a pointer to <see cref="IUnknown" />.
-        /// </summary>
+        /// <summary>Casts the COM pointer to a pointer to <see cref="IUnknown" />.</summary>
         public static implicit operator IUnknown*(ComObject<T> comObject)
         {
             return comObject.UnknownPointer;
         }
 
-        /// <summary>
-        ///     Disposes managed and unmanaged resources.
-        /// </summary>
+        /// <summary>Disposes managed and unmanaged resources.</summary>
         /// <param name="disposing">A value indicating whether managed resources should be disposed.</param>
         protected virtual void Dispose(bool disposing)
         {
         }
 
-        /// <summary>
-        ///     Destructor.
-        /// </summary>
+        /// <summary>Finalizes the <see cref="ComObject{T}" />.</summary>
         ~ComObject()
         {
             if (!_isDisposed)

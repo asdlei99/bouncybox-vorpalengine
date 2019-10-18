@@ -100,7 +100,12 @@ namespace BouncyBox.VorpalEngine.Engine.Interop
         public static extern void XInputEnable(int enable);
 
         [DllImport(LibraryPath, CallingConvention = CallingConvention.Winapi, EntryPoint = "XInputGetAudioDeviceIds", ExactSpelling = true)]
-        public static extern unsafe uint XInputGetAudioDeviceIds(uint dwUserIndex, ushort* pRenderDeviceId, uint* pRenderCount, ushort* pCaptureDeviceId, uint* pCaptureCount);
+        public static extern unsafe uint XInputGetAudioDeviceIds(
+            uint dwUserIndex,
+            ushort* pRenderDeviceId,
+            uint* pRenderCount,
+            ushort* pCaptureDeviceId,
+            uint* pCaptureCount);
 
         [DllImport(LibraryPath, CallingConvention = CallingConvention.Winapi, EntryPoint = "XInputGetBatteryInformation ", ExactSpelling = true)]
         public static extern unsafe uint XInputGetBatteryInformation(uint dwUserIndex, byte devType, XINPUT_BATTERY_INFORMATION* pBatteryInformation);

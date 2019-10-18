@@ -7,9 +7,7 @@
     public interface IGameStateManager<out TGameState>
         where TGameState : class
     {
-        /// <summary>
-        ///     Gets the game state.
-        /// </summary>
+        /// <summary>Gets the game state.</summary>
         TGameState GameState { get; }
     }
 }

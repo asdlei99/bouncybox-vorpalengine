@@ -15,9 +15,7 @@ using TerraFX.Interop;
 
 namespace BouncyBox.VorpalEngine.Engine.Game
 {
-    /// <summary>
-    ///     Base class for all games. This class manages the update and render loops and the windows message loop.
-    /// </summary>
+    /// <summary>Base class for all games. This class manages the update and render loops and the windows message loop.</summary>
     public abstract class Game<TGameState, TRenderState, TSceneKey> : IDisposable
         where TGameState : class
         where TRenderState : class, new()
@@ -33,12 +31,8 @@ namespace BouncyBox.VorpalEngine.Engine.Game
         private bool _isDisposed;
         private RenderForm? _renderForm;
 
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="Game{TGameState,TRenderState,TSceneKey}" /> type.
-        /// </summary>
-        /// <remarks>
-        ///     Subscribes to the <see cref="RenderWindowClosingMessage" /> global message.
-        /// </remarks>
+        /// <summary>Initializes a new instance of the <see cref="Game{TGameState,TRenderState,TSceneKey}" /> type.</summary>
+        /// <remarks>Subscribes to the <see cref="RenderWindowClosingMessage" /> global message.</remarks>
         /// <param name="interfaces">An <see cref="IInterfaces" /> implementation.</param>
         /// <param name="gameExecutionStateManager">An <see cref="IGameExecutionStateManager" /> implementation.</param>
         /// <param name="entityManager">An <see cref="IEntityManager{TGameState,TRenderState}" /> implementation.</param>
@@ -67,12 +61,8 @@ namespace BouncyBox.VorpalEngine.Engine.Game
                     .Subscribe<RenderWindowClosingMessage>(HandleRenderWindowClosingMessage);
         }
 
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="Game{TGameState,TRenderState,TSceneKey}" /> type.
-        /// </summary>
-        /// <remarks>
-        ///     Subscribes to the <see cref="RenderWindowClosingMessage" /> global message.
-        /// </remarks>
+        /// <summary>Initializes a new instance of the <see cref="Game{TGameState,TRenderState,TSceneKey}" /> type.</summary>
+        /// <remarks>Subscribes to the <see cref="RenderWindowClosingMessage" /> global message.</remarks>
         /// <param name="interfaces">An <see cref="IInterfaces" /> implementation.</param>
         /// <param name="gameExecutionStateManager">An <see cref="IGameExecutionStateManager" /> implementation.</param>
         /// <param name="entityManager">An <see cref="IEntityManager{TGameState,TRenderState}" /> implementation.</param>
@@ -88,9 +78,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
         {
         }
 
-        /// <summary>
-        ///     Gets the <see cref="IInterfaces" /> implementation.
-        /// </summary>
+        /// <summary>Gets the <see cref="IInterfaces" /> implementation.</summary>
         protected IInterfaces Interfaces { get; }
 
         /// <inheritdoc />
@@ -105,12 +93,8 @@ namespace BouncyBox.VorpalEngine.Engine.Game
                 ref _isDisposed);
         }
 
-        /// <summary>
-        ///     Runs the game.
-        /// </summary>
-        /// <remarks>
-        ///     Publishes the <see cref="LoadSceneMessage{TSceneKey}" /> global message.
-        /// </remarks>
+        /// <summary>Runs the game.</summary>
+        /// <remarks>Publishes the <see cref="LoadSceneMessage{TSceneKey}" /> global message.</remarks>
         /// <param name="initialSceneKey">The scene to load.</param>
         /// <returns>Returns the result of the run.</returns>
         /// <exception cref="Exception">Thrown when an engine thread threw an unhandled exception.</exception>
@@ -190,16 +174,12 @@ namespace BouncyBox.VorpalEngine.Engine.Game
             throw new Exception($"An unhandled exception occurred on the {thread.GetName()} thread.", exception);
         }
 
-        /// <summary>
-        ///     Handle dispatched messages.
-        /// </summary>
+        /// <summary>Handle dispatched messages.</summary>
         protected virtual void OnHandleDispatchedMessages()
         {
         }
 
-        /// <summary>
-        ///     Process Win32 messages.
-        /// </summary>
+        /// <summary>Process Win32 messages.</summary>
         private static unsafe void ProcessWin32Messages()
         {
             MSG msg;
@@ -211,9 +191,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
             }
         }
 
-        /// <summary>
-        ///     <para>Handles the <see cref="RenderWindowClosingMessage" /> global message.</para>
-        /// </summary>
+        /// <summary>Handles the <see cref="RenderWindowClosingMessage" /> global message.</summary>
         /// <param name="message">The message being handled.</param>
         private void HandleRenderWindowClosingMessage(RenderWindowClosingMessage message)
         {

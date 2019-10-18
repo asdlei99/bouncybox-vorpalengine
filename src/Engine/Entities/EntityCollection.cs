@@ -94,9 +94,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
             DisposeHelper.Dispose(DisposeEntities, ref _isDisposed);
         }
 
-        /// <summary>
-        ///     Disposes all entities in the collection.
-        /// </summary>
+        /// <summary>Disposes all entities in the collection.</summary>
         private void DisposeEntities()
         {
             foreach (TEntity entity in _entities)
@@ -105,9 +103,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
             }
         }
 
-        /// <summary>
-        ///     A comparer that orders entities by <see cref="IEntity.Order" />.
-        /// </summary>
+        /// <summary>A comparer that orders entities by <see cref="IEntity.Order" />.</summary>
         private class EntityComparer : IComparer<TEntity>
         {
             /// <inheritdoc />

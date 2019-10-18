@@ -39,9 +39,7 @@ namespace BouncyBox.VorpalEngine.Engine.Messaging
                 ref _isDisposed);
         }
 
-        /// <summary>
-        ///     Queues a message for dispatch.
-        /// </summary>
+        /// <summary>Queues a message for dispatch.</summary>
         /// <param name="message">The message to publish.</param>
         /// <returns>Returns the concurrent message publisher/subscriber.</returns>
         public ConcurrentMessagePublisherSubscriber<TMessageBase> Publish<TMessage>(TMessage message)
@@ -52,9 +50,7 @@ namespace BouncyBox.VorpalEngine.Engine.Messaging
             return this;
         }
 
-        /// <summary>
-        ///     Queues a message for dispatch.
-        /// </summary>
+        /// <summary>Queues a message for dispatch.</summary>
         /// <returns>Returns the concurrent message publisher/subscriber.</returns>
         public ConcurrentMessagePublisherSubscriber<TMessageBase> Publish<TMessage>()
             where TMessage : TMessageBase, new()
@@ -79,17 +75,13 @@ namespace BouncyBox.VorpalEngine.Engine.Messaging
             return this;
         }
 
-        /// <summary>
-        ///     Dequeues dispatched messages, calling the appropriate handler for each message.
-        /// </summary>
+        /// <summary>Dequeues dispatched messages, calling the appropriate handler for each message.</summary>
         public void HandleDispatched()
         {
             _messageDispatchQueue.HandleDispatched();
         }
 
-        /// <summary>
-        ///     Creates a new concurrent message publisher/subscriber.
-        /// </summary>
+        /// <summary>Creates a new concurrent message publisher/subscriber.</summary>
         /// <param name="interfaces">An <see cref="IInterfaces" /> implementation.</param>
         /// <param name="context">A nested context.</param>
         /// <returns>Returns a new concurrent message publisher/subscriber.</returns>
@@ -101,9 +93,7 @@ namespace BouncyBox.VorpalEngine.Engine.Messaging
                 new ConcurrentMessageDispatchQueue<TMessageBase>(interfaces.SerilogLogger, context));
         }
 
-        /// <summary>
-        ///     Creates a new concurrent message publisher/subscriber.
-        /// </summary>
+        /// <summary>Creates a new concurrent message publisher/subscriber.</summary>
         /// <param name="interfaces">An <see cref="IInterfaces" /> implementation.</param>
         /// <returns>Returns a new concurrent message publisher/subscriber.</returns>
         public static ConcurrentMessagePublisherSubscriber<TMessageBase> Create(IInterfaces interfaces)

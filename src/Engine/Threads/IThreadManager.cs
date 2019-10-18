@@ -4,20 +4,14 @@ using System.Threading;
 
 namespace BouncyBox.VorpalEngine.Engine.Threads
 {
-    /// <summary>
-    ///     Represents the spawning and tracking of various threads used by the engine.
-    /// </summary>
+    /// <summary>Represents the spawning and tracking of various threads used by the engine.</summary>
     public interface IThreadManager : IDisposable
     {
-        /// <summary>
-        ///     Verifies that the currently-executing thread is the specified thread.
-        /// </summary>
+        /// <summary>Verifies that the currently-executing thread is the specified thread.</summary>
         /// <param name="thread">The process thread to verify.</param>
         void VerifyProcessThread(ProcessThread thread);
 
-        /// <summary>
-        ///     Starts an engine thread.
-        /// </summary>
+        /// <summary>Starts an engine thread.</summary>
         /// <param name="threadWorker">A thread worker.</param>
         /// <param name="thread">The engine thread to start.</param>
         /// <param name="terminationCountdownEvent">
@@ -34,11 +28,9 @@ namespace BouncyBox.VorpalEngine.Engine.Threads
             CountdownEvent terminationCountdownEvent,
             ManualResetEventSlim unhandledExceptionManualResetEvent);
 
-        /// <summary>
-        ///     Request that engine threads gracefully terminate, then wait for all threads to complete.
-        /// </summary>
+        /// <summary>Request that engine threads gracefully terminate, then wait for all threads to complete.</summary>
         /// <param name="terminationCountdownEvent">A countdown event that is decremented as each thread terminates.</param>
-        /// <returns>A collection of tuples containing unhandled exceptions and the engine threads they occurred on.</returns>
+        /// <returns>Returns a collection of tuples containing unhandled exceptions and the engine threads they occurred on.</returns>
         IReadOnlyCollection<(EngineThread thread, Exception exception)> RequestEngineThreadTerminationAndWaitForTermination(
             CountdownEvent terminationCountdownEvent);
     }

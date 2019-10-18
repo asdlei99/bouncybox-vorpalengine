@@ -9,9 +9,7 @@ using BouncyBox.VorpalEngine.Engine.Threads;
 
 namespace BouncyBox.VorpalEngine.Engine.Scenes
 {
-    /// <summary>
-    ///     A collection of updaters and renderers that form one logical game unit.
-    /// </summary>
+    /// <summary>A collection of updaters and renderers that form one logical game unit.</summary>
     public abstract class Scene<TGameState, TRenderState, TSceneKey> : IScene<TSceneKey>
         where TGameState : class
         where TRenderState : class, new()
@@ -22,9 +20,7 @@ namespace BouncyBox.VorpalEngine.Engine.Scenes
         private readonly HashSet<IRenderer<TRenderState>> _renderers = new HashSet<IRenderer<TRenderState>>();
         private readonly HashSet<IUpdater<TRenderState>> _updaters = new HashSet<IUpdater<TRenderState>>();
 
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="Scene{TGameState,TRenderState,TSceneKey}" /> type.
-        /// </summary>
+        /// <summary>Initializes a new instance of the <see cref="Scene{TGameState,TRenderState,TSceneKey}" /> type.</summary>
         /// <param name="interfaces">An <see cref="IInterfaces" /> implementation.</param>
         /// <param name="entityManager">An <see cref="IEntityManager{TGameState,TRenderState}" /> implementation.</param>
         /// <param name="key">The scene's key.</param>
@@ -68,9 +64,7 @@ namespace BouncyBox.VorpalEngine.Engine.Scenes
         {
         }
 
-        /// <summary>
-        ///     Adds updaters to the scene.
-        /// </summary>
+        /// <summary>Adds updaters to the scene.</summary>
         /// <param name="updaters">The updaters to add.</param>
         /// <returns>Returns the scene.</returns>
         /// <exception cref="InvalidOperationException">Thrown when the thread executing this method is not the update thread.</exception>
@@ -86,9 +80,7 @@ namespace BouncyBox.VorpalEngine.Engine.Scenes
             return this;
         }
 
-        /// <summary>
-        ///     Adds updaters to the scene.
-        /// </summary>
+        /// <summary>Adds updaters to the scene.</summary>
         /// <param name="updaters">The updaters to add.</param>
         /// <returns>Returns the scene.</returns>
         /// <exception cref="InvalidOperationException">Thrown when the thread executing this method is not the update thread.</exception>
@@ -97,9 +89,7 @@ namespace BouncyBox.VorpalEngine.Engine.Scenes
             return AddUpdaters((IEnumerable<IUpdater<TRenderState>>)updaters);
         }
 
-        /// <summary>
-        ///     Adds renderers to the scene.
-        /// </summary>
+        /// <summary>Adds renderers to the scene.</summary>
         /// <param name="renderers">The renderers to add.</param>
         /// <returns>Returns the scene.</returns>
         /// <exception cref="InvalidOperationException">Thrown when the thread executing this method is not the update thread.</exception>
@@ -115,9 +105,7 @@ namespace BouncyBox.VorpalEngine.Engine.Scenes
             return this;
         }
 
-        /// <summary>
-        ///     Adds renderers to the scene.
-        /// </summary>
+        /// <summary>Adds renderers to the scene.</summary>
         /// <param name="renderers">The renderers to add.</param>
         /// <returns>Returns the scene.</returns>
         /// <exception cref="InvalidOperationException">Thrown when the thread executing this method is not the update thread.</exception>
@@ -126,9 +114,7 @@ namespace BouncyBox.VorpalEngine.Engine.Scenes
             return AddRenderers((IEnumerable<IRenderer<TRenderState>>)renderers);
         }
 
-        /// <summary>
-        ///     Removes updaters from the scene.
-        /// </summary>
+        /// <summary>Removes updaters from the scene.</summary>
         /// <param name="updaters">The updaters to remove.</param>
         /// <returns>Returns the scene.</returns>
         /// <exception cref="InvalidOperationException">Thrown when the thread executing this method is not the update thread.</exception>
@@ -144,9 +130,7 @@ namespace BouncyBox.VorpalEngine.Engine.Scenes
             return this;
         }
 
-        /// <summary>
-        ///     Removes updaters from the scene.
-        /// </summary>
+        /// <summary>Removes updaters from the scene.</summary>
         /// <param name="updaters">The updaters to remove.</param>
         /// <returns>Returns the scene.</returns>
         /// <exception cref="InvalidOperationException">Thrown when the thread executing this method is not the update thread.</exception>
@@ -155,9 +139,7 @@ namespace BouncyBox.VorpalEngine.Engine.Scenes
             return RemoveUpdaters((IEnumerable<IUpdater<TRenderState>>)updaters);
         }
 
-        /// <summary>
-        ///     Removes renderers from the scene.
-        /// </summary>
+        /// <summary>Removes renderers from the scene.</summary>
         /// <param name="renderers">The renderers to remove.</param>
         /// <returns>Returns the scene.</returns>
         /// <exception cref="InvalidOperationException">Thrown when the thread executing this method is not the update thread.</exception>
@@ -173,9 +155,7 @@ namespace BouncyBox.VorpalEngine.Engine.Scenes
             return this;
         }
 
-        /// <summary>
-        ///     Removes renderers from the scene.
-        /// </summary>
+        /// <summary>Removes renderers from the scene.</summary>
         /// <param name="renderers">The renderers to remove.</param>
         /// <returns>Returns the scene.</returns>
         /// <exception cref="InvalidOperationException">Thrown when the thread executing this method is not the update thread.</exception>
@@ -184,25 +164,19 @@ namespace BouncyBox.VorpalEngine.Engine.Scenes
             return RemoveRenderers((IEnumerable<IRenderer<TRenderState>>)renderers);
         }
 
-        /// <summary>
-        ///     Removes all updaters from the scene.
-        /// </summary>
+        /// <summary>Removes all updaters from the scene.</summary>
         protected void ClearUpdaters()
         {
             RemoveUpdaters(_updaters);
         }
 
-        /// <summary>
-        ///     Removes all renderers from the scene.
-        /// </summary>
+        /// <summary>Removes all renderers from the scene.</summary>
         protected void ClearRenderers()
         {
             RemoveRenderers(_renderers);
         }
 
-        /// <summary>
-        ///     Removes all updaters and renderers from the scene.
-        /// </summary>
+        /// <summary>Removes all updaters and renderers from the scene.</summary>
         protected void ClearEntities()
         {
             RemoveUpdaters(_updaters);

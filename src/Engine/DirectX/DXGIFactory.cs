@@ -2,18 +2,14 @@
 
 namespace BouncyBox.VorpalEngine.Engine.DirectX
 {
-    /// <summary>
-    ///     Factory for various DXGI structs.
-    /// </summary>
+    /// <summary>Factory for various DXGI structs.</summary>
     // ReSharper disable once InconsistentNaming
     public static class DXGIFactory
     {
-        /// <summary>
-        ///     Creates a <see cref="DXGI_RATIONAL" />.
-        /// </summary>
+        /// <summary>Creates a <see cref="DXGI_RATIONAL" />.</summary>
         /// <param name="numerator">The numerator value.</param>
         /// <param name="denominator">The denominator value.</param>
-        /// <returns></returns>
+        /// <returns>Returns a <see cref="DXGI_RATIONAL" />.</returns>
         public static DXGI_RATIONAL CreateRational(uint numerator, uint denominator)
         {
             return
@@ -24,9 +20,7 @@ namespace BouncyBox.VorpalEngine.Engine.DirectX
                 };
         }
 
-        /// <summary>
-        ///     Creates a <see cref="DXGI_RGBA" />.
-        /// </summary>
+        /// <summary>Creates a <see cref="DXGI_RGBA" />.</summary>
         /// <param name="r">The r value.</param>
         /// <param name="g">The g value.</param>
         /// <param name="b">The b value.</param>

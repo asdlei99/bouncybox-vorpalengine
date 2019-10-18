@@ -3,17 +3,13 @@ using TerraFX.Interop;
 
 namespace BouncyBox.VorpalEngine.Engine.DirectX.ComObjects
 {
-    /// <summary>
-    ///     Proxies the <see cref="ID2D1Device" /> COM interface.
-    /// </summary>
+    /// <summary>Proxies the <see cref="ID2D1Device" /> COM interface.</summary>
     public unsafe class D2D1Device : ComObject<ID2D1Device>
     {
         private ComPtr<ID2D1Device> _d2d1Device;
 
         /// <inheritdoc />
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="D2D1Device" /> type by proxying <see cref="D2D1.D2D1CreateDevice" />.
-        /// </summary>
+        /// <summary>Initializes a new instance of the <see cref="D2D1Device" /> type by proxying <see cref="D2D1.D2D1CreateDevice" />.</summary>
         public D2D1Device(DXGIDevice dxgiDevice, bool debug = false)
         {
             var d2d1CreationProperties =
@@ -36,9 +32,7 @@ namespace BouncyBox.VorpalEngine.Engine.DirectX.ComObjects
         /// <inheritdoc />
         public override ID2D1Device* Pointer => _d2d1Device;
 
-        /// <summary>
-        ///     Proxies <see cref="ID2D1Device.CreateDeviceContext" />.
-        /// </summary>
+        /// <summary>Proxies <see cref="ID2D1Device.CreateDeviceContext" />.</summary>
         public D2D1DeviceContext CreateDeviceContext()
         {
             var d2d1DeviceContext = new ComPtr<ID2D1DeviceContext>();
@@ -52,9 +46,7 @@ namespace BouncyBox.VorpalEngine.Engine.DirectX.ComObjects
             return new D2D1DeviceContext(d2d1DeviceContext);
         }
 
-        /// <summary>
-        ///     Proxies <see cref="ID2D1Device.GetFactory" />.
-        /// </summary>
+        /// <summary>Proxies <see cref="ID2D1Device.GetFactory" />.</summary>
         public D2D1Factory GetFactory()
         {
             var d2d1Factory = new ComPtr<ID2D1Factory>();

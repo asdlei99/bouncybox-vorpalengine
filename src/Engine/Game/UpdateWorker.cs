@@ -11,9 +11,7 @@ using BouncyBox.VorpalEngine.Engine.Threads;
 
 namespace BouncyBox.VorpalEngine.Engine.Game
 {
-    /// <summary>
-    ///     An engine thread worker that updates the game state.
-    /// </summary>
+    /// <summary>An engine thread worker that updates the game state.</summary>
     internal sealed class UpdateWorker<TGameState, TRenderState> : EngineThreadWorker
         where TGameState : class
         where TRenderState : class
@@ -31,9 +29,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
         private bool _isRenderWindowMinimized;
         private TimeSpan _updatePeriod = TimeSpan.FromSeconds(1) / (60 * UpdatesPerSecondMultiplier); // Default to 60 Hz
 
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="UpdateWorker{TGameState,TRenderState}" />.
-        /// </summary>
+        /// <summary>Initializes a new instance of the <see cref="UpdateWorker{TGameState,TRenderState}" />.</summary>
         /// <param name="interfaces">An <see cref="IInterfaces" /> implementation.</param>
         /// <param name="entityManager">An <see cref="IEntityManager{TGameState,TRenderState}" /> implementation.</param>
         /// <param name="sceneManager">An <see cref="ISceneManager" /> implementation.</param>
@@ -46,9 +42,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
             _serilogLogger = new ContextSerilogLogger(interfaces.SerilogLogger, context);
         }
 
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="UpdateWorker{TGameState,TRenderState}" /> type.
-        /// </summary>
+        /// <summary>Initializes a new instance of the <see cref="UpdateWorker{TGameState,TRenderState}" /> type.</summary>
         /// <param name="interfaces">An <see cref="IInterfaces" /> implementation.</param>
         /// <param name="entityManager">An <see cref="IEntityManager{TGameState,TRenderState}" /> implementation.</param>
         /// <param name="sceneManager">An <see cref="ISceneManager" /> implementation.</param>
@@ -121,9 +115,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
             _engineStatsStopwatch.Restart();
         }
 
-        /// <summary>
-        ///     Handles the <see cref="RefreshPeriodChangedMessage" /> global message.
-        /// </summary>
+        /// <summary>Handles the <see cref="RefreshPeriodChangedMessage" /> global message.</summary>
         /// <param name="message">The message being handled.</param>
         private void HandleRefreshRateChangedMessage(RefreshPeriodChangedMessage message)
         {
@@ -132,9 +124,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
             _updatePeriod = message.RefreshPeriod / UpdatesPerSecondMultiplier;
         }
 
-        /// <summary>
-        ///     Handles the <see cref="RenderWindowActivatedMessage" /> global message.
-        /// </summary>
+        /// <summary>Handles the <see cref="RenderWindowActivatedMessage" /> global message.</summary>
         /// <param name="message">The message being handled.</param>
         private void HandleRenderWindowActivatedMessage(RenderWindowActivatedMessage message)
         {
@@ -144,9 +134,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
             _isRenderWindowActivated = true;
         }
 
-        /// <summary>
-        ///     Handles the <see cref="RenderWindowDeactivatedMessage" /> global message.
-        /// </summary>
+        /// <summary>Handles the <see cref="RenderWindowDeactivatedMessage" /> global message.</summary>
         /// <param name="message">The message being handled.</param>
         private void HandleRenderWindowDeactivatedMessage(RenderWindowDeactivatedMessage message)
         {
@@ -156,18 +144,14 @@ namespace BouncyBox.VorpalEngine.Engine.Game
             _isRenderWindowActivated = false;
         }
 
-        /// <summary>
-        ///     Handles the <see cref="RenderWindowMinimizedMessage" /> global message.
-        /// </summary>
+        /// <summary>Handles the <see cref="RenderWindowMinimizedMessage" /> global message.</summary>
         /// <param name="message">The message being handled.</param>
         private void HandleRenderWindowMinimizedMessage(RenderWindowMinimizedMessage message)
         {
             _isRenderWindowMinimized = true;
         }
 
-        /// <summary>
-        ///     Handles the <see cref="RenderWindowRestoredMessage" /> global message.
-        /// </summary>
+        /// <summary>Handles the <see cref="RenderWindowRestoredMessage" /> global message.</summary>
         /// <param name="message">The message being handled.</param>
         private void HandleRenderWindowRestoredMessage(RenderWindowRestoredMessage message)
         {

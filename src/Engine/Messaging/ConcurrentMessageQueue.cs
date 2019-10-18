@@ -25,9 +25,7 @@ namespace BouncyBox.VorpalEngine.Engine.Messaging
             _subscriptionsByMessageType =
                 new ConcurrentDictionary<Type, ConcurrentDictionary<SubscriptionToken, ConcurrentMessageDispatchQueue<TMessageBase>>>();
 
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="ConcurrentMessageQueue{TMessageBase}" /> type.
-        /// </summary>
+        /// <summary>Initializes a new instance of the <see cref="ConcurrentMessageQueue{TMessageBase}" /> type.</summary>
         /// <param name="serilogLogger">An <see cref="ISerilogLogger" /> implementation.</param>
         /// <param name="context">A nested context.</param>
         public ConcurrentMessageQueue(ISerilogLogger serilogLogger, NestedContext context)
@@ -36,9 +34,7 @@ namespace BouncyBox.VorpalEngine.Engine.Messaging
             _serilogLogger = new ContextSerilogLogger(serilogLogger, _context);
         }
 
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="ConcurrentMessageQueue{TMessageBase}" /> type.
-        /// </summary>
+        /// <summary>Initializes a new instance of the <see cref="ConcurrentMessageQueue{TMessageBase}" /> type.</summary>
         /// <param name="serilogLogger">An <see cref="ISerilogLogger" /> implementation.</param>
         public ConcurrentMessageQueue(ISerilogLogger serilogLogger)
             : this(serilogLogger, NestedContext.None())

@@ -1,8 +1,6 @@
 ﻿namespace BouncyBox.VorpalEngine.Engine.Messaging
 {
-    /// <summary>
-    ///     Represents an update message.
-    /// </summary>
+    /// <summary>Represents an update message.</summary>
     public interface IUpdateMessage : IMessage
     {
     }

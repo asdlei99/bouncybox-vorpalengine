@@ -7,9 +7,7 @@ using System.Runtime.CompilerServices;
 
 namespace BouncyBox.VorpalEngine.Engine.Resources
 {
-    /// <summary>
-    ///     Represents a file system source for binary resources.
-    /// </summary>
+    /// <summary>Represents a file system source for binary resources.</summary>
     public class FileSystemResourceSource : IResourceSource
     {
         private static readonly ReadOnlyDictionary<ResourceType, (string folderName, string fileExtension)> MappingsByResourceTypes =
@@ -22,9 +20,7 @@ namespace BouncyBox.VorpalEngine.Engine.Resources
 
         private readonly string _rootDirectory;
 
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="FileSystemResourceSource" /> type.
-        /// </summary>
+        /// <summary>Initializes a new instance of the <see cref="FileSystemResourceSource" /> type.</summary>
         /// <param name="rootDirectory">A fully-qualified directory that contains resource subdirectories named by type.</param>
         /// <exception cref="ArgumentException">Thrown when the root directory is not fully-qualified.</exception>
         public FileSystemResourceSource(string rootDirectory)
@@ -54,9 +50,7 @@ namespace BouncyBox.VorpalEngine.Engine.Resources
             return (GetResourceResult.Valid, immutableData);
         }
 
-        /// <summary>
-        ///     Builds a full path for the given resource type and key. The path is rooted to the provided root directory.
-        /// </summary>
+        /// <summary>Builds a full path for the given resource type and key. The path is rooted to the provided root directory.</summary>
         /// <param name="type">The type of the resource.</param>
         /// <param name="key">The key of the resource.</param>
         /// <returns>Returns a full path to the resource.</returns>

@@ -5,9 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace BouncyBox.VorpalEngine.Engine.Interop
 {
-    /// <summary>
-    ///     Maps common window messages to string representations of their constants.
-    /// </summary>
+    /// <summary>Maps common window messages to string representations of their constants.</summary>
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     internal class WindowMessage
     {
@@ -604,9 +602,7 @@ namespace BouncyBox.VorpalEngine.Engine.Interop
                 WM_XBUTTONUP
             };
 
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="WindowMessage" /> type.
-        /// </summary>
+        /// <summary>Initializes a new instance of the <see cref="WindowMessage" /> type.</summary>
         /// <param name="name">The string representation of the constant name.</param>
         /// <param name="value">The constant value.</param>
         public WindowMessage(string name, int value)
@@ -615,27 +611,19 @@ namespace BouncyBox.VorpalEngine.Engine.Interop
             Value = value;
         }
 
-        /// <summary>
-        ///     Gets the string representation of the constant name.
-        /// </summary>
+        /// <summary>Gets the string representation of the constant name.</summary>
         public string Name { get; }
 
-        /// <summary>
-        ///     Gets the constant value.
-        /// </summary>
+        /// <summary>Gets the constant value.</summary>
         public int Value { get; }
 
-        /// <summary>
-        ///     Casts the <see cref="WindowMessage" /> instance to its constant value.
-        /// </summary>
+        /// <summary>Casts the <see cref="WindowMessage" /> instance to its constant value.</summary>
         public static implicit operator int(WindowMessage value)
         {
             return value.Value;
         }
 
-        /// <summary>
-        ///     Attempts to map a constant value to a known window message.
-        /// </summary>
+        /// <summary>Attempts to map a constant value to a known window message.</summary>
         /// <param name="value">A constant value.</param>
         /// <returns>Returns the known window message, if one exists; otherwise, returns null.</returns>
         public static WindowMessage? MapKnown(int value)
@@ -645,9 +633,7 @@ namespace BouncyBox.VorpalEngine.Engine.Interop
             return windowsMessage;
         }
 
-        /// <summary>
-        ///     A collection of window messages keyed by value.
-        /// </summary>
+        /// <summary>A collection of window messages keyed by value.</summary>
         private class WindowsMessageCollection : KeyedCollection<int, WindowMessage>
         {
             /// <inheritdoc />

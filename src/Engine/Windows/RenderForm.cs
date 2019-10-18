@@ -15,9 +15,7 @@ using User32 = TerraFX.Interop.User32;
 
 namespace BouncyBox.VorpalEngine.Engine.Windows
 {
-    /// <summary>
-    ///     A window used as a rendering target.
-    /// </summary>
+    /// <summary>A window used as a rendering target.</summary>
     internal sealed class RenderForm : Form
     {
         private readonly ConcurrentMessagePublisherSubscriber<IGlobalMessage> _globalMessagePublisherSubscriber;
@@ -34,9 +32,7 @@ namespace BouncyBox.VorpalEngine.Engine.Windows
         private bool _wasMaximized;
         private WindowedMode _windowedMode;
 
-        /// <summary>
-        ///     <para>Initializes a new instance of the <see cref="RenderForm" /> type.</para>
-        /// </summary>
+        /// <summary>Initializes a new instance of the <see cref="RenderForm" /> type.</summary>
         /// <remarks>
         ///     <para>
         ///         This constructor handles all configuration of the underlying window in preparation for rendering, including setting
@@ -121,9 +117,7 @@ namespace BouncyBox.VorpalEngine.Engine.Windows
         {
         }
 
-        /// <summary>
-        ///     Instructs the global message publisher/subscriber to handle messages to which this object subscribed.
-        /// </summary>
+        /// <summary>Instructs the global message publisher/subscriber to handle messages to which this object subscribed.</summary>
         /// <exception cref="InvalidOperationException">Thrown when the thread executing this method is not the main thread.</exception>
         public void HandleDispatchedMessages()
         {
@@ -202,9 +196,7 @@ namespace BouncyBox.VorpalEngine.Engine.Windows
             base.WndProc(ref m);
         }
 
-        /// <summary>
-        ///     Handles the <see cref="User32.WM_ACTIVATE" /> message.
-        /// </summary>
+        /// <summary>Handles the <see cref="User32.WM_ACTIVATE" /> message.</summary>
         /// <remarks>
         ///     <para>Publishes the <see cref="RenderWindowActivatedMessage" /> global message.</para>
         ///     <para>Publishes the <see cref="RenderWindowDeactivatedMessage" /> global message.</para>
@@ -227,12 +219,8 @@ namespace BouncyBox.VorpalEngine.Engine.Windows
             _interfaces.Keyboard.Reset();
         }
 
-        /// <summary>
-        ///     Handles the <see cref="User32.WM_CLOSE" /> message.
-        /// </summary>
-        /// <remarks>
-        ///     Publishes the <see cref="RenderWindowClosingMessage" /> global message.
-        /// </remarks>
+        /// <summary>Handles the <see cref="User32.WM_CLOSE" /> message.</summary>
+        /// <remarks>Publishes the <see cref="RenderWindowClosingMessage" /> global message.</remarks>
         private HandleResult HandleClose(ref Message message)
         {
             message.Result = IntPtr.Zero;
@@ -245,33 +233,25 @@ namespace BouncyBox.VorpalEngine.Engine.Windows
             return HandleResult.Return;
         }
 
-        /// <summary>
-        ///     Handles the <see cref="User32.WM_DESTROY" /> message.
-        /// </summary>
+        /// <summary>Handles the <see cref="User32.WM_DESTROY" /> message.</summary>
         private void HandleWindowDestruction()
         {
             _globalMessagePublisherSubscriber.Dispose();
         }
 
-        /// <summary>
-        ///     Handles the <see cref="User32.WM_DISPLAYCHANGE" /> message.
-        /// </summary>
+        /// <summary>Handles the <see cref="User32.WM_DISPLAYCHANGE" /> message.</summary>
         private void HandleDisplayResolutionChange()
         {
             // TODO
         }
 
-        /// <summary>
-        ///     Handles the <see cref="User32.WM_ENTERSIZEMOVE" /> message.
-        /// </summary>
+        /// <summary>Handles the <see cref="User32.WM_ENTERSIZEMOVE" /> message.</summary>
         private void HandleEnterSizeMove()
         {
             _isUserMovingOrResizing = true;
         }
 
-        /// <summary>
-        ///     Handles the <see cref="User32.WM_EXITSIZEMOVE" /> message.
-        /// </summary>
+        /// <summary>Handles the <see cref="User32.WM_EXITSIZEMOVE" /> message.</summary>
         private void HandleExitSizeMove()
         {
             _isUserMovingOrResizing = false;
@@ -286,9 +266,7 @@ namespace BouncyBox.VorpalEngine.Engine.Windows
             _sizeMessage = null;
         }
 
-        /// <summary>
-        ///     Handles the <see cref="User32.WM_INPUT" /> message.
-        /// </summary>
+        /// <summary>Handles the <see cref="User32.WM_INPUT" /> message.</summary>
         /// <param name="message">The associated Windows message.</param>
         /// <exception>Thrown when <see cref="User32.GetRawInputData" /> failed.</exception>
         private unsafe void HandleInput(ref Message message)
@@ -347,26 +325,20 @@ namespace BouncyBox.VorpalEngine.Engine.Windows
             }
         }
 
-        /// <summary>
-        ///     Handles the <see cref="User32.WM_MENUCHAR" /> message.
-        /// </summary>
+        /// <summary>Handles the <see cref="User32.WM_MENUCHAR" /> message.</summary>
         /// <param name="message">The associated Windows message.</param>
         private static void HandleMenuChar(ref Message message)
         {
             message.Result = new IntPtr(User32.MNC_CLOSE << 16);
         }
 
-        /// <summary>
-        ///     Handles the <see cref="User32.WM_MOVE" /> message.
-        /// </summary>
+        /// <summary>Handles the <see cref="User32.WM_MOVE" /> message.</summary>
         private void HandleMove()
         {
             SetMonitorHandle();
         }
 
-        /// <summary>
-        ///     Handles the <see cref="User32.WM_POWERBROADCAST" /> message.
-        /// </summary>
+        /// <summary>Handles the <see cref="User32.WM_POWERBROADCAST" /> message.</summary>
         /// <param name="message">The associated Windows message.</param>
         private static void HandlePowerBroadcast(ref Message message)
         {
@@ -381,9 +353,7 @@ namespace BouncyBox.VorpalEngine.Engine.Windows
             }
         }
 
-        /// <summary>
-        ///     Handles the <see cref="User32.WM_SIZE" /> message.
-        /// </summary>
+        /// <summary>Handles the <see cref="User32.WM_SIZE" /> message.</summary>
         /// <remarks>
         ///     <para>Publishes the <see cref="RenderWindowMinimizedMessage" /> global message.</para>
         ///     <para>Publishes the <see cref="RenderWindowRestoredMessage" /> global message.</para>
@@ -432,9 +402,7 @@ namespace BouncyBox.VorpalEngine.Engine.Windows
             }
         }
 
-        /// <summary>
-        ///     Handles the <see cref="User32.WM_SYSCOMMAND" /> message.
-        /// </summary>
+        /// <summary>Handles the <see cref="User32.WM_SYSCOMMAND" /> message.</summary>
         /// <param name="message">The associated Windows message.</param>
         private HandleResult HandleSysCommand(ref Message message)
         {
@@ -472,12 +440,8 @@ namespace BouncyBox.VorpalEngine.Engine.Windows
             return HandleResult.InvokeBaseWndProc;
         }
 
-        /// <summary>
-        ///     Detects the display the render form is considered to be on according to Windows and tracks the resulting monitor handle.
-        /// </summary>
-        /// <remarks>
-        ///     Publishes the <see cref="DisplayChangedMessage" /> global message.
-        /// </remarks>
+        /// <summary>Detects the display the render form is considered to be on according to Windows and tracks the resulting monitor handle.</summary>
+        /// <remarks>Publishes the <see cref="DisplayChangedMessage" /> global message.</remarks>
         /// <exception>Thrown when <see cref="User32.GetMonitorInfoW" /> failed.</exception>
         /// <exception>Thrown when <see cref="User32.EnumDisplayDevicesW" /> failed.</exception>
         private unsafe void SetMonitorHandle()
@@ -527,9 +491,7 @@ namespace BouncyBox.VorpalEngine.Engine.Windows
         ///         configuration.
         ///     </para>
         /// </summary>
-        /// <remarks>
-        ///     Publishes the <see cref="ResolutionChangedMessage" /> global message.
-        /// </remarks>
+        /// <remarks>Publishes the <see cref="ResolutionChangedMessage" /> global message.</remarks>
         /// <param name="requestedResolution">The requested resolution.</param>
         /// <param name="userRequested">A value indicating whether the user requested the change.</param>
         private void SetResolution(Size requestedResolution, bool userRequested)
@@ -615,9 +577,7 @@ namespace BouncyBox.VorpalEngine.Engine.Windows
             _serilogLogger.LogInformation(mode == WindowedMode.BorderedWindowed ? "Window is now bordered" : "Window is now borderless");
         }
 
-        /// <summary>
-        ///     Sets the window's border style.
-        /// </summary>
+        /// <summary>Sets the window's border style.</summary>
         private void SetFormBorderStyle()
         {
             FormBorderStyle =
@@ -626,37 +586,27 @@ namespace BouncyBox.VorpalEngine.Engine.Windows
                     : FormBorderStyle.None;
         }
 
-        /// <summary>
-        ///     Handles the <see cref="ResolutionRequestedMessage" /> global message.
-        /// </summary>
+        /// <summary>Handles the <see cref="ResolutionRequestedMessage" /> global message.</summary>
         /// <param name="message">The message being handled.</param>
         private void HandleResolutionRequestedMessage(ResolutionRequestedMessage message)
         {
             SetResolution(message.Resolution, false);
         }
 
-        /// <summary>
-        ///     Handles the <see cref="WindowedModeRequestedMessage" /> global message.
-        /// </summary>
+        /// <summary>Handles the <see cref="WindowedModeRequestedMessage" /> global message.</summary>
         /// <param name="message">The message being handled.</param>
         private void HandleWindowedModeRequestedMessage(WindowedModeRequestedMessage message)
         {
             SetWindowedMode(message.Mode);
         }
 
-        /// <summary>
-        ///     Determines whether to call the window's window procedure after processing a Windows message.
-        /// </summary>
+        /// <summary>Determines whether to call the window's window procedure after processing a Windows message.</summary>
         private enum HandleResult
         {
-            /// <summary>
-            ///     Do not call the window's window procedure.
-            /// </summary>
+            /// <summary>Do not call the window's window procedure.</summary>
             Return,
 
-            /// <summary>
-            ///     Call the window's window procedure.
-            /// </summary>
+            /// <summary>Call the window's window procedure.</summary>
             InvokeBaseWndProc
         }
     }

@@ -11,9 +11,7 @@ using User32 = TerraFX.Interop.User32;
 
 namespace BouncyBox.VorpalEngine.Engine.Game
 {
-    /// <summary>
-    ///     An engine thread worker that renders render states.
-    /// </summary>
+    /// <summary>An engine thread worker that renders render states.</summary>
     internal sealed class RenderWorker<TGameState, TRenderState> : EngineThreadWorker
         where TGameState : class
         where TRenderState : class, new()
@@ -31,9 +29,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
         private bool _isRenderWindowMinimized;
         private IntPtr _windowHandle;
 
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="RenderWorker{TGameState,TRenderState}" /> type.
-        /// </summary>
+        /// <summary>Initializes a new instance of the <see cref="RenderWorker{TGameState,TRenderState}" /> type.</summary>
         /// <param name="interfaces">An <see cref="IInterfaces" /> implementation.</param>
         /// <param name="entityManager">An <see cref="IEntityManager{TGameState,TRenderState}" /> implementation.</param>
         /// <param name="context">A nested context.</param>
@@ -43,9 +39,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
             _entityManager = entityManager;
         }
 
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="RenderWorker{TGameState,TRenderState}" /> type.
-        /// </summary>
+        /// <summary>Initializes a new instance of the <see cref="RenderWorker{TGameState,TRenderState}" /> type.</summary>
         /// <param name="interfaces">An <see cref="IInterfaces" /> implementation.</param>
         /// <param name="entityManager">An <see cref="IEntityManager{TGameState,TRenderState}" /> implementation.</param>
         public RenderWorker(IInterfaces interfaces, IEntityManager<TGameState, TRenderState> entityManager)
@@ -72,12 +66,8 @@ namespace BouncyBox.VorpalEngine.Engine.Game
         }
 
         /// <inheritdoc />
-        /// <summary>
-        ///     Performs the work.
-        /// </summary>
-        /// <remarks>
-        ///     Publishes the <see cref="RecreateRenderTargetMessage" /> global message.
-        /// </remarks>
+        /// <summary>Performs the work.</summary>
+        /// <remarks>Publishes the <see cref="RecreateRenderTargetMessage" /> global message.</remarks>
         /// <exception>Thrown when <see cref="TerraFX.Interop.User32.GetClientRect" /> failed.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Thrown when the result of rendering is an unexpected value.</exception>
         protected override unsafe void OnDoWork(CancellationToken cancellationToken)
@@ -153,45 +143,35 @@ namespace BouncyBox.VorpalEngine.Engine.Game
             _engineStatsStopwatch.Restart();
         }
 
-        /// <summary>
-        ///     Handles the <see cref="RenderWindowHandleCreatedMessage" /> global message.
-        /// </summary>
+        /// <summary>Handles the <see cref="RenderWindowHandleCreatedMessage" /> global message.</summary>
         /// <param name="message">The message being handled.</param>
         private void HandleRenderWindowHandleCreatedMessage(RenderWindowHandleCreatedMessage message)
         {
             _windowHandle = message.WindowHandle;
         }
 
-        /// <summary>
-        ///     Handles the <see cref="RenderWindowActivatedMessage" /> global message.
-        /// </summary>
+        /// <summary>Handles the <see cref="RenderWindowActivatedMessage" /> global message.</summary>
         /// <param name="message">The message being handled.</param>
         private void HandleRenderWindowActivatedMessage(RenderWindowActivatedMessage message)
         {
             _isRenderWindowActivated = true;
         }
 
-        /// <summary>
-        ///     Handles the <see cref="RenderWindowActivatedMessage" /> global message.
-        /// </summary>
+        /// <summary>Handles the <see cref="RenderWindowActivatedMessage" /> global message.</summary>
         /// <param name="message">The message being handled.</param>
         private void HandleRenderWindowDeactivatedMessage(RenderWindowDeactivatedMessage message)
         {
             _isRenderWindowActivated = false;
         }
 
-        /// <summary>
-        ///     Handles the <see cref="RenderWindowMinimizedMessage" /> global message.
-        /// </summary>
+        /// <summary>Handles the <see cref="RenderWindowMinimizedMessage" /> global message.</summary>
         /// <param name="message">The message being handled.</param>
         private void HandleRenderWindowMinimizedMessage(RenderWindowMinimizedMessage message)
         {
             _isRenderWindowMinimized = true;
         }
 
-        /// <summary>
-        ///     Handles the <see cref="RenderWindowRestoredMessage" /> global message.
-        /// </summary>
+        /// <summary>Handles the <see cref="RenderWindowRestoredMessage" /> global message.</summary>
         /// <param name="message">The message being handled.</param>
         private void HandleRenderWindowRestoredMessage(RenderWindowRestoredMessage message)
         {

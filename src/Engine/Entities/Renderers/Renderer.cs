@@ -17,9 +17,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities.Renderers
         private bool _isDisposed;
         private bool _isInitialized;
 
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="Renderer{TRenderState}" /> type.
-        /// </summary>
+        /// <summary>Initializes a new instance of the <see cref="Renderer{TRenderState}" /> type.</summary>
         /// <param name="interfaces">An <see cref="IInterfaces" /> implementation.</param>
         /// <param name="context">A nested context.</param>
         /// <param name="order">The entity order. The order must be unique for all renderers in an <see cref="EntityCollection{TEntity}" />.</param>
@@ -31,9 +29,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities.Renderers
             GlobalMessagePublisherSubscriber = ConcurrentMessagePublisherSubscriber<IGlobalMessage>.Create(interfaces, context);
         }
 
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="Renderer{TRenderState}" /> type.
-        /// </summary>
+        /// <summary>Initializes a new instance of the <see cref="Renderer{TRenderState}" /> type.</summary>
         /// <param name="interfaces">An <see cref="IInterfaces" /> implementation.</param>
         /// <param name="order">The entity order. The order must be unique for all renderers in an <see cref="EntityCollection{TEntity}" />.</param>
         protected Renderer(IInterfaces interfaces, uint order = 0)
@@ -41,14 +37,10 @@ namespace BouncyBox.VorpalEngine.Engine.Entities.Renderers
         {
         }
 
-        /// <summary>
-        ///     Gets the nested context.
-        /// </summary>
+        /// <summary>Gets the nested context.</summary>
         protected NestedContext Context { get; }
 
-        /// <summary>
-        ///     Gets the <see cref="IInterfaces" /> implementation.
-        /// </summary>
+        /// <summary>Gets the <see cref="IInterfaces" /> implementation.</summary>
         protected IInterfaces Interfaces { get; }
 
         /// <summary>
@@ -58,29 +50,19 @@ namespace BouncyBox.VorpalEngine.Engine.Entities.Renderers
         /// </summary>
         protected ConcurrentMessagePublisherSubscriber<IGlobalMessage> GlobalMessagePublisherSubscriber { get; }
 
-        /// <summary>
-        ///     Gets a value indicating if the renderer is neither paused nor suspended.
-        /// </summary>
+        /// <summary>Gets a value indicating if the renderer is neither paused nor suspended.</summary>
         protected bool IsRunning => !IsPaused && !IsSuspended;
 
-        /// <summary>
-        ///     Gets a value indicating if the renderer is paused.
-        /// </summary>
+        /// <summary>Gets a value indicating if the renderer is paused.</summary>
         protected bool IsPaused { get; private set; }
 
-        /// <summary>
-        ///     Gets a value indicating if the renderer is suspended.
-        /// </summary>
+        /// <summary>Gets a value indicating if the renderer is suspended.</summary>
         protected bool IsSuspended { get; private set; }
 
-        /// <summary>
-        ///     Gets or sets a value that determines whether to render when the game execution state is paused.
-        /// </summary>
+        /// <summary>Gets or sets a value that determines whether to render when the game execution state is paused.</summary>
         protected virtual bool RenderWhenPaused { get; set; } = true;
 
-        /// <summary>
-        ///     Gets or sets a value that determines whether to render when the game execution state is suspended.
-        /// </summary>
+        /// <summary>Gets or sets a value that determines whether to render when the game execution state is suspended.</summary>
         protected virtual bool RenderWhenSuspended { get; set; } = false;
 
         /// <inheritdoc />
@@ -258,9 +240,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities.Renderers
         {
         }
 
-        /// <summary>
-        ///     Determines if the entity should render a render state.
-        /// </summary>
+        /// <summary>Determines if the entity should render a render state.</summary>
         /// <returns>Returns a value indicating whether the entity should render a render state.</returns>
         private bool ShouldRender()
         {

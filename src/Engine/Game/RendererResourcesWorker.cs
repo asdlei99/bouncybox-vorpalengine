@@ -13,9 +13,7 @@ using User32 = TerraFX.Interop.User32;
 
 namespace BouncyBox.VorpalEngine.Engine.Game
 {
-    /// <summary>
-    ///     An engine thread worker that manages requests to initialize, resize, and release DirectX resources.
-    /// </summary>
+    /// <summary>An engine thread worker that manages requests to initialize, resize, and release DirectX resources.</summary>
     internal sealed class RendererResourcesWorker<TGameState, TRenderState> : EngineThreadWorker
         where TGameState : class
         where TRenderState : class
@@ -41,9 +39,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
         private TimeSpan? _refreshPeriod;
         private IntPtr _windowHandle = IntPtr.Zero;
 
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="RendererResourcesWorker{TGameState,TRenderState}" /> type.
-        /// </summary>
+        /// <summary>Initializes a new instance of the <see cref="RendererResourcesWorker{TGameState,TRenderState}" /> type.</summary>
         /// <param name="interfaces">An <see cref="IInterfaces" /> implementation.</param>
         /// <param name="entityManager">An <see cref="IEntityManager{TGameState,TRenderState}" /> implementation.</param>
         /// <param name="context">A nested context.</param>
@@ -55,9 +51,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
             _serilogLogger = new ContextSerilogLogger(interfaces.SerilogLogger, Context);
         }
 
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="RendererResourcesWorker{TGameState,TRenderState}" /> type.
-        /// </summary>
+        /// <summary>Initializes a new instance of the <see cref="RendererResourcesWorker{TGameState,TRenderState}" /> type.</summary>
         /// <param name="interfaces">An <see cref="IInterfaces" /> implementation.</param>
         /// <param name="entityManager">An <see cref="IEntityManager{TGameState,TRenderState}" /> implementation.</param>
         public RendererResourcesWorker(IInterfaces interfaces, IEntityManager<TGameState, TRenderState> entityManager)
@@ -80,9 +74,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
         }
 
         /// <inheritdoc />
-        /// <summary>
-        ///     <para>Performs the work.</para>
-        /// </summary>
+        /// <summary>Performs the work.</summary>
         /// <exception cref="InvalidOperationException">Thrown when the thread executing this method is not the renderer resources thread.</exception>
         /// <exception cref="DirectXException">Thrown if the maximum initialization attempts were reached without success.</exception>
         protected override void OnDoWork(CancellationToken cancellationToken)
@@ -141,12 +133,8 @@ namespace BouncyBox.VorpalEngine.Engine.Game
             ReleaseResources();
         }
 
-        /// <summary>
-        ///     Initializes DirectX and renderer resources.
-        /// </summary>
-        /// <remarks>
-        ///     Publishes the <see cref="RefreshPeriodChangedMessage" /> global message.
-        /// </remarks>
+        /// <summary>Initializes DirectX and renderer resources.</summary>
+        /// <remarks>Publishes the <see cref="RefreshPeriodChangedMessage" /> global message.</remarks>
         /// <exception>Thrown when <see cref="TerraFX.Interop.User32.GetClientRect" /> failed.</exception>
         private unsafe void InitializeResources()
         {
@@ -235,9 +223,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
             PublishRefreshRateChangedMessage();
         }
 
-        /// <summary>
-        ///     Releases DirectX and renderer resources.
-        /// </summary>
+        /// <summary>Releases DirectX and renderer resources.</summary>
         private void ReleaseResources()
         {
             _entityManager.ReleaseRendererResources();
@@ -258,7 +244,8 @@ namespace BouncyBox.VorpalEngine.Engine.Game
         }
 
         /// <summary>
-        ///     Initializes the render target. This method is called when initializing resources and also in response to resolution changes.
+        ///     Initializes the render target. This method is called when initializing resources and also in response to resolution
+        ///     changes.
         /// </summary>
         private void InitializeRenderTarget()
         {
@@ -290,9 +277,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
             _d2d1DeviceContext.SetTextAntialiasMode(D2D1_TEXT_ANTIALIAS_MODE.D2D1_TEXT_ANTIALIAS_MODE_CLEARTYPE);
         }
 
-        /// <summary>
-        ///     Publishes the <see cref="RefreshPeriodChangedMessage" /> global message.
-        /// </summary>
+        /// <summary>Publishes the <see cref="RefreshPeriodChangedMessage" /> global message.</summary>
         private void PublishRefreshRateChangedMessage()
         {
             // Retrieve the current refresh rate
@@ -316,9 +301,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
             GlobalMessagePublisherSubscriber.Publish(new RefreshPeriodChangedMessage(refreshPeriod, hz));
         }
 
-        /// <summary>
-        ///     Handles the <see cref="RenderWindowHandleCreatedMessage" /> global message.
-        /// </summary>
+        /// <summary>Handles the <see cref="RenderWindowHandleCreatedMessage" /> global message.</summary>
         /// <param name="message">The message being handled.</param>
         private void HandleRenderWindowHandleCreatedMessage(RenderWindowHandleCreatedMessage message)
         {
@@ -327,12 +310,8 @@ namespace BouncyBox.VorpalEngine.Engine.Game
             InitializeResources();
         }
 
-        /// <summary>
-        ///     Handles the <see cref="DisplayChangedMessage" /> global message.
-        /// </summary>
-        /// <remarks>
-        ///     Publishes the <see cref="RefreshPeriodChangedMessage" /> global message.
-        /// </remarks>
+        /// <summary>Handles the <see cref="DisplayChangedMessage" /> global message.</summary>
+        /// <remarks>Publishes the <see cref="RefreshPeriodChangedMessage" /> global message.</remarks>
         /// <param name="message">The message being handled.</param>
         private void HandleDisplayChangedMessage(DisplayChangedMessage message)
         {
@@ -344,9 +323,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
             PublishRefreshRateChangedMessage();
         }
 
-        /// <summary>
-        ///     Handles the <see cref="ResolutionChangedMessage" /> global message.
-        /// </summary>
+        /// <summary>Handles the <see cref="ResolutionChangedMessage" /> global message.</summary>
         /// <param name="message">The message being handled.</param>
         private void HandleResolutionChangedMessage(ResolutionChangedMessage message)
         {

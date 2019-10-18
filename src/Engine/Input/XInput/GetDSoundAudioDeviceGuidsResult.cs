@@ -4,9 +4,7 @@
 
 namespace BouncyBox.VorpalEngine.Engine.Input.XInput
 {
-    /// <summary>
-    ///     Wraps the result of a call to <see cref="XInput14.XInputGetDSoundAudioDeviceGuids" />.
-    /// </summary>
+    /// <summary>Wraps the result of a call to <see cref="XInput14.XInputGetDSoundAudioDeviceGuids" />.</summary>
     public enum GetDSoundAudioDeviceGuidsResult
     {
         Success,

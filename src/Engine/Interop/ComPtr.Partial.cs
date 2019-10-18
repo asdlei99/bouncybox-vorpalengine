@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using BouncyBox.VorpalEngine.Engine.DirectX.ComObjects;
-using TerraFX.Interop;
 
 #pragma warning disable 1591
 
@@ -16,7 +15,7 @@ namespace BouncyBox.VorpalEngine.Engine.Interop
         {
             int result = As(p);
 
-            ComObject<IUnknown>.CheckResultHandle(result, $"Failed to query {nameof(U)}.", allowNoInterface);
+            ComObject.CheckResultHandle(result, $"Failed to query {nameof(U)}.", allowNoInterface);
 
             return result;
         }

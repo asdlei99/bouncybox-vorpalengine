@@ -10,9 +10,7 @@ using EnumsNET;
 
 namespace BouncyBox.VorpalEngine.Engine.Threads
 {
-    /// <summary>
-    ///     Spawns and tracks various threads used by the engine.
-    /// </summary>
+    /// <summary>Spawns and tracks various threads used by the engine.</summary>
     public class ThreadManager : IThreadManager
     {
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
@@ -20,9 +18,7 @@ namespace BouncyBox.VorpalEngine.Engine.Threads
         private readonly Dictionary<ProcessThread, ThreadWrapper> _threadsByProcessThread = new Dictionary<ProcessThread, ThreadWrapper>();
         private bool _isDisposed;
 
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="ThreadManager" /> type.
-        /// </summary>
+        /// <summary>Initializes a new instance of the <see cref="ThreadManager" /> type.</summary>
         /// <param name="serilogLogger">An <see cref="ISerilogLogger" /> implementation.</param>
         /// <param name="mainThread">The main thread.</param>
         /// <param name="context">A nested context.</param>
@@ -40,9 +36,7 @@ namespace BouncyBox.VorpalEngine.Engine.Threads
             VerifyProcessThread(ProcessThread.Main);
         }
 
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="ThreadManager" /> type.
-        /// </summary>
+        /// <summary>Initializes a new instance of the <see cref="ThreadManager" /> type.</summary>
         /// <param name="serilogLogger">An <see cref="ISerilogLogger" /> implementation.</param>
         /// <param name="mainThread">The main thread.</param>
         /// <exception cref="InvalidOperationException">Thrown when the thread executing this method is not the main thread.</exception>
@@ -145,16 +139,12 @@ namespace BouncyBox.VorpalEngine.Engine.Threads
                 ProcessThread.Main);
         }
 
-        /// <summary>
-        ///     Wraps a thread.
-        /// </summary>
+        /// <summary>Wraps a thread.</summary>
         private class ThreadWrapper
         {
             private readonly Thread _thread;
 
-            /// <summary>
-            ///     Initializes a new instance of the <see cref="ThreadWrapper" /> type.
-            /// </summary>
+            /// <summary>Initializes a new instance of the <see cref="ThreadWrapper" /> type.</summary>
             /// <param name="thread">The main thread.</param>
             public ThreadWrapper(Thread thread)
             {
@@ -163,9 +153,7 @@ namespace BouncyBox.VorpalEngine.Engine.Threads
                 ProcessThread = ProcessThread.Main;
             }
 
-            /// <summary>
-            ///     Initializes a new instance of the <see cref="ThreadWrapper" /> type.
-            /// </summary>
+            /// <summary>Initializes a new instance of the <see cref="ThreadWrapper" /> type.</summary>
             /// <param name="threadWorker">The engine thread worker that will do work on the thread.</param>
             /// <param name="thread">The thread being wrapped.</param>
             /// <param name="terminationCountdownEvent">
@@ -227,27 +215,19 @@ namespace BouncyBox.VorpalEngine.Engine.Threads
                     });
             }
 
-            /// <summary>
-            ///     Gets the process thread type of the thread being wrapped.
-            /// </summary>
+            /// <summary>Gets the process thread type of the thread being wrapped.</summary>
             public ProcessThread ProcessThread { get; }
 
-            /// <summary>
-            ///     Gets a tuple containing an unhandled exception and what engine thread it occurred on.
-            /// </summary>
+            /// <summary>Gets a tuple containing an unhandled exception and what engine thread it occurred on.</summary>
             public (EngineThread thread, Exception exception)? UnhandledException { get; private set; }
 
-            /// <summary>
-            ///     Starts the thread.
-            /// </summary>
+            /// <summary>Starts the thread.</summary>
             public void Start()
             {
                 _thread.Start();
             }
 
-            /// <summary>
-            ///     Verifies that the currently-executing thread is the specified thread.
-            /// </summary>
+            /// <summary>Verifies that the currently-executing thread is the specified thread.</summary>
             /// <exception cref="InvalidOperationException">Thrown when the current thread is not the specified thread.</exception>
             [DebuggerStepThrough]
             [Conditional("DEBUG")]

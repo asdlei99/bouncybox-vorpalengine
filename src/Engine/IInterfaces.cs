@@ -13,39 +13,25 @@ namespace BouncyBox.VorpalEngine.Engine
     /// </summary>
     public interface IInterfaces
     {
-        /// <summary>
-        ///     Gets the <see cref="ISerilogLogger" /> implementation.
-        /// </summary>
+        /// <summary>Gets the <see cref="ISerilogLogger" /> implementation.</summary>
         ISerilogLogger SerilogLogger { get; }
 
-        /// <summary>
-        ///     Gets the <see cref="IThreadManager" /> implementation.
-        /// </summary>
+        /// <summary>Gets the <see cref="IThreadManager" /> implementation.</summary>
         IThreadManager ThreadManager { get; }
 
-        /// <summary>
-        ///     Gets the <see cref="ICommonGameSettings" /> implementation.
-        /// </summary>
+        /// <summary>Gets the <see cref="ICommonGameSettings" /> implementation.</summary>
         ICommonGameSettings CommonGameSettings { get; }
 
-        /// <summary>
-        ///     Gets the global <see cref="IConcurrentMessageQueue{TMessageBase}" /> implementation.
-        /// </summary>
+        /// <summary>Gets the global <see cref="IConcurrentMessageQueue{TMessageBase}" /> implementation.</summary>
         IConcurrentMessageQueue<IGlobalMessage> GlobalConcurrentMessageQueue { get; }
 
-        /// <summary>
-        ///     Gets the update <see cref="IMessageQueue{TMessageBase}" /> implementation.
-        /// </summary>
+        /// <summary>Gets the update <see cref="IMessageQueue{TMessageBase}" /> implementation.</summary>
         IMessageQueue<IUpdateMessage> UpdateMessageQueue { get; }
 
-        /// <summary>
-        ///     Gets the <see cref="IKeyboard" /> implementation.
-        /// </summary>
+        /// <summary>Gets the <see cref="IKeyboard" /> implementation.</summary>
         IKeyboard Keyboard { get; }
 
-        /// <summary>
-        ///     Gets the <see cref="IStatefulGamepad" /> implementation.
-        /// </summary>
+        /// <summary>Gets the <see cref="IStatefulGamepad" /> implementation.</summary>
         IStatefulGamepad StatefulGamepad { get; }
     }
 }

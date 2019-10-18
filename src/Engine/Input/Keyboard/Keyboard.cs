@@ -9,9 +9,7 @@ using EnumsNET;
 
 namespace BouncyBox.VorpalEngine.Engine.Input.Keyboard
 {
-    /// <summary>
-    ///     The keyboard.
-    /// </summary>
+    /// <summary>The keyboard.</summary>
     [DebuggerDisplay("{" + nameof(DebuggerDisplay) + "}")]
     public class Keyboard : IKeyboard
     {

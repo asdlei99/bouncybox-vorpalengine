@@ -25,9 +25,7 @@ namespace BouncyBox.VorpalEngine.Engine.Messaging
             DisposeHelper.Dispose(() => { _messageSubscriber?.Dispose(); }, ref _isDisposed);
         }
 
-        /// <summary>
-        ///     Publishes a message to any subscribers subscribes to the message type.
-        /// </summary>
+        /// <summary>Publishes a message to any subscribers subscribes to the message type.</summary>
         /// <returns>Returns the message publisher/subscriber.</returns>
         public MessagePublisherSubscriber<TMessageBase> Publish<TMessage>(TMessage message)
             where TMessage : TMessageBase, new()
@@ -37,9 +35,7 @@ namespace BouncyBox.VorpalEngine.Engine.Messaging
             return this;
         }
 
-        /// <summary>
-        ///     Publishes a message to any subscribers subscribes to the message type.
-        /// </summary>
+        /// <summary>Publishes a message to any subscribers subscribes to the message type.</summary>
         /// <returns>Returns the message publisher/subscriber.</returns>
         public MessagePublisherSubscriber<TMessageBase> Publish<TMessage>()
             where TMessage : TMessageBase, new()
@@ -63,9 +59,7 @@ namespace BouncyBox.VorpalEngine.Engine.Messaging
             return this;
         }
 
-        /// <summary>
-        ///     Creates a new message publisher/subscriber.
-        /// </summary>
+        /// <summary>Creates a new message publisher/subscriber.</summary>
         /// <param name="messageQueue">The message queue to proxy.</param>
         /// <param name="context">A nested context.</param>
         /// <returns>Returns a new message publisher/subscriber.</returns>
@@ -76,9 +70,7 @@ namespace BouncyBox.VorpalEngine.Engine.Messaging
                 new MessageSubscriber<TMessageBase>(messageQueue, context));
         }
 
-        /// <summary>
-        ///     Creates a new message publisher/subscriber.
-        /// </summary>
+        /// <summary>Creates a new message publisher/subscriber.</summary>
         /// <param name="messageQueue">The message queue to proxy.</param>
         /// <returns>Returns a new message publisher/subscriber.</returns>
         public static MessagePublisherSubscriber<TMessageBase> Create(IMessageQueue<TMessageBase> messageQueue)

@@ -5,16 +5,12 @@ using EnumsNET;
 
 namespace BouncyBox.VorpalEngine.Engine.Threads
 {
-    /// <summary>
-    ///     A base class for all engine thread workers.
-    /// </summary>
+    /// <summary>A base class for all engine thread workers.</summary>
     public abstract class EngineThreadWorker : IEngineThreadWorker
     {
         private readonly ProcessThread _thread;
 
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="EngineThreadWorker" /> type.
-        /// </summary>
+        /// <summary>Initializes a new instance of the <see cref="EngineThreadWorker" /> type.</summary>
         /// <param name="interfaces">An <see cref="IInterfaces" /> implementation.</param>
         /// <param name="thread">The thread on which the worker will perform work.</param>
         /// <param name="context">A nested context.</param>
@@ -27,28 +23,20 @@ namespace BouncyBox.VorpalEngine.Engine.Threads
             GlobalMessagePublisherSubscriber = ConcurrentMessagePublisherSubscriber<IGlobalMessage>.Create(interfaces, context);
         }
 
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="EngineThreadWorker" /> type.
-        /// </summary>
+        /// <summary>Initializes a new instance of the <see cref="EngineThreadWorker" /> type.</summary>
         /// <param name="interfaces">An <see cref="IInterfaces" /> implementation.</param>
         /// <param name="thread">The thread on which the worker will perform work.</param>
         protected EngineThreadWorker(IInterfaces interfaces, EngineThread thread) : this(interfaces, thread, NestedContext.None())
         {
         }
 
-        /// <summary>
-        ///     Gets the <see cref="IInterfaces" /> implementation.
-        /// </summary>
+        /// <summary>Gets the <see cref="IInterfaces" /> implementation.</summary>
         protected IInterfaces Interfaces { get; }
 
-        /// <summary>
-        ///     Gets the nested context.
-        /// </summary>
+        /// <summary>Gets the nested context.</summary>
         protected NestedContext Context { get; }
 
-        /// <summary>
-        ///     Gets the global message publisher/subscriber.
-        /// </summary>
+        /// <summary>Gets the global message publisher/subscriber.</summary>
         protected ConcurrentMessagePublisherSubscriber<IGlobalMessage> GlobalMessagePublisherSubscriber { get; }
 
         /// <inheritdoc />

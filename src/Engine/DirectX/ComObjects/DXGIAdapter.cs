@@ -4,17 +4,13 @@ using TerraFX.Interop;
 
 namespace BouncyBox.VorpalEngine.Engine.DirectX.ComObjects
 {
-    /// <summary>
-    ///     Proxies the <see cref="IDXGIAdapter" /> COM interface.
-    /// </summary>
+    /// <summary>Proxies the <see cref="IDXGIAdapter" /> COM interface.</summary>
     // ReSharper disable once InconsistentNaming
     public unsafe class DXGIAdapter : ComObject<IDXGIAdapter>
     {
         private ComPtr<IDXGIAdapter> _dxgiAdapter;
 
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="DXGIAdapter" /> type.
-        /// </summary>
+        /// <summary>Initializes a new instance of the <see cref="DXGIAdapter" /> type.</summary>
         /// <param name="dxgiAdapter">A COM pointer to an <see cref="IDXGIAdapter" />.</param>
         public DXGIAdapter(ComPtr<IDXGIAdapter> dxgiAdapter)
         {
@@ -24,9 +20,7 @@ namespace BouncyBox.VorpalEngine.Engine.DirectX.ComObjects
         /// <inheritdoc />
         public override IDXGIAdapter* Pointer => _dxgiAdapter;
 
-        /// <summary>
-        ///     Proxies <see cref="IDXGIAdapter.GetDesc" />.
-        /// </summary>
+        /// <summary>Proxies <see cref="IDXGIAdapter.GetDesc" />.</summary>
         public DXGI_ADAPTER_DESC GetDesc()
         {
             DXGI_ADAPTER_DESC desc;
@@ -36,11 +30,10 @@ namespace BouncyBox.VorpalEngine.Engine.DirectX.ComObjects
             return desc;
         }
 
-        /// <summary>
-        ///     Proxies <see cref="IDXGIAdapter.GetParent" />.
-        /// </summary>
+        /// <summary>Proxies <see cref="IDXGIAdapter.GetParent" />.</summary>
         /// <param name="allowNoInterface">
-        ///     A value that determines whether to allow an <see cref="Engine.Interop.Windows.E_NOINTERFACE" /> HRESULT.
+        ///     A value that determines whether to allow an <see cref="Engine.Interop.Windows.E_NOINTERFACE" />
+        ///     HRESULT.
         /// </param>
         // ReSharper disable once InconsistentNaming
         public DXGIFactory2? GetParentDXGIFactory2(bool allowNoInterface = false)

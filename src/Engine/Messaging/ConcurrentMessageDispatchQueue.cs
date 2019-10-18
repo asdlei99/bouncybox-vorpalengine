@@ -7,8 +7,8 @@ using BouncyBox.VorpalEngine.Engine.Logging;
 namespace BouncyBox.VorpalEngine.Engine.Messaging
 {
     /// <summary>
-    ///     A queue that can receive dispatched global messages with the intent of potentially processing those messages on a different
-    ///     thread.
+    ///     A queue that can receive dispatched global messages with the intent of potentially processing those messages on a
+    ///     different thread.
     /// </summary>
     public class ConcurrentMessageDispatchQueue<TMessageBase> : IDisposable
         where TMessageBase : IGlobalMessage
@@ -19,9 +19,7 @@ namespace BouncyBox.VorpalEngine.Engine.Messaging
         private readonly ContextSerilogLogger _serilogLogger;
         private bool _isDisposed;
 
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="ConcurrentMessageDispatchQueue{TMessageBase}" /> type.
-        /// </summary>
+        /// <summary>Initializes a new instance of the <see cref="ConcurrentMessageDispatchQueue{TMessageBase}" /> type.</summary>
         /// <param name="serilogLogger">An <see cref="ISerilogLogger" /> implementation.</param>
         /// <param name="context">A nested context.</param>
         public ConcurrentMessageDispatchQueue(ISerilogLogger serilogLogger, NestedContext context)
@@ -30,9 +28,7 @@ namespace BouncyBox.VorpalEngine.Engine.Messaging
             _serilogLogger = new ContextSerilogLogger(serilogLogger, _context);
         }
 
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="ConcurrentMessageDispatchQueue{TMessageBase}" /> type.
-        /// </summary>
+        /// <summary>Initializes a new instance of the <see cref="ConcurrentMessageDispatchQueue{TMessageBase}" /> type.</summary>
         /// <param name="serilogLogger">An <see cref="ISerilogLogger" /> implementation.</param>
         public ConcurrentMessageDispatchQueue(ISerilogLogger serilogLogger)
             : this(serilogLogger, NestedContext.None())
@@ -51,9 +47,7 @@ namespace BouncyBox.VorpalEngine.Engine.Messaging
                 ref _isDisposed);
         }
 
-        /// <summary>
-        ///     Invokes the specified delegate when a dispatched message of the specified type is handled.
-        /// </summary>
+        /// <summary>Invokes the specified delegate when a dispatched message of the specified type is handled.</summary>
         /// <param name="handlerDelegate">A delegate that is invoked when a dispatched message of the specified type is handled.</param>
         /// <returns>Returns the concurrent message dispatch queue.</returns>
         public ConcurrentMessageDispatchQueue<TMessageBase> Handle<TMessage>(Action<TMessage> handlerDelegate)
@@ -74,7 +68,8 @@ namespace BouncyBox.VorpalEngine.Engine.Messaging
         }
 
         /// <summary>
-        ///     Dispatches a message to the queue. The message will be processed with a subsequent call to <see cref="HandleDispatched" />.
+        ///     Dispatches a message to the queue. The message will be processed with a subsequent call to
+        ///     <see cref="HandleDispatched" />.
         /// </summary>
         /// <param name="message">The message to dispatch.</param>
         /// <returns>Returns the concurrent message dispatch queue.</returns>
@@ -101,9 +96,7 @@ namespace BouncyBox.VorpalEngine.Engine.Messaging
             return this;
         }
 
-        /// <summary>
-        ///     Dequeues dispatched messages, calling the appropriate handler for each message.
-        /// </summary>
+        /// <summary>Dequeues dispatched messages, calling the appropriate handler for each message.</summary>
         public void HandleDispatched()
         {
             while (_queue.TryDequeue(out TMessageBase message))

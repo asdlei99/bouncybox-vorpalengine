@@ -14,9 +14,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
         private readonly IThreadManager _threadManager;
         private TRenderState? _nextState;
 
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="RenderStateManager{TRenderState}" /> type.
-        /// </summary>
+        /// <summary>Initializes a new instance of the <see cref="RenderStateManager{TRenderState}" /> type.</summary>
         /// <param name="threadManager">An <see cref="IThreadManager" /> implemenetation.</param>
         public RenderStateManager(IThreadManager threadManager)
         {

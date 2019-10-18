@@ -7,9 +7,7 @@ using BouncyBox.VorpalEngine.Engine.Threads;
 
 namespace BouncyBox.VorpalEngine.Engine
 {
-    /// <summary>
-    ///     Interfaces that are commonly used throughout the engine.
-    /// </summary>
+    /// <summary>Interfaces that are commonly used throughout the engine.</summary>
     public class Interfaces : IInterfaces
     {
         /// <summary>

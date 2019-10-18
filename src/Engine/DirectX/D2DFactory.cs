@@ -2,34 +2,22 @@
 
 namespace BouncyBox.VorpalEngine.Engine.DirectX
 {
-    /// <summary>
-    ///     Factory for various Direct2D structs.
-    /// </summary>
+    /// <summary>Factory for various Direct2D structs.</summary>
     public static class D2DFactory
     {
-        /// <summary>
-        ///     A point at (0,0).
-        /// </summary>
+        /// <summary>A point at (0,0).</summary>
         public static readonly D2D_POINT_2F ZeroPoint2F = new D2D_POINT_2F { x = 0, y = 0 };
 
-        /// <summary>
-        ///     A point at (0,0).
-        /// </summary>
+        /// <summary>A point at (0,0).</summary>
         public static readonly D2D_POINT_2U ZeroPoint2U = new D2D_POINT_2U { x = 0, y = 0 };
 
-        /// <summary>
-        ///     A size of (0,0).
-        /// </summary>
+        /// <summary>A size of (0,0).</summary>
         public static readonly D2D_SIZE_F ZeroSizeF = new D2D_SIZE_F { width = 0, height = 0 };
 
-        /// <summary>
-        ///     A size of (0,0).
-        /// </summary>
+        /// <summary>A size of (0,0).</summary>
         public static readonly D2D_SIZE_U ZeroSizeU = new D2D_SIZE_U { width = 0, height = 0 };
 
-        /// <summary>
-        ///     Creates a <see cref="D2D_POINT_2F" />.
-        /// </summary>
+        /// <summary>Creates a <see cref="D2D_POINT_2F" />.</summary>
         /// <param name="x">The x value.</param>
         /// <param name="y">The y value.</param>
         /// <returns>Returns a <see cref="D2D_POINT_2F" />.</returns>
@@ -43,9 +31,7 @@ namespace BouncyBox.VorpalEngine.Engine.DirectX
                 };
         }
 
-        /// <summary>
-        ///     Creates a <see cref="D2D_POINT_2U" />.
-        /// </summary>
+        /// <summary>Creates a <see cref="D2D_POINT_2U" />.</summary>
         /// <param name="x">The x value.</param>
         /// <param name="y">The y value.</param>
         /// <returns>Returns a <see cref="D2D_POINT_2U" />.</returns>
@@ -59,9 +45,7 @@ namespace BouncyBox.VorpalEngine.Engine.DirectX
                 };
         }
 
-        /// <summary>
-        ///     Creates a <see cref="D2D_RECT_F" />.
-        /// </summary>
+        /// <summary>Creates a <see cref="D2D_RECT_F" />.</summary>
         /// <param name="left">The left value.</param>
         /// <param name="top">The top value.</param>
         /// <param name="right">The right value.</param>
@@ -79,9 +63,7 @@ namespace BouncyBox.VorpalEngine.Engine.DirectX
                 };
         }
 
-        /// <summary>
-        ///     Creates a <see cref="D2D_RECT_F" />.
-        /// </summary>
+        /// <summary>Creates a <see cref="D2D_RECT_F" />.</summary>
         /// <param name="topLeft">The top-left location.</param>
         /// <param name="bottomRight">The bottom-right location.</param>
         /// <returns>Returns a <see cref="D2D_RECT_F" />.</returns>
@@ -97,9 +79,7 @@ namespace BouncyBox.VorpalEngine.Engine.DirectX
                 };
         }
 
-        /// <summary>
-        ///     Creates a <see cref="D2D_RECT_F" />.
-        /// </summary>
+        /// <summary>Creates a <see cref="D2D_RECT_F" />.</summary>
         /// <param name="location">The location.</param>
         /// <param name="size">The size.</param>
         /// <returns>Returns a <see cref="D2D_RECT_F" />.</returns>
@@ -115,9 +95,7 @@ namespace BouncyBox.VorpalEngine.Engine.DirectX
                 };
         }
 
-        /// <summary>
-        ///     Creates a <see cref="D2D_RECT_F" />.
-        /// </summary>
+        /// <summary>Creates a <see cref="D2D_RECT_F" />.</summary>
         /// <param name="left">The left value.</param>
         /// <param name="top">The top value.</param>
         /// <param name="width">The width.</param>
@@ -135,9 +113,7 @@ namespace BouncyBox.VorpalEngine.Engine.DirectX
                 };
         }
 
-        /// <summary>
-        ///     Creates a <see cref="D2D_RECT_U" />.
-        /// </summary>
+        /// <summary>Creates a <see cref="D2D_RECT_U" />.</summary>
         /// <param name="left">The left value.</param>
         /// <param name="top">The top value.</param>
         /// <param name="right">The right value.</param>
@@ -155,9 +131,7 @@ namespace BouncyBox.VorpalEngine.Engine.DirectX
                 };
         }
 
-        /// <summary>
-        ///     Creates a <see cref="D2D_RECT_U" />.
-        /// </summary>
+        /// <summary>Creates a <see cref="D2D_RECT_U" />.</summary>
         /// <param name="topLeft">The top-left location.</param>
         /// <param name="bottomRight">The bottom-right location.</param>
         /// <returns>Returns a <see cref="D2D_RECT_U" />.</returns>
@@ -173,9 +147,7 @@ namespace BouncyBox.VorpalEngine.Engine.DirectX
                 };
         }
 
-        /// <summary>
-        ///     Creates a <see cref="D2D_RECT_U" />.
-        /// </summary>
+        /// <summary>Creates a <see cref="D2D_RECT_U" />.</summary>
         /// <param name="location">The location.</param>
         /// <param name="size">The size.</param>
         /// <returns>Returns a <see cref="D2D_RECT_U" />.</returns>
@@ -191,9 +163,7 @@ namespace BouncyBox.VorpalEngine.Engine.DirectX
                 };
         }
 
-        /// <summary>
-        ///     Creates a <see cref="D2D_RECT_U" />.
-        /// </summary>
+        /// <summary>Creates a <see cref="D2D_RECT_U" />.</summary>
         /// <param name="left">The left value.</param>
         /// <param name="top">The top value.</param>
         /// <param name="width">The width.</param>
@@ -211,9 +181,7 @@ namespace BouncyBox.VorpalEngine.Engine.DirectX
                 };
         }
 
-        /// <summary>
-        ///     Creates a <see cref="D2D_SIZE_F" />.
-        /// </summary>
+        /// <summary>Creates a <see cref="D2D_SIZE_F" />.</summary>
         /// <param name="width">The width value.</param>
         /// <param name="height">The height value.</param>
         /// <returns>Returns a <see cref="D2D_SIZE_F" />.</returns>
@@ -227,9 +195,7 @@ namespace BouncyBox.VorpalEngine.Engine.DirectX
                 };
         }
 
-        /// <summary>
-        ///     Creates a <see cref="D2D_SIZE_U" />.
-        /// </summary>
+        /// <summary>Creates a <see cref="D2D_SIZE_U" />.</summary>
         /// <param name="width">The width value.</param>
         /// <param name="height">The height value.</param>
         /// <returns>Returns a <see cref="D2D_SIZE_U" />.</returns>

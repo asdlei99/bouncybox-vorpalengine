@@ -3,9 +3,7 @@ using System.Collections.Generic;
 
 namespace BouncyBox.VorpalEngine.Engine.Messaging
 {
-    /// <summary>
-    ///     Proxies subscriptions to a message queue in order to make unsubscription easier.
-    /// </summary>
+    /// <summary>Proxies subscriptions to a message queue in order to make unsubscription easier.</summary>
     public class MessageSubscriber<TMessageBase> : IDisposable
         where TMessageBase : IMessage
     {
@@ -14,9 +12,7 @@ namespace BouncyBox.VorpalEngine.Engine.Messaging
         private readonly HashSet<SubscriptionToken> _tokens = new HashSet<SubscriptionToken>();
         private bool _isDisposed;
 
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="MessageSubscriber{TMessageBase}" /> type.
-        /// </summary>
+        /// <summary>Initializes a new instance of the <see cref="MessageSubscriber{TMessageBase}" /> type.</summary>
         /// <param name="messageQueue">The message queue that issued the subscription tokens.</param>
         /// <param name="context">A nested context.</param>
         public MessageSubscriber(IMessageQueue<TMessageBase> messageQueue, NestedContext context)
@@ -25,9 +21,7 @@ namespace BouncyBox.VorpalEngine.Engine.Messaging
             _context = context;
         }
 
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="MessageSubscriber{TMessageBase}" /> type.
-        /// </summary>
+        /// <summary>Initializes a new instance of the <see cref="MessageSubscriber{TMessageBase}" /> type.</summary>
         /// <param name="messageQueue">The message queue that issued the subscription tokens.</param>
         public MessageSubscriber(IMessageQueue<TMessageBase> messageQueue)
             : this(messageQueue, NestedContext.None())

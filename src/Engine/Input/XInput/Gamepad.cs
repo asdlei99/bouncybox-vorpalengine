@@ -4,28 +4,20 @@ using BouncyBox.VorpalEngine.Engine.Interop;
 
 namespace BouncyBox.VorpalEngine.Engine.Input.XInput
 {
-    /// <summary>
-    ///     An XInput gamepad that wraps access to the underlying XInput 1.4 API.
-    /// </summary>
+    /// <summary>An XInput gamepad that wraps access to the underlying XInput 1.4 API.</summary>
     public class Gamepad
     {
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="Gamepad" /> type.
-        /// </summary>
+        /// <summary>Initializes a new instance of the <see cref="Gamepad" /> type.</summary>
         /// <param name="userIndex">A user index.</param>
         public Gamepad(byte userIndex)
         {
             UserIndex = userIndex;
         }
 
-        /// <summary>
-        ///     Gets the user index.
-        /// </summary>
+        /// <summary>Gets the user index.</summary>
         public byte UserIndex { get; }
 
-        /// <summary>
-        ///     Wraps a call to <see cref="XInput14.XInputGetAudioDeviceIds" />.
-        /// </summary>
+        /// <summary>Wraps a call to <see cref="XInput14.XInputGetAudioDeviceIds" />.</summary>
         /// <exception cref="Win32Exception">Thrown when <see cref="XInput14.XInputGetAudioDeviceIds" /> failed.</exception>
         public unsafe GetAudioDeviceIdsResult GetAudioDeviceIds(ushort* pRenderDeviceId, uint* pRenderCount, ushort* pCaptureDeviceId, uint* pCaptureCount)
         {
@@ -39,9 +31,7 @@ namespace BouncyBox.VorpalEngine.Engine.Input.XInput
             };
         }
 
-        /// <summary>
-        ///     Wraps a call to <see cref="XInput14.XInputGetBatteryInformation" />.
-        /// </summary>
+        /// <summary>Wraps a call to <see cref="XInput14.XInputGetBatteryInformation" />.</summary>
         public unsafe XInput14.XINPUT_BATTERY_INFORMATION? GetBatteryInformation(byte devType)
         {
             XInput14.XINPUT_BATTERY_INFORMATION xInputBatteryInformation;
@@ -51,9 +41,7 @@ namespace BouncyBox.VorpalEngine.Engine.Input.XInput
                        : (XInput14.XINPUT_BATTERY_INFORMATION?)null;
         }
 
-        /// <summary>
-        ///     Wraps a call to <see cref="XInput14.XInputGetCapabilities" />.
-        /// </summary>
+        /// <summary>Wraps a call to <see cref="XInput14.XInputGetCapabilities" />.</summary>
         /// <exception cref="Win32Exception">Thrown when <see cref="XInput14.XInputGetCapabilities" /> failed.</exception>
         public unsafe (GetCapabilitiesResult result, XInput14.XINPUT_CAPABILITIES? xInputCapabilities) GetCapabilities(uint dwFlags)
         {
@@ -68,9 +56,7 @@ namespace BouncyBox.VorpalEngine.Engine.Input.XInput
             };
         }
 
-        /// <summary>
-        ///     Wraps a call to <see cref="XInput14.XInputGetDSoundAudioDeviceGuids" />.
-        /// </summary>
+        /// <summary>Wraps a call to <see cref="XInput14.XInputGetDSoundAudioDeviceGuids" />.</summary>
         /// <exception cref="Win32Exception">Thrown when <see cref="XInput14.XInputGetDSoundAudioDeviceGuids" /> failed.</exception>
         public unsafe (GetDSoundAudioDeviceGuidsResult result, Guid? dSoundRenderGuid, Guid? dSoundCaptureGuid) GetDSoundAudioDeviceGuids()
         {
@@ -86,9 +72,7 @@ namespace BouncyBox.VorpalEngine.Engine.Input.XInput
             };
         }
 
-        /// <summary>
-        ///     Wraps a call to <see cref="XInput14.XInputGetKeystroke" />.
-        /// </summary>
+        /// <summary>Wraps a call to <see cref="XInput14.XInputGetKeystroke" />.</summary>
         /// <exception cref="Win32Exception">Thrown when <see cref="XInput14.XInputGetKeystroke" /> failed.</exception>
         public unsafe (GetKeystrokeResult result, XInputKeystroke? keystroke) GetKeystroke()
         {
@@ -104,9 +88,7 @@ namespace BouncyBox.VorpalEngine.Engine.Input.XInput
             };
         }
 
-        /// <summary>
-        ///     Wraps a call to <see cref="XInput14.XInputGetState" />.
-        /// </summary>
+        /// <summary>Wraps a call to <see cref="XInput14.XInputGetState" />.</summary>
         /// <exception cref="Win32Exception">Thrown when <see cref="XInput14.XInputGetState" /> failed.</exception>
         public unsafe (GetStateResult result, XInputState? state) GetState()
         {
@@ -121,9 +103,7 @@ namespace BouncyBox.VorpalEngine.Engine.Input.XInput
             };
         }
 
-        /// <summary>
-        ///     Wraps a call to <see cref="XInput14.XInputSetState" />.
-        /// </summary>
+        /// <summary>Wraps a call to <see cref="XInput14.XInputSetState" />.</summary>
         /// <exception cref="Win32Exception">Thrown when <see cref="XInput14.XInputSetState" /> failed.</exception>
         public unsafe SetStateResult SetState(XInput14.XINPUT_VIBRATION xInputVibration)
         {
@@ -137,17 +117,13 @@ namespace BouncyBox.VorpalEngine.Engine.Input.XInput
             };
         }
 
-        /// <summary>
-        ///     Wraps a call to <see cref="XInput14.XInputEnable" />.
-        /// </summary>
+        /// <summary>Wraps a call to <see cref="XInput14.XInputEnable" />.</summary>
         public static void Enable()
         {
             XInput14.XInputEnable(TerraFX.Interop.Windows.TRUE);
         }
 
-        /// <summary>
-        ///     Wraps a call to <see cref="XInput14.XInputEnable" />.
-        /// </summary>
+        /// <summary>Wraps a call to <see cref="XInput14.XInputEnable" />.</summary>
         public static void Disable()
         {
             XInput14.XInputEnable(TerraFX.Interop.Windows.FALSE);
