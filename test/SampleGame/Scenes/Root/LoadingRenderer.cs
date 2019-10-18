@@ -2,8 +2,6 @@
 using BouncyBox.VorpalEngine.Engine;
 using BouncyBox.VorpalEngine.Engine.DirectX;
 using BouncyBox.VorpalEngine.Engine.DirectX.ComObjects;
-using BouncyBox.VorpalEngine.Engine.Game;
-using BouncyBox.VorpalEngine.Engine.Interop;
 using BouncyBox.VorpalEngine.SampleGame.States.Render;
 using TerraFX.Interop;
 
@@ -36,7 +34,7 @@ namespace BouncyBox.VorpalEngine.SampleGame.Scenes.Root
             _textFormat?.Dispose();
         }
 
-        protected override void OnRender(DirectXResources resources, RenderState renderState, IEngineStats engineStats)
+        protected override void OnRender(DirectXResources resources, RenderState renderState)
         {
             Debug.Assert(renderState.SceneStates.Loading != null);
 

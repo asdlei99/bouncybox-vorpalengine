@@ -28,22 +28,29 @@ namespace BouncyBox.VorpalEngine.DebuggingGame.Scenes.Root
             }.ToImmutableArray();
 
         private readonly TimeSpan _delayIncrement = TimeSpan.FromMilliseconds(1);
+        private readonly IGameStateManager<GameState> _gameStateManager;
         private readonly TimeSpan _maximumDelay = TimeSpan.FromSeconds(1);
+        private EngineRenderStatsMessage? _latestEngineRenderStatsMessage;
+        private EngineUpdateStatsMessage? _latestEngineUpdateStatsMessage;
         private KeyboardSnapshot _previousKeyboardSnapshot = new KeyboardSnapshot(ImmutableArray<User32.VirtualKey>.Empty);
 
-        public RootUpdater(IInterfaces interfaces, NestedContext context) : base(interfaces, context.CopyAndPush(nameof(RootUpdater)))
+        public RootUpdater(IInterfaces interfaces, IGameStateManager<GameState> gameStateManager, NestedContext context)
+            : base(interfaces, context.CopyAndPush(nameof(RootUpdater)))
+        {
+            _gameStateManager = gameStateManager;
+
+            GlobalMessagePublisherSubscriber
+                .Subscribe<EngineUpdateStatsMessage>(HandleEngineUpdateStatsMessage)
+                .Subscribe<EngineRenderStatsMessage>(HandleEngineRenderStatsMessage);
+        }
+
+        public RootUpdater(IInterfaces interfaces, IGameStateManager<GameState> gameStateManager) : this(interfaces, gameStateManager, NestedContext.None())
         {
         }
 
-        public RootUpdater(IInterfaces interfaces) : base(interfaces)
+        protected override void OnUpdateGameState()
         {
-        }
-
-        protected override void OnUpdateGameState(GameState gameState)
-        {
-            System.Diagnostics.Debug.Assert(gameState.SceneStates.Root != null);
-
-            RootSceneGameState sceneGameState = gameState.SceneStates.Root;
+            RootSceneGameState sceneGameState = _gameStateManager.GameState.SceneStates.Root!;
 
             // Keyboard
 
@@ -152,16 +159,20 @@ namespace BouncyBox.VorpalEngine.DebuggingGame.Scenes.Root
             }
         }
 
-        protected override void OnPrepareRenderState(GameState gameState, RenderState renderState)
+        protected override void OnPrepareRenderState(RenderState renderState)
         {
-            System.Diagnostics.Debug.Assert(gameState.SceneStates.Root != null);
-
-            RootSceneGameState sceneGameState = gameState.SceneStates.Root;
+            RootSceneGameState sceneGameState = _gameStateManager.GameState.SceneStates.Root!;
             RootSceneRenderState sceneRenderState = renderState.SceneStates.Root ??= new RootSceneRenderState();
 
             sceneRenderState.Counter = sceneGameState.Counter;
-            sceneRenderState.RenderDelayInMilliseconds = (ulong)sceneGameState.RenderDelay.TotalMilliseconds;
-            sceneRenderState.UpdateDelayInMilliseconds = (ulong)sceneGameState.UpdateDelay.TotalMilliseconds;
+            sceneRenderState.UpdatesPerSecond = _latestEngineUpdateStatsMessage?.UpdatesPerSecond;
+            sceneRenderState.FramesPerSecond = _latestEngineRenderStatsMessage?.FramesPerSecond;
+            sceneRenderState.MeanFrametime = _latestEngineRenderStatsMessage?.MeanFrametime;
+            sceneRenderState.MinimumFrametime = _latestEngineRenderStatsMessage?.MinimumFrametime;
+            sceneRenderState.MaximumFrametime = _latestEngineRenderStatsMessage?.MaximumFrametime;
+            sceneRenderState.FrameCount = _latestEngineRenderStatsMessage?.FrameCount;
+            sceneRenderState.RenderDelayInMilliseconds = (uint)sceneGameState.RenderDelay.TotalMilliseconds;
+            sceneRenderState.UpdateDelayInMilliseconds = (uint)sceneGameState.UpdateDelay.TotalMilliseconds;
             sceneRenderState.GamePadDPadLeft = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.DPadLeft) ? "\u2190" : " ";
             sceneRenderState.GamePadDPadUp = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.DPadLeft) ? "\u2191" : " ";
             sceneRenderState.GamePadDPadRight = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.DPadLeft) ? "\u2192" : " ";
@@ -178,6 +189,16 @@ namespace BouncyBox.VorpalEngine.DebuggingGame.Scenes.Root
             sceneRenderState.GamePadRightTrigger = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.RightTrigger) ? "RTr " : "    ";
             sceneRenderState.GamePadLeftThumbPress = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.LeftThumbPress) ? "LTh " : "    ";
             sceneRenderState.GamePadRightThumbPress = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.RightThumbPress) ? "RTh" : "";
+        }
+
+        private void HandleEngineUpdateStatsMessage(EngineUpdateStatsMessage message)
+        {
+            _latestEngineUpdateStatsMessage = message;
+        }
+
+        private void HandleEngineRenderStatsMessage(EngineRenderStatsMessage message)
+        {
+            _latestEngineRenderStatsMessage = message;
         }
     }
 }

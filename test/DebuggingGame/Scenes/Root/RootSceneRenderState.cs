@@ -1,10 +1,18 @@
-﻿namespace BouncyBox.VorpalEngine.DebuggingGame.Scenes.Root
+﻿using System;
+
+namespace BouncyBox.VorpalEngine.DebuggingGame.Scenes.Root
 {
     public class RootSceneRenderState
     {
         public ulong Counter { get; set; }
-        public ulong UpdateDelayInMilliseconds { get; set; }
-        public ulong RenderDelayInMilliseconds { get; set; }
+        public double? UpdatesPerSecond { get; set; }
+        public double? FramesPerSecond { get; set; }
+        public TimeSpan? MeanFrametime { get; set; }
+        public TimeSpan? MinimumFrametime { get; set; }
+        public TimeSpan? MaximumFrametime { get; set; }
+        public ulong? FrameCount { get; set; }
+        public uint UpdateDelayInMilliseconds { get; set; }
+        public uint RenderDelayInMilliseconds { get; set; }
         public string? GamePadDPadLeft { get; set; }
         public string? GamePadDPadUp { get; set; }
         public string? GamePadDPadRight { get; set; }

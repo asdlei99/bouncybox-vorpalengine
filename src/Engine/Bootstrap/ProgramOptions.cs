@@ -1,4 +1,5 @@
-﻿using CommandLine;
+﻿using BouncyBox.VorpalEngine.Engine.Logging;
+using CommandLine;
 using Serilog.Events;
 
 namespace BouncyBox.VorpalEngine.Engine.Bootstrap
@@ -13,6 +14,12 @@ namespace BouncyBox.VorpalEngine.Engine.Bootstrap
         /// </summary>
         [Option("loggingenabled", HelpText = "Determines whether logging is enabled.", Default = true)]
         public bool IsLoggingEnabled { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the destination for log output.
+        /// </summary>
+        [Option("logdestination", HelpText = "The destination for log output.", Default = LogDestination.Debug)]
+        public LogDestination LogDestination { get; set; }
 
         /// <summary>
         ///     Gets or sets a value that controls the minimum log level to output.

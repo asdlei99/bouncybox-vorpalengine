@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace BouncyBox.VorpalEngine.Engine.Interop
@@ -14,7 +13,6 @@ namespace BouncyBox.VorpalEngine.Engine.Interop
         ///     Gets an appropriately-typed exception for the last Win32 error.
         /// </summary>
         /// <returns>Returns an exception.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Exception GetException()
         {
             int errorCode = Marshal.GetHRForLastWin32Error();

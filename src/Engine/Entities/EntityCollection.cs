@@ -12,18 +12,8 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         where TEntity : IEntity
     {
         private readonly HashSet<TEntity> _entities = new HashSet<TEntity>();
-        private readonly Action<TEntity>? _entityAddedDelegate;
         private readonly SortedSet<TEntity> _sortedEntities = new SortedSet<TEntity>(new EntityComparer());
         private bool _isDisposed;
-
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="EntityCollection{TEntity}" /> type.
-        /// </summary>
-        /// <param name="entityAddedDelegate">A delegate to invoke whenever an entity is added.</param>
-        public EntityCollection(Action<TEntity>? entityAddedDelegate = null)
-        {
-            _entityAddedDelegate = entityAddedDelegate;
-        }
 
         /// <inheritdoc />
         public int Count => _entities.Count;
@@ -45,27 +35,19 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
 
         /// <inheritdoc />
         /// <exception cref="InvalidOperationException">Thrown when an entity with a duplicate <see cref="IEntity.Order" /> is added.</exception>
-        public void Add(TEntity entity)
-        {
-            if (!_entities.Add(entity))
-            {
-                return;
-            }
-
-            if (!_sortedEntities.Add(entity))
-            {
-                throw new InvalidOperationException($"A {typeof(TEntity).FullName} with order {entity.Order} already exists.");
-            }
-            _entityAddedDelegate?.Invoke(entity);
-        }
-
-        /// <inheritdoc />
-        /// <exception cref="InvalidOperationException">Thrown when an entity with a duplicate <see cref="IEntity.Order" /> is added.</exception>
         public void Add(IEnumerable<TEntity> entities)
         {
-            foreach (TEntity renderer in entities)
+            foreach (TEntity entity in entities)
             {
-                Add(renderer);
+                if (!_entities.Add(entity))
+                {
+                    return;
+                }
+
+                if (!_sortedEntities.Add(entity))
+                {
+                    throw new InvalidOperationException($"A {typeof(TEntity).FullName} with order {entity.Order} already exists.");
+                }
             }
         }
 
@@ -77,24 +59,18 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         }
 
         /// <inheritdoc />
-        public void Remove(TEntity entity)
-        {
-            if (!_entities.Remove(entity))
-            {
-                return;
-            }
-
-            entity.Dispose();
-
-            _sortedEntities.Remove(entity);
-        }
-
-        /// <inheritdoc />
         public void Remove(IEnumerable<TEntity> entities)
         {
             foreach (TEntity entity in entities)
             {
-                Remove(entity);
+                if (!_entities.Remove(entity))
+                {
+                    return;
+                }
+
+                entity.Dispose();
+
+                _sortedEntities.Remove(entity);
             }
         }
 
@@ -137,7 +113,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
             /// <inheritdoc />
             public int Compare(TEntity x, TEntity y)
             {
-                return x == null ? 1 : y == null ? -1 : x.Order.CompareTo(y.Order);
+                return Comparer<uint?>.Default.Compare(x?.Order, y?.Order);
             }
         }
     }

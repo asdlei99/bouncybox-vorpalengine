@@ -5,7 +5,7 @@ namespace BouncyBox.VorpalEngine.Engine.DirectX
 {
     /// <inheritdoc />
     /// <summary>
-    ///     Exception thrown by <see cref="DirectXResourceManager" />.
+    ///     Exception thrown when an error occurs interacting with DirectX COM objects.
     /// </summary>
     [Serializable]
     internal class DirectXException : Exception

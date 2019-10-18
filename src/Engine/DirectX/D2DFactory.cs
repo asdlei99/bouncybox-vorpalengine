@@ -1,5 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using TerraFX.Interop;
+﻿using TerraFX.Interop;
 
 namespace BouncyBox.VorpalEngine.Engine.DirectX
 {
@@ -34,7 +33,6 @@ namespace BouncyBox.VorpalEngine.Engine.DirectX
         /// <param name="x">The x value.</param>
         /// <param name="y">The y value.</param>
         /// <returns>Returns a <see cref="D2D_POINT_2F" />.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static D2D_POINT_2F CreatePoint2F(float x, float y)
         {
             return
@@ -51,7 +49,6 @@ namespace BouncyBox.VorpalEngine.Engine.DirectX
         /// <param name="x">The x value.</param>
         /// <param name="y">The y value.</param>
         /// <returns>Returns a <see cref="D2D_POINT_2U" />.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static D2D_POINT_2U CreatePoint2U(uint x, uint y)
         {
             return
@@ -70,7 +67,6 @@ namespace BouncyBox.VorpalEngine.Engine.DirectX
         /// <param name="right">The right value.</param>
         /// <param name="bottom">The bottom value.</param>
         /// <returns>Returns a <see cref="D2D_RECT_F" />.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static D2D_RECT_F CreateRectF(float left, float top, float right, float bottom)
         {
             return
@@ -89,7 +85,6 @@ namespace BouncyBox.VorpalEngine.Engine.DirectX
         /// <param name="topLeft">The top-left location.</param>
         /// <param name="bottomRight">The bottom-right location.</param>
         /// <returns>Returns a <see cref="D2D_RECT_F" />.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static D2D_RECT_F CreateRectF(D2D_POINT_2F topLeft, D2D_POINT_2F bottomRight)
         {
             return
@@ -108,7 +103,6 @@ namespace BouncyBox.VorpalEngine.Engine.DirectX
         /// <param name="location">The location.</param>
         /// <param name="size">The size.</param>
         /// <returns>Returns a <see cref="D2D_RECT_F" />.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static D2D_RECT_F CreateRectF(D2D_POINT_2F location, D2D_SIZE_F size)
         {
             return
@@ -129,7 +123,6 @@ namespace BouncyBox.VorpalEngine.Engine.DirectX
         /// <param name="width">The width.</param>
         /// <param name="height">The height.</param>
         /// <returns>Returns a <see cref="D2D_RECT_F" />.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static D2D_RECT_F CreateRectFWithSize(float left, float top, float width, float height)
         {
             return
@@ -150,7 +143,6 @@ namespace BouncyBox.VorpalEngine.Engine.DirectX
         /// <param name="right">The right value.</param>
         /// <param name="bottom">The bottom value.</param>
         /// <returns>Returns a <see cref="D2D_RECT_U" />.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static D2D_RECT_U CreateRectU(uint left, uint top, uint right, uint bottom)
         {
             return
@@ -169,7 +161,6 @@ namespace BouncyBox.VorpalEngine.Engine.DirectX
         /// <param name="topLeft">The top-left location.</param>
         /// <param name="bottomRight">The bottom-right location.</param>
         /// <returns>Returns a <see cref="D2D_RECT_U" />.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static D2D_RECT_U CreateRectU(D2D_POINT_2U topLeft, D2D_POINT_2U bottomRight)
         {
             return
@@ -188,7 +179,6 @@ namespace BouncyBox.VorpalEngine.Engine.DirectX
         /// <param name="location">The location.</param>
         /// <param name="size">The size.</param>
         /// <returns>Returns a <see cref="D2D_RECT_U" />.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static D2D_RECT_U CreateRectU(D2D_POINT_2U location, D2D_SIZE_U size)
         {
             return
@@ -209,7 +199,6 @@ namespace BouncyBox.VorpalEngine.Engine.DirectX
         /// <param name="width">The width.</param>
         /// <param name="height">The height.</param>
         /// <returns>Returns a <see cref="D2D_RECT_U" />.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static D2D_RECT_U CreateRectUWithSize(uint left, uint top, uint width, uint height)
         {
             return
@@ -228,7 +217,6 @@ namespace BouncyBox.VorpalEngine.Engine.DirectX
         /// <param name="width">The width value.</param>
         /// <param name="height">The height value.</param>
         /// <returns>Returns a <see cref="D2D_SIZE_F" />.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static D2D_SIZE_F CreateSizeF(float width, float height)
         {
             return
@@ -245,7 +233,6 @@ namespace BouncyBox.VorpalEngine.Engine.DirectX
         /// <param name="width">The width value.</param>
         /// <param name="height">The height value.</param>
         /// <returns>Returns a <see cref="D2D_SIZE_U" />.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static D2D_SIZE_U CreateSizeU(uint width, uint height)
         {
             return

@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
+using System.Linq;
 using System.Threading;
-using BouncyBox.VorpalEngine.Engine.Messaging;
+using BouncyBox.Common.NetStandard21.Logging;
+using BouncyBox.VorpalEngine.Engine.Logging;
 using EnumsNET;
 
 namespace BouncyBox.VorpalEngine.Engine.Threads
@@ -14,53 +16,38 @@ namespace BouncyBox.VorpalEngine.Engine.Threads
     public class ThreadManager : IThreadManager
     {
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
-        private readonly Dictionary<ProcessThread, ThreadWrapper> _threadsByEngineThread = new Dictionary<ProcessThread, ThreadWrapper>();
+        private readonly ISerilogLogger _serilogLogger;
+        private readonly Dictionary<ProcessThread, ThreadWrapper> _threadsByProcessThread = new Dictionary<ProcessThread, ThreadWrapper>();
         private bool _isDisposed;
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="ThreadManager" /> type.
         /// </summary>
+        /// <param name="serilogLogger">An <see cref="ISerilogLogger" /> implementation.</param>
         /// <param name="mainThread">The main thread.</param>
+        /// <param name="context">A nested context.</param>
         /// <exception cref="InvalidOperationException">Thrown when the thread executing this method is not the main thread.</exception>
-        public ThreadManager(Thread mainThread)
+        public ThreadManager(ISerilogLogger serilogLogger, Thread mainThread, NestedContext context)
         {
+            context = context.CopyAndPush(nameof(ThreadManager));
+
+            _serilogLogger = new ContextSerilogLogger(serilogLogger, context);
+
             mainThread.Name = "Main Thread";
 
-            _threadsByEngineThread.Add(ProcessThread.Main, new ThreadWrapper(mainThread));
+            _threadsByProcessThread.Add(ProcessThread.Main, new ThreadWrapper(mainThread));
 
             VerifyProcessThread(ProcessThread.Main);
         }
 
-        /// <inheritdoc />
-        /// <exception cref="InvalidOperationException">Thrown when the specified thread is already started.</exception>
-        [DebuggerStepThrough]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void StartEngineThread(IInterfaces interfaces, IEngineThreadWorker threadWorker, EngineThread thread)
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="ThreadManager" /> type.
+        /// </summary>
+        /// <param name="serilogLogger">An <see cref="ISerilogLogger" /> implementation.</param>
+        /// <param name="mainThread">The main thread.</param>
+        /// <exception cref="InvalidOperationException">Thrown when the thread executing this method is not the main thread.</exception>
+        public ThreadManager(ISerilogLogger serilogLogger, Thread mainThread) : this(serilogLogger, mainThread, NestedContext.None())
         {
-            VerifyProcessThread(ProcessThread.Main);
-
-            var processThread = Enums.Parse<ProcessThread>(thread.GetName());
-            string name = thread.GetName();
-
-            if (_threadsByEngineThread.ContainsKey(processThread))
-            {
-                throw new InvalidOperationException($"{name} thread is already started.");
-            }
-
-            _threadsByEngineThread.Add(processThread, new ThreadWrapper(interfaces, threadWorker, name, _cancellationTokenSource.Token));
-        }
-
-        /// <inheritdoc />
-        [DebuggerStepThrough]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void StopEngineThreads()
-        {
-            _cancellationTokenSource.Cancel();
-
-            foreach (ThreadWrapper threadWrapper in _threadsByEngineThread.Values)
-            {
-                threadWrapper.WaitForCompletion();
-            }
         }
 
         /// <summary>
@@ -70,11 +57,10 @@ namespace BouncyBox.VorpalEngine.Engine.Threads
         /// <exception cref="InvalidOperationException">Thrown when the specified thread has not been started.</exception>
         /// <exception cref="InvalidOperationException">Thrown when the current thread is not the specified thread.</exception>
         [DebuggerStepThrough]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void VerifyProcessThread(ProcessThread thread)
         {
 #if DEBUG
-            if (!_threadsByEngineThread.TryGetValue(thread, out ThreadWrapper? expectedThreadWrapper))
+            if (!_threadsByProcessThread.TryGetValue(thread, out ThreadWrapper? expectedThreadWrapper))
             {
                 throw new InvalidOperationException($"{thread} thread has not been started.");
             }
@@ -84,12 +70,74 @@ namespace BouncyBox.VorpalEngine.Engine.Threads
         }
 
         /// <inheritdoc />
+        /// <exception cref="InvalidOperationException">Thrown when the thread executing this method is not the main thread.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when the specified thread is already started.</exception>
+        public void StartEngineThread(
+            IEngineThreadWorker threadWorker,
+            EngineThread thread,
+            CountdownEvent terminationCountdownEvent,
+            ManualResetEventSlim unhandledExceptionManualResetEvent)
+        {
+            VerifyProcessThread(ProcessThread.Main);
+
+            var processThread = Enums.Parse<ProcessThread>(thread.GetName());
+
+            if (_threadsByProcessThread.ContainsKey(processThread))
+            {
+                throw new InvalidOperationException($"{thread.GetName()} thread is already started.");
+            }
+
+            var threadWrapper = new ThreadWrapper(
+                threadWorker,
+                thread,
+                terminationCountdownEvent,
+                unhandledExceptionManualResetEvent,
+                _cancellationTokenSource.Token);
+
+            _threadsByProcessThread.Add(processThread, threadWrapper);
+
+            threadWrapper.Start();
+        }
+
+        /// <inheritdoc />
+        /// <exception cref="InvalidOperationException">Thrown when the thread executing this method is not the main thread.</exception>
+        public IReadOnlyCollection<(EngineThread thread, Exception exception)> RequestEngineThreadTerminationAndWaitForTermination(
+            CountdownEvent terminationCountdownEvent)
+        {
+            VerifyProcessThread(ProcessThread.Main);
+
+            _serilogLogger.LogDebug("Requesting engine thread termination");
+
+            _cancellationTokenSource.Cancel();
+
+            _serilogLogger.LogDebug("Waiting for engine threads to terminate");
+
+            terminationCountdownEvent.Wait();
+
+            _serilogLogger.LogDebug("Engine threads terminated");
+
+            ImmutableArray<(EngineThread thread, Exception exception)> unhandledExceptions =
+                _threadsByProcessThread.Values.Where(a => a.UnhandledException != null).Select(a => a.UnhandledException!.Value).ToImmutableArray();
+
+            // Remove all engine threads from the dictionary
+            ImmutableArray<ProcessThread> threadsToRemove =
+                _threadsByProcessThread.Where(a => a.Value.ProcessThread != ProcessThread.Main).Select(a => a.Key).ToImmutableArray();
+
+            foreach (ProcessThread thread in threadsToRemove)
+            {
+                _threadsByProcessThread.Remove(thread);
+            }
+
+            return unhandledExceptions;
+        }
+
+        /// <inheritdoc />
         public void Dispose()
         {
             DisposeHelper.Dispose(
                 () =>
                 {
-                    _threadsByEngineThread.Clear();
+                    _threadsByProcessThread.Clear();
                     _cancellationTokenSource.Dispose();
                 },
                 ref _isDisposed,
@@ -97,46 +145,112 @@ namespace BouncyBox.VorpalEngine.Engine.Threads
                 ProcessThread.Main);
         }
 
+        /// <summary>
+        ///     Wraps a thread.
+        /// </summary>
         private class ThreadWrapper
         {
-            private readonly ManualResetEventSlim _manualResetEvent = new ManualResetEventSlim();
             private readonly Thread _thread;
 
+            /// <summary>
+            ///     Initializes a new instance of the <see cref="ThreadWrapper" /> type.
+            /// </summary>
+            /// <param name="thread">The main thread.</param>
             public ThreadWrapper(Thread thread)
             {
                 _thread = thread;
-                _manualResetEvent.Set();
+
+                ProcessThread = ProcessThread.Main;
             }
 
-            public ThreadWrapper(IInterfaces interfaces, IEngineThreadWorker threadWorker, string name, CancellationToken cancellationToken)
+            /// <summary>
+            ///     Initializes a new instance of the <see cref="ThreadWrapper" /> type.
+            /// </summary>
+            /// <param name="threadWorker">The engine thread worker that will do work on the thread.</param>
+            /// <param name="thread">The thread being wrapped.</param>
+            /// <param name="terminationCountdownEvent">
+            ///     A countdown event that is incremented when the thread starts and decremented when the
+            ///     thread terminates.
+            /// </param>
+            /// <param name="unhandledExceptionManualResetEvent">
+            ///     A manual reset event that can be set to indicate that an unhandled exception occurred on
+            ///     a thread.
+            /// </param>
+            /// <param name="cancellationToken">A cancellation token that shuts down the thread.</param>
+            public ThreadWrapper(
+                IEngineThreadWorker threadWorker,
+                EngineThread thread,
+                CountdownEvent terminationCountdownEvent,
+                ManualResetEventSlim unhandledExceptionManualResetEvent,
+                CancellationToken cancellationToken)
             {
+                ProcessThread = Enums.Parse<ProcessThread>(thread.GetName());
+
                 _thread = new Thread(
                     () =>
                     {
-                        ConcurrentMessagePublisherSubscriber<IGlobalMessage> globalMessagePublisherSubscriber =
-                            ConcurrentMessagePublisherSubscriber<IGlobalMessage>
-                                .Create(interfaces, threadWorker.Context);
+                        // Indicate that the thread has started
+                        terminationCountdownEvent.AddCount();
 
-                        Thread.CurrentThread.Name = $"{name} Thread";
-
-                        threadWorker.SubscribeToMessages(globalMessagePublisherSubscriber);
-
-                        while (!cancellationToken.IsCancellationRequested)
+                        try
                         {
-                            // Handle dispatched messages
-                            globalMessagePublisherSubscriber.HandleDispatched();
+                            // Set the thread's name for easier debugging
+                            Thread.CurrentThread.Name = $"{thread.GetName()} Thread";
 
-                            threadWorker.DoWork(cancellationToken);
+                            // Prepare the worker for work
+                            threadWorker.Prepare();
+
+                            while (!cancellationToken.IsCancellationRequested)
+                            {
+                                // Handle dispatched messages
+                                threadWorker.HandleDispatchedMessages();
+
+                                // Perform the thread's work
+                                threadWorker.DoWork(cancellationToken);
+                            }
+
+                            // Clean up the worker
+                            threadWorker.CleanUp();
                         }
+                        catch (Exception exception)
+                        {
+                            UnhandledException = (thread, exception);
 
-                        threadWorker.CleanUp();
-
-                        _manualResetEvent.Set();
+                            // Indicate that an unhandled exception occurred
+                            unhandledExceptionManualResetEvent.Set();
+                        }
+                        finally
+                        {
+                            // Indicate that the thread has terminated
+                            terminationCountdownEvent.Signal();
+                        }
                     });
+            }
 
+            /// <summary>
+            ///     Gets the process thread type of the thread being wrapped.
+            /// </summary>
+            public ProcessThread ProcessThread { get; }
+
+            /// <summary>
+            ///     Gets a tuple containing an unhandled exception and what engine thread it occurred on.
+            /// </summary>
+            public (EngineThread thread, Exception exception)? UnhandledException { get; private set; }
+
+            /// <summary>
+            ///     Starts the thread.
+            /// </summary>
+            public void Start()
+            {
                 _thread.Start();
             }
 
+            /// <summary>
+            ///     Verifies that the currently-executing thread is the specified thread.
+            /// </summary>
+            /// <exception cref="InvalidOperationException">Thrown when the current thread is not the specified thread.</exception>
+            [DebuggerStepThrough]
+            [Conditional("DEBUG")]
             public void Verify()
             {
                 Thread actualThread = Thread.CurrentThread;
@@ -145,11 +259,6 @@ namespace BouncyBox.VorpalEngine.Engine.Threads
                 {
                     throw new InvalidOperationException($"Current thread should be {_thread.Name} but is actually {actualThread.Name ?? "an unknown thread"}.");
                 }
-            }
-
-            public void WaitForCompletion()
-            {
-                _manualResetEvent.Wait();
             }
         }
     }

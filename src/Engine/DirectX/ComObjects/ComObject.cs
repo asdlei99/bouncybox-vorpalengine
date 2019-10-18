@@ -1,16 +1,39 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using TerraFX.Interop;
-using Windows = BouncyBox.VorpalEngine.Engine.Interop.Windows;
 
 namespace BouncyBox.VorpalEngine.Engine.DirectX.ComObjects
 {
     /// <summary>
+    ///     Base class that contains COM object helper methods.
+    /// </summary>
+    public abstract class ComObject
+    {
+        /// <summary>
+        ///     Throws a <see cref="ComObjectException" /> for failure HRESULTs.
+        /// </summary>
+        /// <param name="hr">An HRESULT.</param>
+        /// <param name="exceptionMessage">The exception message to use if <see cref="ComObjectException" /> is thrown.</param>
+        /// <param name="allowNoInterface">
+        ///     A value that determines whether to allow an <see cref="Engine.Interop.Windows.E_NOINTERFACE" />
+        ///     HRESULT.
+        /// </param>
+        public static void CheckResultHandle(int hr, string exceptionMessage, bool allowNoInterface = false)
+        {
+            if (Windows.SUCCEEDED(hr) || allowNoInterface && unchecked((uint)hr) == Interop.Windows.E_NOINTERFACE)
+            {
+                return;
+            }
+
+            throw new ComObjectException(exceptionMessage, Marshal.GetExceptionForHR(hr) ?? new Win32Exception(hr));
+        }
+    }
+
+    /// <summary>
     ///     Base class for all COM interface proxies.
     /// </summary>
-    public abstract unsafe class ComObject<T> : IComObject<T>
+    public abstract unsafe class ComObject<T> : ComObject, IComObject<T>
         where T : unmanaged
     {
         private bool _isDisposed;
@@ -31,26 +54,6 @@ namespace BouncyBox.VorpalEngine.Engine.DirectX.ComObjects
                     GC.SuppressFinalize(this);
                 },
                 ref _isDisposed);
-        }
-
-        /// <summary>
-        ///     Throws a <see cref="ComObjectException" /> for failure HRESULTs.
-        /// </summary>
-        /// <param name="hr">An HRESULT.</param>
-        /// <param name="exceptionMessage">The exception message to use if <see cref="ComObjectException" /> is thrown.</param>
-        /// <param name="allowNoInterface">
-        ///     A value that determines whether to allow an <see cref="Engine.Interop.Windows.E_NOINTERFACE" />
-        ///     HRESULT.
-        /// </param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void CheckResultHandle(int hr, string exceptionMessage, bool allowNoInterface = false)
-        {
-            if (TerraFX.Interop.Windows.SUCCEEDED(hr) || allowNoInterface && unchecked((uint)hr) == Windows.E_NOINTERFACE)
-            {
-                return;
-            }
-
-            throw new ComObjectException(exceptionMessage, Marshal.GetExceptionForHR(hr) ?? new Win32Exception(hr));
         }
 
         /// <summary>

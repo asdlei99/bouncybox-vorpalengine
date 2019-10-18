@@ -1,12 +1,16 @@
 ﻿using System;
-using System.Runtime.CompilerServices;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 using BouncyBox.VorpalEngine.Engine.Bootstrap;
+using BouncyBox.VorpalEngine.Engine.Entities;
 using BouncyBox.VorpalEngine.Engine.Forms;
 using BouncyBox.VorpalEngine.Engine.Logging;
 using BouncyBox.VorpalEngine.Engine.Messaging;
 using BouncyBox.VorpalEngine.Engine.Messaging.GlobalMessages;
 using BouncyBox.VorpalEngine.Engine.Scenes;
 using BouncyBox.VorpalEngine.Engine.Threads;
+using EnumsNET;
 using TerraFX.Interop;
 
 namespace BouncyBox.VorpalEngine.Engine.Game
@@ -14,42 +18,46 @@ namespace BouncyBox.VorpalEngine.Engine.Game
     /// <summary>
     ///     Base class for all games. This class manages the update and render loops and the windows message loop.
     /// </summary>
-    public abstract class Game<TRenderState, TSceneKey> : IDisposable
+    public abstract class Game<TGameState, TRenderState, TSceneKey> : IDisposable
+        where TGameState : class
         where TRenderState : class, new()
         where TSceneKey : struct, Enum
     {
-        private readonly EngineStats _engineStats = new EngineStats();
+        private readonly IEntityManager<TGameState, TRenderState> _entityManager;
+        private readonly ManualResetEventSlim _exitManualResetEvent = new ManualResetEventSlim();
         private readonly IGameExecutionStateManager _gameExecutionStateManager;
         private readonly ConcurrentMessagePublisherSubscriber<IGlobalMessage> _globalMessagePublisherSubscriber;
         private readonly ProgramOptions _programOptions;
-        private readonly IRenderStateManager<TRenderState> _renderStateManager;
-        private readonly ISceneManager<TRenderState> _sceneManager;
+        private readonly ISceneManager _sceneManager;
         private readonly ContextSerilogLogger _serilogLogger;
         private bool _isDisposed;
         private RenderForm? _renderForm;
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="Game{TRenderState,TSceneKey}" /> type.
+        ///     Initializes a new instance of the <see cref="Game{TGameState,TRenderState,TSceneKey}" /> type.
         /// </summary>
+        /// <remarks>
+        ///     Subscribes to the <see cref="RenderWindowClosingMessage" /> global message.
+        /// </remarks>
         /// <param name="interfaces">An <see cref="IInterfaces" /> implementation.</param>
         /// <param name="gameExecutionStateManager">An <see cref="IGameExecutionStateManager" /> implementation.</param>
-        /// <param name="renderStateManager">An <see cref="IRenderStateManager{TRenderState}" /> implementation.</param>
-        /// <param name="sceneManager">An <see cref="ISceneManager{TRenderState}" /> implementation.</param>
+        /// <param name="entityManager">An <see cref="IEntityManager{TGameState,TRenderState}" /> implementation.</param>
+        /// <param name="sceneManager">An <see cref="ISceneManager" /> implementation.</param>
         /// <param name="programOptions">Parsed command line arguments.</param>
         /// <param name="context">A nested context.</param>
         protected Game(
             IInterfaces interfaces,
             IGameExecutionStateManager gameExecutionStateManager,
-            IRenderStateManager<TRenderState> renderStateManager,
-            ISceneManager<TRenderState> sceneManager,
+            IEntityManager<TGameState, TRenderState> entityManager,
+            ISceneManager sceneManager,
             ProgramOptions programOptions,
             NestedContext context)
         {
-            context = context.CopyAndPush(nameof(Game<TRenderState, TSceneKey>));
+            context = context.CopyAndPush(nameof(Game<TGameState, TRenderState, TSceneKey>));
 
             Interfaces = interfaces;
             _gameExecutionStateManager = gameExecutionStateManager;
-            _renderStateManager = renderStateManager;
+            _entityManager = entityManager;
             _sceneManager = sceneManager;
             _programOptions = programOptions;
             _serilogLogger = new ContextSerilogLogger(interfaces.SerilogLogger, context);
@@ -60,20 +68,23 @@ namespace BouncyBox.VorpalEngine.Engine.Game
         }
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="Game{TRenderState,TSceneKey}" /> type.
+        ///     Initializes a new instance of the <see cref="Game{TGameState,TRenderState,TSceneKey}" /> type.
         /// </summary>
+        /// <remarks>
+        ///     Subscribes to the <see cref="RenderWindowClosingMessage" /> global message.
+        /// </remarks>
         /// <param name="interfaces">An <see cref="IInterfaces" /> implementation.</param>
         /// <param name="gameExecutionStateManager">An <see cref="IGameExecutionStateManager" /> implementation.</param>
-        /// <param name="renderStateManager">An <see cref="IRenderStateManager{TRenderState}" /> implementation.</param>
-        /// <param name="sceneManager">An <see cref="ISceneManager{TRenderState}" /> implementation.</param>
+        /// <param name="entityManager">An <see cref="IEntityManager{TGameState,TRenderState}" /> implementation.</param>
+        /// <param name="sceneManager">An <see cref="ISceneManager" /> implementation.</param>
         /// <param name="programOptions">Parsed command line arguments.</param>
         protected Game(
             IInterfaces interfaces,
             IGameExecutionStateManager gameExecutionStateManager,
-            IRenderStateManager<TRenderState> renderStateManager,
-            ISceneManager<TRenderState> sceneManager,
+            IEntityManager<TGameState, TRenderState> entityManager,
+            ISceneManager sceneManager,
             ProgramOptions programOptions)
-            : this(interfaces, gameExecutionStateManager, renderStateManager, sceneManager, programOptions, NestedContext.None())
+            : this(interfaces, gameExecutionStateManager, entityManager, sceneManager, programOptions, NestedContext.None())
         {
         }
 
@@ -95,15 +106,21 @@ namespace BouncyBox.VorpalEngine.Engine.Game
         }
 
         /// <summary>
-        ///     <para>Runs the game.</para>
-        ///     <para>Publishes the <see cref="LoadSceneMessage{TSceneKey}" /> global message.</para>
+        ///     Runs the game.
         /// </summary>
+        /// <remarks>
+        ///     Publishes the <see cref="LoadSceneMessage{TSceneKey}" /> global message.
+        /// </remarks>
         /// <param name="initialSceneKey">The scene to load.</param>
         /// <returns>Returns the result of the run.</returns>
+        /// <exception cref="Exception">Thrown when an engine thread threw an unhandled exception.</exception>
         public RunResult Run(TSceneKey initialSceneKey)
         {
-            var updateLoop = new UpdateLoop(Interfaces, _engineStats, () => _sceneManager.Update());
-            var renderLoop = new RenderLoop<TRenderState>(Interfaces, _renderStateManager, _engineStats, a => _sceneManager.Render(a, _engineStats));
+            var updateWorker = new UpdateWorker<TGameState, TRenderState>(Interfaces, _entityManager, _sceneManager);
+            var renderWorker = new RenderWorker<TGameState, TRenderState>(Interfaces, _entityManager);
+            var rendererResourcesWorker = new RendererResourcesWorker<TGameState, TRenderState>(Interfaces, _entityManager);
+            // The main thread increments the count by 1
+            var countdownEvent = new CountdownEvent(1);
 
             // Create render window
 
@@ -115,8 +132,9 @@ namespace BouncyBox.VorpalEngine.Engine.Game
 
             _serilogLogger.LogDebug("Starting threads");
 
-            Interfaces.ThreadManager.StartEngineThread(Interfaces, updateLoop, EngineThread.Update);
-            Interfaces.ThreadManager.StartEngineThread(Interfaces, renderLoop, EngineThread.Render);
+            Interfaces.ThreadManager.StartEngineThread(updateWorker, EngineThread.Update, countdownEvent, _exitManualResetEvent);
+            Interfaces.ThreadManager.StartEngineThread(rendererResourcesWorker, EngineThread.RendererResources, countdownEvent, _exitManualResetEvent);
+            Interfaces.ThreadManager.StartEngineThread(renderWorker, EngineThread.Render, countdownEvent, _exitManualResetEvent);
 
             // Show the render window
 
@@ -149,10 +167,36 @@ namespace BouncyBox.VorpalEngine.Engine.Game
 
                 _renderForm.HandleDispatchedMessages();
                 _gameExecutionStateManager.HandleDispatchedMessages();
-                _sceneManager.HandleDispatchedMessages();
+
+                if (!_exitManualResetEvent.IsSet)
+                {
+                    // No exit requested
+                    continue;
+                }
+
+                // The user tried to close the render window or an unhandled exception occurred on an engine thread
+                _serilogLogger.LogDebug("Exit requested");
+                break;
             } while (wParam == null);
 
-            return RunResult.Success;
+            // The main thread decrements the count by 1
+            countdownEvent.Signal();
+
+            IReadOnlyCollection<(EngineThread thread, Exception exception)> unhandledExceptions =
+                Interfaces.ThreadManager.RequestEngineThreadTerminationAndWaitForTermination(countdownEvent);
+
+            // The render window must be disposed of last to avoid additional unhandled exceptions
+            // (e.g., the render thread attempting to use resources tied to the window handle)
+            _renderForm.Dispose();
+
+            if (unhandledExceptions.Count == 0)
+            {
+                return RunResult.Success;
+            }
+
+            (EngineThread thread, Exception exception) = unhandledExceptions.First();
+
+            throw new Exception($"An unhandled exception occurred on the {thread.GetName()} thread.", exception);
         }
 
         /// <summary>
@@ -166,7 +210,6 @@ namespace BouncyBox.VorpalEngine.Engine.Game
         ///     Process Win32 messages.
         /// </summary>
         /// <returns>Returns the WParam of the WM_QUIT message if it's received; otherwise, returns null.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static unsafe UIntPtr? ProcessWin32Messages()
         {
             MSG msg;
@@ -187,14 +230,11 @@ namespace BouncyBox.VorpalEngine.Engine.Game
 
         /// <summary>
         ///     <para>Handles the <see cref="RenderWindowClosingMessage" /> global message.</para>
-        ///     <para>Publishes the <see cref="EngineThreadsTerminatedMessage" /> global message.</para>
         /// </summary>
         /// <param name="message">The message being handled.</param>
         private void HandleRenderWindowClosingMessage(RenderWindowClosingMessage message)
         {
-            Interfaces.ThreadManager.StopEngineThreads();
-
-            Interfaces.GlobalConcurrentMessageQueue.Publish<EngineThreadsTerminatedMessage>();
+            _exitManualResetEvent.Set();
         }
     }
 }

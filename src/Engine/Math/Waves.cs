@@ -5,6 +5,7 @@ namespace BouncyBox.VorpalEngine.Engine.Math
     /// <summary>
     ///     Mathematical wave formulas.
     /// </summary>
+    // TODO: Vectorize using SIMD instructions (MathSharp)
     public static class Waves
     {
         /// <summary>

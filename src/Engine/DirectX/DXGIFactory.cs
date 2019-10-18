@@ -1,5 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using TerraFX.Interop;
+﻿using TerraFX.Interop;
 
 namespace BouncyBox.VorpalEngine.Engine.DirectX
 {
@@ -15,7 +14,6 @@ namespace BouncyBox.VorpalEngine.Engine.DirectX
         /// <param name="numerator">The numerator value.</param>
         /// <param name="denominator">The denominator value.</param>
         /// <returns></returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static DXGI_RATIONAL CreateRational(uint numerator, uint denominator)
         {
             return
@@ -34,7 +32,6 @@ namespace BouncyBox.VorpalEngine.Engine.DirectX
         /// <param name="b">The b value.</param>
         /// <param name="a">The a value.</param>
         /// <returns>Returns a <see cref="DXGI_RGBA" />.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static DXGI_RGBA CreateRgba(float r, float g, float b, float a)
         {
             return

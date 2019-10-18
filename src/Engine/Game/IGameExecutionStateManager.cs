@@ -13,16 +13,6 @@ namespace BouncyBox.VorpalEngine.Engine.Game
         GameExecutionState GameExecutionState { get; }
 
         /// <summary>
-        ///     Gets a value indicating if the game is paused.
-        /// </summary>
-        bool IsGamePaused { get; }
-
-        /// <summary>
-        ///     Gets a value indicating if the game is suspended.
-        /// </summary>
-        bool IsGameSuspended { get; }
-
-        /// <summary>
         ///     Handles dispatched messages.
         /// </summary>
         void HandleDispatchedMessages();

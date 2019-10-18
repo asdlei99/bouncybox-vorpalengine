@@ -1,24 +1,33 @@
 ﻿using BouncyBox.VorpalEngine.Engine.DirectX.ComObjects;
-using BouncyBox.VorpalEngine.Engine.Interop;
 using TerraFX.Interop;
 
 namespace BouncyBox.VorpalEngine.Engine.DirectX
 {
     /// <summary>
-    ///     Provides core DirectX resources and render window client area dimensions.
+    ///     Provides DirectX resources and render window client area dimensions.
     /// </summary>
     public struct DirectXResources
     {
         /// <summary>
         ///     Initializes a new instance of the <see cref="DirectXResources" /> type.
         /// </summary>
-        /// <param name="dxgiAdapter">An <see cref="IDXGIAdapter" />.</param>
-        /// <param name="d2d1DeviceContext">An <see cref="ID2D1DeviceContext" />.</param>
-        /// <param name="dWriteFactory1">An <see cref="IDWriteFactory1" />.</param>
+        /// <param name="dxgiAdapter">A <see cref="DXGIAdapter" />.</param>
+        /// <param name="dxgiSwapChain1">A <see cref="DXGISwapChain1" />.</param>
+        /// <param name="d2d1Device">A <see cref="D2D1Device" />.</param>
+        /// <param name="d2d1DeviceContext">A <see cref="D2D1DeviceContext" />.</param>
+        /// <param name="dWriteFactory1">A <see cref="DWriteFactory1" />.</param>
         /// <param name="clientSize">The size of the render window's client area.</param>
-        public DirectXResources(DXGIAdapter dxgiAdapter, D2D1DeviceContext d2d1DeviceContext, DWriteFactory1 dWriteFactory1, D2D_SIZE_U clientSize)
+        public DirectXResources(
+            DXGIAdapter dxgiAdapter,
+            DXGISwapChain1 dxgiSwapChain1,
+            D2D1Device d2d1Device,
+            D2D1DeviceContext d2d1DeviceContext,
+            DWriteFactory1 dWriteFactory1,
+            D2D_SIZE_U clientSize)
         {
             DXGIAdapter = dxgiAdapter;
+            DXGISwapChain1 = dxgiSwapChain1;
+            D2D1Device = d2d1Device;
             D2D1DeviceContext = d2d1DeviceContext;
             DWriteFactory1 = dWriteFactory1;
             ClientSize = clientSize;
@@ -28,14 +37,14 @@ namespace BouncyBox.VorpalEngine.Engine.DirectX
         /// <summary>
         ///     <para>Initializes a new instance of the <see cref="DirectXResources" /> type.</para>
         ///     <para>
-        ///         This constructor is intended to be used when the core DirectX resources are unchanged but the render window's client
-        ///         area changes.
+        ///         This constructor is intended to be used when DirectX resources are unchanged but the render window's client area
+        ///         changes.
         ///     </para>
         /// </summary>
-        /// <param name="resources">A <see cref="DirectXResources" /> to copy.</param>
+        /// <param name="resources">DirectX resources.</param>
         /// <param name="clientSize">The size of the render window's client area.</param>
         public DirectXResources(DirectXResources resources, D2D_SIZE_U clientSize)
-            : this(resources.DXGIAdapter, resources.D2D1DeviceContext, resources.DWriteFactory1, clientSize)
+            : this(resources.DXGIAdapter, resources.DXGISwapChain1, resources.D2D1Device, resources.D2D1DeviceContext, resources.DWriteFactory1, clientSize)
         {
         }
 
@@ -44,6 +53,17 @@ namespace BouncyBox.VorpalEngine.Engine.DirectX
         /// </summary>
         // ReSharper disable once InconsistentNaming
         public DXGIAdapter DXGIAdapter { get; }
+
+        /// <summary>
+        ///     Gets the DXGISwapChain1.
+        /// </summary>
+        // ReSharper disable once InconsistentNaming
+        public DXGISwapChain1 DXGISwapChain1 { get; }
+
+        /// <summary>
+        ///     Gets the D2D1Device.
+        /// </summary>
+        public D2D1Device D2D1Device { get; }
 
         /// <summary>
         ///     Gets the <see cref="D2D1DeviceContext" />.

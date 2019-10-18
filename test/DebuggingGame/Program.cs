@@ -14,8 +14,10 @@ namespace BouncyBox.VorpalEngine.DebuggingGame
         [STAThread]
         private static int Main(string[] args)
         {
+#if DEBUG
             MessageLogFilter.ShouldLogMessageDelegate = a => true;
             MessageLogFilter.ShouldLogMessageTypeDelegate = a => true;
+#endif
 
             return GameFactory.CreateAndRun<DebuggingGame, GameState, RenderState, SceneKey>(SceneKey.Root, args, RegisterComponents);
         }

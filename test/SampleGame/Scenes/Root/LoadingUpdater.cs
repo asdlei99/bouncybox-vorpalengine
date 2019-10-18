@@ -2,45 +2,32 @@
 using System.Diagnostics;
 using BouncyBox.VorpalEngine.Engine;
 using BouncyBox.VorpalEngine.Engine.Math;
-using BouncyBox.VorpalEngine.SampleGame.States.Game;
 using BouncyBox.VorpalEngine.SampleGame.States.Render;
 
 namespace BouncyBox.VorpalEngine.SampleGame.Scenes.Root
 {
     public class LoadingUpdater : Updater
     {
-        private readonly SineWave _loadingIndicatorSineWave = default!;
-        private readonly TriangleWave _loadingIndicatorTriangleWave = default!;
+        private readonly SineWave _loadingIndicatorSineWave;
+        private readonly TriangleWave _loadingIndicatorTriangleWave;
         private readonly Stopwatch _opacityStopwatch = new Stopwatch();
 
         public LoadingUpdater(IInterfaces interfaces, NestedContext context) : base(interfaces, context.CopyAndPush(nameof(LoadingUpdater)))
         {
-            Initialize();
+            _loadingIndicatorSineWave = new SineWave(0, 1, TimeSpan.FromSeconds(2), WaveOffset.Trough, _opacityStopwatch);
+            _loadingIndicatorTriangleWave = new TriangleWave(0, 1, TimeSpan.FromSeconds(2), WaveOffset.Trough, _opacityStopwatch);
         }
 
-        public LoadingUpdater(IInterfaces interfaces) : base(interfaces)
+        public LoadingUpdater(IInterfaces interfaces) : this(interfaces, NestedContext.None())
         {
-            Initialize();
         }
 
-        // Allows initialization code to be reused despite the fields being declared readonly
-        private void Initialize()
-        {
-            ref readonly SineWave loadingIndicatorSineWave = ref _loadingIndicatorSineWave;
-            ref readonly TriangleWave loadingIndicatorTriangleWave = ref _loadingIndicatorTriangleWave;
-
-            UnsafeExtensions.WriteReadonly(in loadingIndicatorSineWave, new SineWave(0, 1, TimeSpan.FromSeconds(2), WaveOffset.Trough, _opacityStopwatch));
-            UnsafeExtensions.WriteReadonly(
-                in loadingIndicatorTriangleWave,
-                new TriangleWave(0, 1, TimeSpan.FromSeconds(2), WaveOffset.Trough, _opacityStopwatch));
-        }
-
-        protected override void OnUpdateGameState(GameState gameState)
+        protected override void OnUpdateGameState()
         {
             _opacityStopwatch.Start();
         }
 
-        protected override void OnPrepareRenderState(GameState gameState, RenderState renderState)
+        protected override void OnPrepareRenderState(RenderState renderState)
         {
             LoadingSceneRenderState sceneRenderState = renderState.SceneStates.Loading ??= new LoadingSceneRenderState();
 

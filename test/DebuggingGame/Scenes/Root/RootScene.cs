@@ -1,24 +1,32 @@
 ﻿using BouncyBox.VorpalEngine.DebuggingGame.States.Game;
+using BouncyBox.VorpalEngine.DebuggingGame.States.Render;
 using BouncyBox.VorpalEngine.Engine;
+using BouncyBox.VorpalEngine.Engine.Entities;
+using BouncyBox.VorpalEngine.Engine.Game;
 
 namespace BouncyBox.VorpalEngine.DebuggingGame.Scenes.Root
 {
     public class RootScene : Scene
     {
-        public RootScene(IInterfaces interfaces) : base(interfaces, SceneKey.Root)
+        private readonly IGameStateManager<GameState> _gameStateManager;
+
+        public RootScene(IInterfaces interfaces, IGameStateManager<GameState> gameStateManager, IEntityManager<GameState, RenderState> entityManager)
+            : base(interfaces, entityManager, SceneKey.Root)
         {
-            AddUpdater(new RootUpdater(interfaces));
-            AddRenderer(new RootRenderer(interfaces));
+            _gameStateManager = gameStateManager;
+
+            AddUpdaters(new RootUpdater(interfaces, gameStateManager));
+            AddRenderers(new RootRenderer(interfaces));
         }
 
-        protected override void OnLoad(GameState gameState)
+        protected override void OnLoad()
         {
-            gameState.SceneStates.Root ??= new RootSceneGameState();
+            _gameStateManager.GameState.SceneStates.Root ??= new RootSceneGameState();
         }
 
-        protected override void OnUnload(GameState gameState)
+        protected override void OnUnload()
         {
-            gameState.SceneStates.Root = null;
+            _gameStateManager.GameState.SceneStates.Root = null;
         }
     }
 }

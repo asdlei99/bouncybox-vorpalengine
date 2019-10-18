@@ -2,14 +2,19 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using Autofac;
 using BouncyBox.Common.NetStandard21.Logging;
+using BouncyBox.VorpalEngine.Engine.Entities;
 using BouncyBox.VorpalEngine.Engine.Forms;
 using BouncyBox.VorpalEngine.Engine.Game;
 using BouncyBox.VorpalEngine.Engine.Input.Keyboard;
 using BouncyBox.VorpalEngine.Engine.Input.XInput;
+using BouncyBox.VorpalEngine.Engine.Logging;
 using BouncyBox.VorpalEngine.Engine.Messaging;
 using BouncyBox.VorpalEngine.Engine.Scenes;
 using BouncyBox.VorpalEngine.Engine.Threads;
@@ -47,7 +52,7 @@ namespace BouncyBox.VorpalEngine.Engine.Bootstrap
             TSceneKey initialSceneKey,
             IEnumerable<string>? args = null,
             Action<ContainerBuilder>? componentRegistrationDelegate = null)
-            where TGame : Game<TRenderState, TSceneKey>
+            where TGame : Game<TGameState, TRenderState, TSceneKey>
             where TGameState : class, new()
             where TRenderState : class, new()
             where TSceneKey : struct, Enum
@@ -65,12 +70,18 @@ namespace BouncyBox.VorpalEngine.Engine.Bootstrap
                 return ExitCodesByRunResult[RunResult.InvalidCommandLineArguments];
             }
 
+            ISerilogLogger serilogLogger = CreateLogger(programOptions);
+
+            serilogLogger.LogVerbose("Registering components with Autofac");
+
             // Register default components
 
             var containerBuilder = new ContainerBuilder();
+            Thread mainThread = Thread.CurrentThread;
 
-            RegisterLogging(programOptions, containerBuilder);
+            containerBuilder.RegisterInstance(serilogLogger).As<ISerilogLogger>().SingleInstance();
             containerBuilder.RegisterType<TGame>().AsSelf().SingleInstance();
+            containerBuilder.RegisterType<EntityManager<TGameState, TRenderState>>().As<IEntityManager<TGameState, TRenderState>>().SingleInstance();
             containerBuilder.Register(a => new GameExecutionStateManager(a.Resolve<IInterfaces>())).As<IGameExecutionStateManager>().SingleInstance();
             containerBuilder
                 .Register(
@@ -80,15 +91,14 @@ namespace BouncyBox.VorpalEngine.Engine.Bootstrap
                         a.Resolve<ICommonGameSettings>(),
                         new ConcurrentMessageQueue<IGlobalMessage>(a.Resolve<ISerilogLogger>()),
                         new MessageQueue<IUpdateMessage>(a.Resolve<ISerilogLogger>(), "UpdateMessageQueue"),
-                        new MessageQueue<IRenderMessage>(a.Resolve<ISerilogLogger>(), "RenderMessageQueue"),
                         a.Resolve<IKeyboard>(),
                         a.Resolve<IStatefulGamepad>()))
                 .As<IInterfaces>()
                 .SingleInstance();
             containerBuilder.RegisterType<Keyboard>().As<IKeyboard>().SingleInstance();
-            containerBuilder.RegisterType<SceneManager<TGameState, TRenderState, TSceneKey>>().As<ISceneManager<TRenderState>>().SingleInstance();
+            containerBuilder.RegisterType<SceneManager<TGameState, TRenderState, TSceneKey>>().As<ISceneManager>().SingleInstance();
             containerBuilder.RegisterType<StatefulGamepad>().As<IStatefulGamepad>().SingleInstance();
-            containerBuilder.RegisterInstance(new ThreadManager(Thread.CurrentThread)).As<IThreadManager>().SingleInstance();
+            containerBuilder.Register(a => new ThreadManager(a.Resolve<ISerilogLogger>(), mainThread)).As<IThreadManager>().SingleInstance();
             containerBuilder.RegisterInstance(programOptions).AsSelf().SingleInstance();
 
             // Register custom components
@@ -96,51 +106,88 @@ namespace BouncyBox.VorpalEngine.Engine.Bootstrap
 
             using IContainer container = containerBuilder.Build();
             using ILifetimeScope lifetimeScope = container.BeginLifetimeScope();
-            var serilogLogger = lifetimeScope.Resolve<ISerilogLogger>();
             using var game = lifetimeScope.Resolve<TGame>();
+            string gameTypeName = typeof(TGame).FullName ?? "of unknown type";
+            int exitCode;
+
+            serilogLogger = new ContextSerilogLogger(lifetimeScope.Resolve<ISerilogLogger>(), new NestedContext("Program"));
 
             try
             {
-                return ExitCodesByRunResult[game.Run(initialSceneKey)];
-            }
-            catch (Exception exception)
-            {
-                // Report unhandled exceptions to the user
+                long startTimestamp = Stopwatch.GetTimestamp();
 
-                serilogLogger.LogError(exception, "An unhandled exception occurred");
-
-                if (Debugger.IsAttached)
+                try
                 {
-                    // Do not display the exception form if a debugger is attached
-                    Debugger.Break();
+                    serilogLogger.LogInformation("Running game {Game}", gameTypeName);
+
+                    exitCode = ExitCodesByRunResult[game.Run(initialSceneKey)];
                 }
-                else
+                catch (Exception exception)
                 {
-                    ErrorForm.CreateForUnhandledException(exception).ShowDialog();
+                    // Report unhandled exceptions to the user
+
+                    serilogLogger.LogError(exception, "An unhandled exception occurred");
+
+                    if (Debugger.IsAttached)
+                    {
+                        // Do not display the exception form if a debugger is attached
+                        Debugger.Break();
+                    }
+                    else
+                    {
+                        serilogLogger.LogDebug("Showing unhandled exception window");
+
+                        using ErrorForm errorForm = ErrorForm.CreateForUnhandledException(exception);
+
+                        errorForm.ShowDialog();
+                    }
+
+                    exitCode = ExitCodesByRunResult[RunResult.UnhandledException];
                 }
 
-                return ExitCodesByRunResult[RunResult.UnhandledException];
+                TimeSpan totalGameTime = TimeSpan.FromTicks(Stopwatch.GetTimestamp() - startTimestamp);
+
+                serilogLogger.LogInformation($"Total game time: {totalGameTime.ToString("c", CultureInfo.InvariantCulture)}");
+                serilogLogger.LogInformation("Exiting game {Game} with exit code {ExitCode}", gameTypeName, exitCode);
             }
             finally
             {
                 serilogLogger.CloseAndFlush();
             }
+
+            return exitCode;
         }
 
         /// <summary>
-        ///     Creates logging-related IoC registrations.
+        ///     Creates the application's Serilog logger.
         /// </summary>
         /// <param name="options">Program options.</param>
-        /// <param name="containerBuilder">An Autofac container builder.</param>
-        private static void RegisterLogging(ProgramOptions options, ContainerBuilder containerBuilder)
+        /// <returns>Returns the Serilog logger.</returns>
+        private static ISerilogLogger CreateLogger(ProgramOptions options)
         {
+            const string outputTemplate = "[{Timestamp:HH:mm:ss.fffffff} {Level:u3}] {Message:lj}{NewLine}{Exception}";
             LoggerConfiguration loggerConfiguration =
                 new LoggerConfiguration()
-                    .MinimumLevel.Is(options.MinimumLogLevel)
-                    .WriteTo.Debug(outputTemplate: "[{Timestamp:HH:mm:ss.fffffff} {Level:u3}] {Message:lj}{NewLine}{Exception}");
-            var serilogLogger = new SerilogLogger(loggerConfiguration, options.IsLoggingEnabled);
+                    .MinimumLevel.Is(options.MinimumLogLevel);
 
-            containerBuilder.RegisterInstance(serilogLogger).As<ISerilogLogger>().SingleInstance();
+            switch (options.LogDestination)
+            {
+                case LogDestination.Debug:
+                    loggerConfiguration.WriteTo.Debug(outputTemplate: outputTemplate);
+                    break;
+                case LogDestination.File:
+                    string applicationDirectory =
+                        Path.GetDirectoryName((Assembly.GetEntryAssembly() ?? throw new InvalidOperationException()).Location) ??
+                        throw new InvalidOperationException();
+                    string logPath = Path.Combine(applicationDirectory, $"log-{DateTimeOffset.Now:yyyyMMdd-HHmmss}.txt");
+
+                    loggerConfiguration.WriteTo.File(logPath, outputTemplate: outputTemplate);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            return new SerilogLogger(loggerConfiguration, options.IsLoggingEnabled);
         }
     }
 }

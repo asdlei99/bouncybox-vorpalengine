@@ -28,9 +28,8 @@ namespace BouncyBox.VorpalEngine.Engine.Forms
         private readonly ContextSerilogLogger _serilogLogger;
         private bool _isActivated;
         private bool _isMinimized;
-        private bool _isRenderingStopped;
         private bool _isUserMovingOrResizing;
-        private IntPtr? _monitorHandle;
+        private IntPtr _monitorHandle = IntPtr.Zero;
         private Size _requestedResolution;
         private Message? _sizeMessage;
         private bool _wasMaximized;
@@ -38,6 +37,8 @@ namespace BouncyBox.VorpalEngine.Engine.Forms
 
         /// <summary>
         ///     <para>Initializes a new instance of the <see cref="RenderForm" /> type.</para>
+        /// </summary>
+        /// <remarks>
         ///     <para>
         ///         This constructor handles all configuration of the underlying window in preparation for rendering, including setting
         ///         window styles, the icon, the caption, the start position, and window control availability. It also registers Raw Input
@@ -45,8 +46,8 @@ namespace BouncyBox.VorpalEngine.Engine.Forms
         ///     </para>
         ///     <para>Subscribes to the <see cref="ResolutionRequestedMessage" /> global message.</para>
         ///     <para>Subscribes to the <see cref="WindowedModeRequestedMessage" /> global message.</para>
-        ///     <para>Publishes to the <see cref="RenderWindowHandleCreatedMessage" /> global message.</para>
-        /// </summary>
+        ///     <para>Publishes the <see cref="RenderWindowHandleCreatedMessage" /> global message.</para>
+        /// </remarks>
         /// <param name="interfaces">An <see cref="IInterfaces" /> implementation.</param>
         /// <param name="programOptions">Parsed command line arguments.</param>
         /// <param name="context">A nested context.</param>
@@ -62,8 +63,7 @@ namespace BouncyBox.VorpalEngine.Engine.Forms
                 ConcurrentMessagePublisherSubscriber<IGlobalMessage>
                     .Create(interfaces, context)
                     .Subscribe<ResolutionRequestedMessage>(HandleResolutionRequestedMessage)
-                    .Subscribe<WindowedModeRequestedMessage>(HandleWindowedModeRequestedMessage)
-                    .Subscribe<EngineThreadsTerminatedMessage>(HandleEngineThreadsTerminatedMessage);
+                    .Subscribe<WindowedModeRequestedMessage>(HandleWindowedModeRequestedMessage);
 
             using (_ignoreWmSize.Set())
             {
@@ -85,7 +85,7 @@ namespace BouncyBox.VorpalEngine.Engine.Forms
 
             // Register keyboard Raw Input device
 
-            interfaces.SerilogLogger.LogDebug("Registering keyboard Raw Input device");
+            _serilogLogger.LogDebug("Registering keyboard Raw Input device");
 
             var rawInputDevice =
                 new RAWINPUTDEVICE
@@ -109,9 +109,11 @@ namespace BouncyBox.VorpalEngine.Engine.Forms
         ///         window styles, the icon, the caption, the start position, and window control availability. It also registers Raw Input
         ///         devices, which send their messages to the render window.
         ///     </para>
+        /// </summary>
+        /// <remarks>
         ///     <para>Subscribes to the <see cref="ResolutionRequestedMessage" /> global message.</para>
         ///     <para>Subscribes to the <see cref="WindowedModeRequestedMessage" /> global message.</para>
-        /// </summary>
+        /// </remarks>
         /// <param name="interfaces">An <see cref="IInterfaces" /> implementation.</param>
         /// <param name="programOptions">Parsed command line arguments.</param>
         /// <exception cref="Win32Exception">Thrown when <see cref="TerraFX.Interop.User32.RegisterRawInputDevices" /> failed.</exception>
@@ -202,10 +204,12 @@ namespace BouncyBox.VorpalEngine.Engine.Forms
         }
 
         /// <summary>
-        ///     <para>Handles the <see cref="User32.WM_ACTIVATE" /> message.</para>
+        ///     Handles the <see cref="User32.WM_ACTIVATE" /> message.
+        /// </summary>
+        /// <remarks>
         ///     <para>Publishes the <see cref="RenderWindowActivatedMessage" /> global message.</para>
         ///     <para>Publishes the <see cref="RenderWindowDeactivatedMessage" /> global message.</para>
-        /// </summary>
+        /// </remarks>
         /// <param name="message">The associated Windows message.</param>
         private void HandleWindowActivation(ref Message message)
         {
@@ -225,25 +229,21 @@ namespace BouncyBox.VorpalEngine.Engine.Forms
         }
 
         /// <summary>
-        ///     <para>Handles the <see cref="User32.WM_CLOSE" /> message.</para>
-        ///     <para>Publishes the <see cref="RenderWindowClosingMessage" /> global message.</para>
+        ///     Handles the <see cref="User32.WM_CLOSE" /> message.
         /// </summary>
+        /// <remarks>
+        ///     Publishes the <see cref="RenderWindowClosingMessage" /> global message.
+        /// </remarks>
         private HandleResult HandleClose(ref Message message)
         {
             message.Result = IntPtr.Zero;
-
-            // Only allow the window to close if engine threads have been terminated
-            if (_isRenderingStopped)
-            {
-                return HandleResult.InvokeBaseWndProc;
-            }
 
             // Hide the window while waiting for engine threads to terminate
             Visible = false;
 
             _globalMessagePublisherSubscriber.Publish<RenderWindowClosingMessage>();
 
-            return HandleResult.Return;
+            return HandleResult.InvokeBaseWndProc;
         }
 
         /// <summary>
@@ -252,8 +252,6 @@ namespace BouncyBox.VorpalEngine.Engine.Forms
         private void HandleWindowDestruction()
         {
             _globalMessagePublisherSubscriber.Dispose();
-
-            User32.PostQuitMessage(0);
         }
 
         /// <summary>
@@ -385,10 +383,12 @@ namespace BouncyBox.VorpalEngine.Engine.Forms
         }
 
         /// <summary>
-        ///     <para>Handles the <see cref="User32.WM_SIZE" /> message.</para>
+        ///     Handles the <see cref="User32.WM_SIZE" /> message.
+        /// </summary>
+        /// <remarks>
         ///     <para>Publishes the <see cref="RenderWindowMinimizedMessage" /> global message.</para>
         ///     <para>Publishes the <see cref="RenderWindowRestoredMessage" /> global message.</para>
-        /// </summary>
+        /// </remarks>
         /// <param name="message">The associated Windows message.</param>
         /// <param name="userResizeComplete">A value indicating if a user resize in progress was completed.</param>
         private void HandleSize(ref Message message, bool userResizeComplete = false)
@@ -474,12 +474,11 @@ namespace BouncyBox.VorpalEngine.Engine.Forms
         }
 
         /// <summary>
-        ///     <para>
-        ///         Detects the display the render form is considered to be on according to Windows and tracks the resulting monitor
-        ///         handle.
-        ///     </para>
-        ///     <para>Publishes the <see cref="DisplayChangedMessage" /> global message.</para>
+        ///     Detects the display the render form is considered to be on according to Windows and tracks the resulting monitor handle.
         /// </summary>
+        /// <remarks>
+        ///     Publishes the <see cref="DisplayChangedMessage" /> global message.
+        /// </remarks>
         /// <exception>Thrown when <see cref="User32.GetMonitorInfoW" /> failed.</exception>
         /// <exception>Thrown when <see cref="User32.EnumDisplayDevicesW" /> failed.</exception>
         private unsafe void SetMonitorHandle()
@@ -528,8 +527,10 @@ namespace BouncyBox.VorpalEngine.Engine.Forms
         ///         The actual resolution after processing the request may be different from the requested resolution due to render window
         ///         configuration.
         ///     </para>
-        ///     <para>Publishes the <see cref="ResolutionChangedMessage" /> global message.</para>
         /// </summary>
+        /// <remarks>
+        ///     Publishes the <see cref="ResolutionChangedMessage" /> global message.
+        /// </remarks>
         /// <param name="requestedResolution">The requested resolution.</param>
         /// <param name="userRequested">A value indicating whether the user requested the change.</param>
         private void SetResolution(Size requestedResolution, bool userRequested)
@@ -642,17 +643,6 @@ namespace BouncyBox.VorpalEngine.Engine.Forms
         private void HandleWindowedModeRequestedMessage(WindowedModeRequestedMessage message)
         {
             SetWindowedMode(message.Mode);
-        }
-
-        /// <summary>
-        ///     Handles the <see cref="EngineThreadsTerminatedMessage" /> global message.
-        /// </summary>
-        /// <param name="message">The message being handled.</param>
-        private void HandleEngineThreadsTerminatedMessage(EngineThreadsTerminatedMessage message)
-        {
-            _isRenderingStopped = true;
-
-            Close();
         }
 
         /// <summary>

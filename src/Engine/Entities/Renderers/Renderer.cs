@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using BouncyBox.VorpalEngine.Engine.DirectX;
-using BouncyBox.VorpalEngine.Engine.Game;
 using BouncyBox.VorpalEngine.Engine.Messaging;
 using TerraFX.Interop;
 using ProcessThread = BouncyBox.VorpalEngine.Engine.Threads.ProcessThread;
@@ -12,8 +11,10 @@ namespace BouncyBox.VorpalEngine.Engine.Entities.Renderers
     public abstract class Renderer<TRenderState> : IRenderer<TRenderState>
         where TRenderState : class
     {
+        private readonly object _directXResourcesLockObject = new object();
         private DirectXResources? _directXResources;
         private bool _isDisposed;
+        private bool _isInitialized;
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="Renderer{TRenderState}" /> type.
@@ -24,6 +25,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities.Renderers
         protected Renderer(IInterfaces interfaces, NestedContext context, uint order = 0)
         {
             Interfaces = interfaces;
+            Context = context;
             Order = order;
             GlobalMessagePublisherSubscriber = ConcurrentMessagePublisherSubscriber<IGlobalMessage>.Create(interfaces, context);
         }
@@ -39,6 +41,11 @@ namespace BouncyBox.VorpalEngine.Engine.Entities.Renderers
         }
 
         /// <summary>
+        ///     Gets the nested context.
+        /// </summary>
+        protected NestedContext Context { get; }
+
+        /// <summary>
         ///     Gets the <see cref="IInterfaces" /> implementation.
         /// </summary>
         protected IInterfaces Interfaces { get; }
@@ -51,18 +58,17 @@ namespace BouncyBox.VorpalEngine.Engine.Entities.Renderers
         protected ConcurrentMessagePublisherSubscriber<IGlobalMessage> GlobalMessagePublisherSubscriber { get; }
 
         /// <summary>
-        ///     <para>Gets a value indicating if the game execution state is running.</para>
-        ///     <para>The game is considered running if it is neither paused nor suspended.</para>
+        ///     Gets a value indicating if the renderer is neither paused nor suspended.
         /// </summary>
         protected bool IsRunning => !IsPaused && !IsSuspended;
 
         /// <summary>
-        ///     Gets a value indicating if the game execution state is paused.
+        ///     Gets a value indicating if the renderer is paused.
         /// </summary>
         protected bool IsPaused { get; private set; }
 
         /// <summary>
-        ///     Gets a value indicating if the game execution state is suspended.
+        ///     Gets a value indicating if the renderer is suspended.
         /// </summary>
         protected bool IsSuspended { get; private set; }
 
@@ -80,38 +86,51 @@ namespace BouncyBox.VorpalEngine.Engine.Entities.Renderers
         public uint Order { get; }
 
         /// <inheritdoc />
-        /// <exception cref="InvalidOperationException">Thrown when the thread executing this method is not the render thread.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when the thread executing this method is not the renderer resources thread.</exception>
         public void InitializeResources(DirectXResources resources)
         {
-            Interfaces.ThreadManager.VerifyProcessThread(ProcessThread.Render);
-
-            _directXResources = resources;
+            Interfaces.ThreadManager.VerifyProcessThread(ProcessThread.RendererResources);
 
             OnInitializeResources(resources);
+
+            lock (_directXResourcesLockObject)
+            {
+                _directXResources = resources;
+            }
+
+            _isInitialized = true;
         }
 
         /// <inheritdoc />
-        /// <exception cref="InvalidOperationException">Thrown when the thread executing this method is not the render thread.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when the thread executing this method is not the renderer resources thread.</exception>
         public void ResizeResources(D2D_SIZE_U clientSize)
         {
-            Interfaces.ThreadManager.VerifyProcessThread(ProcessThread.Render);
+            Interfaces.ThreadManager.VerifyProcessThread(ProcessThread.RendererResources);
 
-            Debug.Assert(_directXResources != null);
+            OnResizeResources(clientSize);
 
-            _directXResources = new DirectXResources(_directXResources.Value, clientSize);
+            lock (_directXResourcesLockObject)
+            {
+                Debug.Assert(_directXResources != null);
 
-            OnResizeResources(_directXResources.Value, clientSize);
+                _directXResources = new DirectXResources(_directXResources.Value, clientSize);
+            }
         }
 
         /// <inheritdoc />
-        /// <exception cref="InvalidOperationException">Thrown when the thread executing this method is not the render thread.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when the thread executing this method is not the renderer resources thread.</exception>
         public void ReleaseResources()
         {
-            Interfaces.ThreadManager.VerifyProcessThread(ProcessThread.Render);
-
-            _directXResources = null;
+            Interfaces.ThreadManager.VerifyProcessThread(ProcessThread.RendererResources);
 
             OnReleaseResources();
+
+            lock (_directXResourcesLockObject)
+            {
+                _directXResources = null;
+            }
+
+            _isInitialized = false;
         }
 
         /// <inheritdoc />
@@ -120,7 +139,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities.Renderers
         ///     <see cref="RenderWhenPaused" />, and <see cref="RenderWhenSuspended" /> values determine that rendering should not occur.
         /// </summary>
         /// <exception cref="InvalidOperationException">Thrown when the thread executing this method is not the render thread.</exception>
-        public void Render(TRenderState renderState, IEngineStats engineStats)
+        public void Render(TRenderState renderState)
         {
             Interfaces.ThreadManager.VerifyProcessThread(ProcessThread.Render);
 
@@ -129,9 +148,16 @@ namespace BouncyBox.VorpalEngine.Engine.Entities.Renderers
                 return;
             }
 
-            Debug.Assert(_directXResources != null);
+            DirectXResources resources;
 
-            OnRender(_directXResources.Value, renderState, engineStats);
+            lock (_directXResourcesLockObject)
+            {
+                Debug.Assert(_directXResources != null);
+
+                resources = _directXResources.Value;
+            }
+
+            OnRender(resources, renderState);
         }
 
         /// <inheritdoc />
@@ -193,73 +219,51 @@ namespace BouncyBox.VorpalEngine.Engine.Entities.Renderers
             DisposeHelper.Dispose(GlobalMessagePublisherSubscriber.Dispose, ref _isDisposed, Interfaces.ThreadManager, ProcessThread.Main);
         }
 
-        /// <summary>
-        ///     Initializes DirectX resources.
-        /// </summary>
-        /// <param name="resources">Core DirectX resources that can be used to initialize other resources.</param>
+        /// <inheritdoc cref="IRenderer.InitializeResources" />
         protected virtual void OnInitializeResources(DirectXResources resources)
         {
         }
 
-        /// <summary>
-        ///     Resizes resources to account for the new render window client size.
-        /// </summary>
-        /// <param name="resources">Core DirectX resources that can be used to initialize other resources.</param>
-        /// <param name="clientSize">The size of the render window's client area.</param>
-        protected virtual void OnResizeResources(DirectXResources resources, D2D_SIZE_U clientSize)
+        /// <inheritdoc cref="IRenderer.ResizeResources" />
+        protected virtual void OnResizeResources(D2D_SIZE_U clientSize)
         {
         }
 
-        /// <summary>
-        ///     Releases resources created by this entity.
-        /// </summary>
+        /// <inheritdoc cref="IRenderer.ReleaseResources" />
         protected virtual void OnReleaseResources()
         {
         }
 
-        /// <summary>
-        ///     Renders the entity.
-        /// </summary>
-        /// <param name="resources">Core DirectX resources that can be used to render.</param>
-        /// <param name="renderState">The render state to render.</param>
-        /// <param name="engineStats">An <see cref="IEngineStats" /> implementation.</param>
-        protected abstract void OnRender(DirectXResources resources, TRenderState renderState, IEngineStats engineStats);
+        /// <inheritdoc cref="IRenderer{TRenderState}.Render" />
+        protected abstract void OnRender(DirectXResources resources, TRenderState renderState);
 
-        /// <summary>
-        ///     Allows the entity to respond to the game execution state being paused.
-        /// </summary>
-        /// <param name="resources">Core DirectX resources that can be used to render.</param>
+        /// <inheritdoc cref="IEntity.Pause" />
         protected virtual void OnPause(DirectXResources resources)
         {
         }
 
-        /// <summary>
-        ///     Allows the entity to respond to the game execution state being unpaused.
-        /// </summary>
-        /// <param name="resources">Core DirectX resources that can be used to render.</param>
+        /// <inheritdoc cref="IEntity.Unpause" />
         protected virtual void OnUnpause(DirectXResources resources)
         {
         }
 
-        /// <summary>
-        ///     Allows the entity to respond to the game execution state being suspended.
-        /// </summary>
-        /// <param name="resources">Core DirectX resources that can be used to render.</param>
+        /// <inheritdoc cref="IEntity.Suspend" />
         protected virtual void OnSuspend(DirectXResources resources)
         {
         }
 
-        /// <summary>
-        ///     Allows the entity to respond to the game execution state being resumed.
-        /// </summary>
-        /// <param name="resources">Core DirectX resources that can be used to render.</param>
+        /// <inheritdoc cref="IEntity.Resume" />
         protected virtual void OnResume(DirectXResources resources)
         {
         }
 
+        /// <summary>
+        ///     Determines if the entity should render a render state.
+        /// </summary>
+        /// <returns>Returns a value indicating whether the entity should render a render state.</returns>
         private bool ShouldRender()
         {
-            return (!IsPaused || RenderWhenPaused) && (!IsSuspended || RenderWhenSuspended);
+            return _isInitialized && (!IsPaused || RenderWhenPaused) && (!IsSuspended || RenderWhenSuspended);
         }
     }
 }

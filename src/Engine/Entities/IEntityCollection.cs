@@ -15,12 +15,6 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         IReadOnlyCollection<TEntity> SortedByOrder { get; }
 
         /// <summary>
-        ///     Adds an entity to the collection.
-        /// </summary>
-        /// <param name="entity">The entity to add.</param>
-        void Add(TEntity entity);
-
-        /// <summary>
         ///     Adds entities to the collection.
         /// </summary>
         /// <param name="entities">The entities to add.</param>
@@ -31,12 +25,6 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         /// </summary>
         /// <param name="entities">The entities to add.</param>
         void Add(params TEntity[] entities);
-
-        /// <summary>
-        ///     Removes an entity from the collection.
-        /// </summary>
-        /// <param name="entity">The entity to remove.</param>
-        void Remove(TEntity entity);
 
         /// <summary>
         ///     Removes entities from the collection.

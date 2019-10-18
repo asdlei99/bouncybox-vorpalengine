@@ -12,14 +12,18 @@ namespace BouncyBox.VorpalEngine.Engine.Game
         private readonly ConcurrentMessagePublisherSubscriber<IGlobalMessage> _globalMessagePublisherSubscriber;
         private readonly ContextSerilogLogger _serilogLogger;
         private bool _isDisposed;
+        private bool _isGamePaused;
+        private bool _isGameSuspended;
 
         /// <summary>
         ///     <para>Initializes a new instance of the <see cref="GameExecutionStateManager" /> type.</para>
+        /// </summary>
+        /// <remarks>
         ///     <para>Subscribes to the <see cref="PauseGameMessage" /> global message.</para>
         ///     <para>Subscribes to the <see cref="UnpauseGameMessage" /> global message.</para>
         ///     <para>Subscribes to the <see cref="SuspendGameMessage" /> global message.</para>
         ///     <para>Subscribes to the <see cref="ResumeGameMessage" /> global message.</para>
-        /// </summary>
+        /// </remarks>
         /// <param name="interfaces">An <see cref="IInterfaces" /> implementation.</param>
         /// <param name="context">A nested context.</param>
         public GameExecutionStateManager(IInterfaces interfaces, NestedContext context)
@@ -38,11 +42,13 @@ namespace BouncyBox.VorpalEngine.Engine.Game
 
         /// <summary>
         ///     <para>Initializes a new instance of the <see cref="GameExecutionStateManager" /> type.</para>
+        /// </summary>
+        /// <remarks>
         ///     <para>Subscribes to the <see cref="PauseGameMessage" /> global message.</para>
         ///     <para>Subscribes to the <see cref="UnpauseGameMessage" /> global message.</para>
         ///     <para>Subscribes to the <see cref="SuspendGameMessage" /> global message.</para>
         ///     <para>Subscribes to the <see cref="ResumeGameMessage" /> global message.</para>
-        /// </summary>
+        /// </remarks>
         /// <param name="interfaces">An <see cref="IInterfaces" /> implementation.</param>
         public GameExecutionStateManager(IInterfaces interfaces)
             : this(interfaces, NestedContext.None())
@@ -50,13 +56,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
         }
 
         /// <inheritdoc />
-        public GameExecutionState GameExecutionState => new GameExecutionState(IsGamePaused, IsGameSuspended);
-
-        /// <inheritdoc />
-        public bool IsGamePaused { get; private set; }
-
-        /// <inheritdoc />
-        public bool IsGameSuspended { get; private set; }
+        public GameExecutionState GameExecutionState => new GameExecutionState(_isGamePaused, _isGameSuspended);
 
         /// <inheritdoc />
         public void HandleDispatchedMessages()
@@ -76,13 +76,13 @@ namespace BouncyBox.VorpalEngine.Engine.Game
         /// <param name="message">The message being handled.</param>
         private void HandlePauseGameMessage(PauseGameMessage message)
         {
-            if (IsGamePaused)
+            if (_isGamePaused)
             {
                 return;
             }
 
             _serilogLogger.LogInformation("Game paused");
-            IsGamePaused = true;
+            _isGamePaused = true;
         }
 
         /// <summary>
@@ -91,13 +91,13 @@ namespace BouncyBox.VorpalEngine.Engine.Game
         /// <param name="message">The message being handled.</param>
         private void HandleUnpauseGameMessage(UnpauseGameMessage message)
         {
-            if (!IsGamePaused)
+            if (!_isGamePaused)
             {
                 return;
             }
 
             _serilogLogger.LogInformation("Game unpaused");
-            IsGamePaused = false;
+            _isGamePaused = false;
         }
 
         /// <summary>
@@ -106,13 +106,13 @@ namespace BouncyBox.VorpalEngine.Engine.Game
         /// <param name="message">The message being handled.</param>
         private void HandleSuspendGameMessage(SuspendGameMessage message)
         {
-            if (IsGameSuspended)
+            if (_isGameSuspended)
             {
                 return;
             }
 
             _serilogLogger.LogInformation("Game suspended");
-            IsGameSuspended = true;
+            _isGameSuspended = true;
         }
 
         /// <summary>
@@ -121,13 +121,13 @@ namespace BouncyBox.VorpalEngine.Engine.Game
         /// <param name="message">The message being handled.</param>
         private void HandleResumeGameMessage(ResumeGameMessage message)
         {
-            if (!IsGameSuspended)
+            if (!_isGameSuspended)
             {
                 return;
             }
 
             _serilogLogger.LogInformation("Game resumed");
-            IsGameSuspended = false;
+            _isGameSuspended = false;
         }
     }
 }

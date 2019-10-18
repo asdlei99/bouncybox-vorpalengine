@@ -39,11 +39,6 @@ namespace BouncyBox.VorpalEngine.Engine
         IMessageQueue<IUpdateMessage> UpdateMessageQueue { get; }
 
         /// <summary>
-        ///     Gets the render <see cref="IMessageQueue{TMessageBase}" /> implementation.
-        /// </summary>
-        IMessageQueue<IRenderMessage> RenderMessageQueue { get; }
-
-        /// <summary>
         ///     Gets the <see cref="IKeyboard" /> implementation.
         /// </summary>
         IKeyboard Keyboard { get; }

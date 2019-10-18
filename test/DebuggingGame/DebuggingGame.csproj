@@ -12,7 +12,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="BouncyBox.Common.NetStandard21.Logging" Version="1.0.0.64" />
+    <PackageReference Include="BouncyBox.Common.NetStandard21.Logging" Version="1.1.0.65" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Engine\Engine.csproj" />

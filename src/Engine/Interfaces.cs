@@ -21,7 +21,6 @@ namespace BouncyBox.VorpalEngine.Engine
         /// <param name="commonGameSettings">An <see cref="ICommonGameSettings" /> implementation.</param>
         /// <param name="globalConcurrentMessageQueue">An <see cref="IConcurrentMessageQueue{TMessageBase}" /> implementation.</param>
         /// <param name="updateMessageQueue">An update <see cref="IMessageQueue{TMessageBase}" /> implementation.</param>
-        /// <param name="renderMessageQueue">A render <see cref="IMessageQueue{TMessageBase}" /> implementation.</param>
         /// <param name="keyboard">An <see cref="IKeyboard" /> implementation.</param>
         /// <param name="statefulGamepad">An <see cref="IStatefulGamepad" /> implementation.</param>
         public Interfaces(
@@ -30,7 +29,6 @@ namespace BouncyBox.VorpalEngine.Engine
             ICommonGameSettings commonGameSettings,
             IConcurrentMessageQueue<IGlobalMessage> globalConcurrentMessageQueue,
             IMessageQueue<IUpdateMessage> updateMessageQueue,
-            IMessageQueue<IRenderMessage> renderMessageQueue,
             IKeyboard keyboard,
             IStatefulGamepad statefulGamepad)
         {
@@ -39,7 +37,6 @@ namespace BouncyBox.VorpalEngine.Engine
             CommonGameSettings = commonGameSettings;
             GlobalConcurrentMessageQueue = globalConcurrentMessageQueue;
             UpdateMessageQueue = updateMessageQueue;
-            RenderMessageQueue = renderMessageQueue;
             Keyboard = keyboard;
             StatefulGamepad = statefulGamepad;
         }
@@ -58,9 +55,6 @@ namespace BouncyBox.VorpalEngine.Engine
 
         /// <inheritdoc />
         public IMessageQueue<IUpdateMessage> UpdateMessageQueue { get; }
-
-        /// <inheritdoc />
-        public IMessageQueue<IRenderMessage> RenderMessageQueue { get; }
 
         /// <inheritdoc />
         public IKeyboard Keyboard { get; }

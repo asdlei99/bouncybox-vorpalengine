@@ -1,5 +1,4 @@
 ﻿using System.Threading;
-using BouncyBox.VorpalEngine.Engine.Messaging;
 
 namespace BouncyBox.VorpalEngine.Engine.Threads
 {
@@ -9,18 +8,12 @@ namespace BouncyBox.VorpalEngine.Engine.Threads
     public interface IEngineThreadWorker
     {
         /// <summary>
-        ///     Gets the nested context;
+        ///     Prepares the worker for work.
         /// </summary>
-        NestedContext Context { get; }
+        void Prepare();
 
         /// <summary>
-        ///     Subscribes to global messages.
-        /// </summary>
-        /// <param name="globalMessagePublisherSubscriber">A global message publisher/subscriber.</param>
-        void SubscribeToMessages(ConcurrentMessagePublisherSubscriber<IGlobalMessage> globalMessagePublisherSubscriber);
-
-        /// <summary>
-        ///     Performs the thread's work.
+        ///     Performs the work.
         /// </summary>
         /// <param name="cancellationToken">A cancellation token whose cancellation signals the thread is attempting to shut down.</param>
         void DoWork(CancellationToken cancellationToken);
@@ -29,5 +22,10 @@ namespace BouncyBox.VorpalEngine.Engine.Threads
         ///     Performs post-work clean-up.
         /// </summary>
         void CleanUp();
+
+        /// <summary>
+        ///     Handles dispatched messages
+        /// </summary>
+        void HandleDispatchedMessages();
     }
 }

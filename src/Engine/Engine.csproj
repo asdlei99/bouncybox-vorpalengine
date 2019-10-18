@@ -12,17 +12,18 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Autofac" Version="4.9.4" />
-    <PackageReference Include="BouncyBox.Common.NetStandard21" Version="1.0.0.64" />
-    <PackageReference Include="BouncyBox.Common.NetStandard21.Logging" Version="1.0.0.64" />
+    <PackageReference Include="BouncyBox.Common.NetStandard21" Version="1.1.0.65" />
+    <PackageReference Include="BouncyBox.Common.NetStandard21.Logging" Version="1.1.0.65" />
     <PackageReference Include="CommandLineParser" Version="2.6.0" />
     <PackageReference Include="Enums.NET" Version="2.3.2" />
     <PackageReference Include="Serilog.Sinks.Debug" Version="1.0.1" />
-    <PackageReference Include="TerraFX.Interop.D2D1" Version="10.0.18362-alpha-20191016.1" />
-    <PackageReference Include="TerraFX.Interop.D3D11" Version="10.0.18362-alpha-20191016.1" />
-    <PackageReference Include="TerraFX.Interop.DWrite" Version="10.0.18362-alpha-20191016.1" />
-    <PackageReference Include="TerraFX.Interop.DXGI" Version="10.0.18362-alpha-20191016.1" />
-    <PackageReference Include="TerraFX.Interop.DXGIDebug" Version="10.0.18362-alpha-20191016.1" />
-    <PackageReference Include="TerraFX.Interop.User32" Version="10.0.18362-alpha-20191016.1" />
-    <PackageReference Include="TerraFX.Interop.Windows" Version="10.0.18362-alpha-20191016.1" />
+    <PackageReference Include="Serilog.Sinks.File" Version="4.1.0" />
+    <PackageReference Include="TerraFX.Interop.D2D1" Version="10.0.18362-alpha-20191016.2" />
+    <PackageReference Include="TerraFX.Interop.D3D11" Version="10.0.18362-alpha-20191016.2" />
+    <PackageReference Include="TerraFX.Interop.DWrite" Version="10.0.18362-alpha-20191016.2" />
+    <PackageReference Include="TerraFX.Interop.DXGI" Version="10.0.18362-alpha-20191016.2" />
+    <PackageReference Include="TerraFX.Interop.DXGIDebug" Version="10.0.18362-alpha-20191016.2" />
+    <PackageReference Include="TerraFX.Interop.User32" Version="10.0.18362-alpha-20191016.2" />
+    <PackageReference Include="TerraFX.Interop.Windows" Version="10.0.18362-alpha-20191016.2" />
   </ItemGroup>
 </Project>

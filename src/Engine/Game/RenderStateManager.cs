@@ -30,7 +30,6 @@ namespace BouncyBox.VorpalEngine.Engine.Game
         /// <exception cref="InvalidOperationException">Thrown when the thread executing this method is not the update thread.</exception>
         public void ProvideNextRenderState(TRenderState state)
         {
-            // This constructor must execute on the update thread
             _threadManager.VerifyProcessThread(ProcessThread.Update);
 
             lock (_lockObject)
@@ -45,7 +44,6 @@ namespace BouncyBox.VorpalEngine.Engine.Game
         /// <exception cref="InvalidOperationException">Thrown when the thread executing this method is not the render thread.</exception>
         public TRenderState? GetRenderStateForRendering(CancellationToken cancellationToken = default)
         {
-            // This constructor must execute on the render thread
             _threadManager.VerifyProcessThread(ProcessThread.Render);
 
             try

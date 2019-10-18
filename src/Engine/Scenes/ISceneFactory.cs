@@ -15,6 +15,6 @@ namespace BouncyBox.VorpalEngine.Engine.Scenes
         /// </summary>
         /// <param name="sceneKey">A scene key.</param>
         /// <returns>Returns the new scene.</returns>
-        IScene<TGameState, TRenderState, TSceneKey> Create(TSceneKey sceneKey);
+        IScene<TSceneKey> Create(TSceneKey sceneKey);
     }
 }

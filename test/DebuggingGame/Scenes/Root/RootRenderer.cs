@@ -6,8 +6,6 @@ using BouncyBox.VorpalEngine.DebuggingGame.States.Render;
 using BouncyBox.VorpalEngine.Engine;
 using BouncyBox.VorpalEngine.Engine.DirectX;
 using BouncyBox.VorpalEngine.Engine.DirectX.ComObjects;
-using BouncyBox.VorpalEngine.Engine.Game;
-using BouncyBox.VorpalEngine.Engine.Interop;
 using TerraFX.Interop;
 
 namespace BouncyBox.VorpalEngine.DebuggingGame.Scenes.Root
@@ -40,7 +38,7 @@ namespace BouncyBox.VorpalEngine.DebuggingGame.Scenes.Root
             _textFormat?.Dispose();
         }
 
-        protected override unsafe void OnRender(DirectXResources resources, RenderState renderState, IEngineStats engineStats)
+        protected override unsafe void OnRender(DirectXResources resources, RenderState renderState)
         {
             Debug.Assert(renderState.SceneStates.Root != null);
 
@@ -54,13 +52,13 @@ namespace BouncyBox.VorpalEngine.DebuggingGame.Scenes.Root
                 .AppendLine()
                 .AppendLine($"Client size : {resources.ClientSize.width} x {resources.ClientSize.height}")
                 .AppendLine()
-                .AppendLine($"UPS : {Math.Round(engineStats.UpdatesPerSecond, 2, MidpointRounding.AwayFromZero)}")
-                .AppendLine($"FPS : {Math.Round(engineStats.FramesPerSecond, 2, MidpointRounding.AwayFromZero)}")
+                .AppendLine($"UPS : {Math.Round(sceneRenderState.UpdatesPerSecond ?? 0, 2, MidpointRounding.AwayFromZero)}")
+                .AppendLine($"FPS : {Math.Round(sceneRenderState.FramesPerSecond ?? 0, 2, MidpointRounding.AwayFromZero)}")
                 .AppendLine(
-                    $"FT  : Mean = {engineStats.MeanFrametime?.TotalMilliseconds.ToString("F3") ?? "?"} ms; Min = {engineStats.MinimumFrametime?.TotalMilliseconds.ToString("F3") ?? "?"} ms; {engineStats.MaximumFrametime?.TotalMilliseconds.ToString("F3") ?? "?"} ms")
+                    $"FT  : Mean = {sceneRenderState.MeanFrametime?.TotalMilliseconds ?? 0:F3} ms; Min = {sceneRenderState.MinimumFrametime?.TotalMilliseconds:F3} ms; {sceneRenderState.MaximumFrametime?.TotalMilliseconds:F3} ms")
                 .AppendLine()
                 .AppendLine($"State counter      : {sceneRenderState.Counter}")
-                .AppendLine($"Frame count        : {engineStats.FrameCount}")
+                .AppendLine($"Frame count        : {sceneRenderState.FrameCount ?? 0}")
                 .AppendLine()
                 .AppendLine($"Update delay : {sceneRenderState.UpdateDelayInMilliseconds} ms  [\u2191] Increase delay  [\u2193] Decrease delay")
                 .AppendLine($"Render delay : {sceneRenderState.RenderDelayInMilliseconds} ms  [\u2192] Increase delay  [\u2190] Decrease delay")
@@ -99,7 +97,7 @@ namespace BouncyBox.VorpalEngine.DebuggingGame.Scenes.Root
 
             if (sceneRenderState.RenderDelayInMilliseconds > 0)
             {
-                Thread.Sleep(TimeSpan.FromMilliseconds(sceneRenderState.RenderDelayInMilliseconds));
+                Thread.Sleep((int)sceneRenderState.RenderDelayInMilliseconds);
             }
         }
     }

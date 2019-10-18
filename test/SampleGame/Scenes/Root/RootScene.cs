@@ -1,13 +1,16 @@
 ﻿using BouncyBox.VorpalEngine.Engine;
+using BouncyBox.VorpalEngine.Engine.Entities;
+using BouncyBox.VorpalEngine.SampleGame.States.Game;
+using BouncyBox.VorpalEngine.SampleGame.States.Render;
 
 namespace BouncyBox.VorpalEngine.SampleGame.Scenes.Root
 {
     public class RootScene : Scene
     {
-        public RootScene(IInterfaces interfaces) : base(interfaces, SceneKey.Root)
+        public RootScene(IInterfaces interfaces, IEntityManager<GameState, RenderState> entityManager) : base(interfaces, entityManager, SceneKey.Root)
         {
-            AddUpdater(new LoadingUpdater(interfaces));
-            AddRenderer(new LoadingRenderer(interfaces));
+            AddUpdaters(new LoadingUpdater(interfaces));
+            AddRenderers(new LoadingRenderer(interfaces));
         }
     }
 }

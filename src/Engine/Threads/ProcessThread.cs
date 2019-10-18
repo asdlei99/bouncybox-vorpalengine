@@ -11,18 +11,23 @@
         Main,
 
         /// <summary>
-        ///     The update thread is used to update the game state and to prepare render states.
+        ///     This thread is used to update the game state and to prepare render states.
         /// </summary>
         Update,
 
         /// <summary>
-        ///     The DirectX thread is used to initialize and release DirectX resources.
+        ///     This thread is used to initialize and release updater resources.
         /// </summary>
-        DirectX,
+        UpdaterResources,
 
         /// <summary>
-        ///     The render thread is used to render render states.
+        ///     This thread is used to render render states.
         /// </summary>
-        Render
+        Render,
+
+        /// <summary>
+        ///     This thread is used to initialize and release renderer resources.
+        /// </summary>
+        RendererResources
     }
 }
