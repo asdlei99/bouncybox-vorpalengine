@@ -38,7 +38,7 @@ namespace BouncyBox.VorpalEngine.DebuggingGame.Scenes.Root
             _textFormat?.Dispose();
         }
 
-        protected override unsafe void OnRender(DirectXResources resources, RenderState renderState)
+        protected override unsafe void OnRender(DirectXResources resources, RenderState renderState, CancellationToken cancellationToken)
         {
             Debug.Assert(renderState.SceneStates.Root != null);
 
@@ -97,7 +97,7 @@ namespace BouncyBox.VorpalEngine.DebuggingGame.Scenes.Root
 
             if (sceneRenderState.RenderDelayInMilliseconds > 0)
             {
-                Thread.Sleep((int)sceneRenderState.RenderDelayInMilliseconds);
+                cancellationToken.WaitHandle.WaitOne(sceneRenderState.RenderDelayInMilliseconds);
             }
         }
     }

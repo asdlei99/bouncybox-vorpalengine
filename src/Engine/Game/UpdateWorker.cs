@@ -82,8 +82,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
             if (_isRenderWindowMinimized)
             {
                 // Reduce CPU utilization
-                Thread.Sleep(_minimizedRenderWindowSleepDuration);
-
+                cancellationToken.WaitHandle.WaitOne(_minimizedRenderWindowSleepDuration);
                 return;
             }
 
@@ -93,7 +92,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
             _sceneManager.HandleDispatchedMessages();
 
             // Update the game state
-            _entityManager.Update();
+            _entityManager.Update(cancellationToken);
 
             // Throttle updating if the render window is deactivated
             TimeSpan sleepDuration =
@@ -102,7 +101,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
             if (sleepDuration > TimeSpan.Zero)
             {
                 // Sleep until the next update period
-                Thread.Sleep(sleepDuration);
+                cancellationToken.WaitHandle.WaitOne(sleepDuration);
             }
 
             // Calculate engine stats

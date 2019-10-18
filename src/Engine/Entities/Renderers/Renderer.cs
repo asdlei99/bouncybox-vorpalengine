@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Threading;
 using BouncyBox.VorpalEngine.Engine.DirectX;
 using BouncyBox.VorpalEngine.Engine.Messaging;
 using TerraFX.Interop;
@@ -139,7 +140,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities.Renderers
         ///     <see cref="RenderWhenPaused" />, and <see cref="RenderWhenSuspended" /> values determine that rendering should not occur.
         /// </summary>
         /// <exception cref="InvalidOperationException">Thrown when the thread executing this method is not the render thread.</exception>
-        public void Render(TRenderState renderState)
+        public void Render(TRenderState renderState, CancellationToken cancellationToken)
         {
             Interfaces.ThreadManager.VerifyProcessThread(ProcessThread.Render);
 
@@ -157,7 +158,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities.Renderers
                 resources = _directXResources.Value;
             }
 
-            OnRender(resources, renderState);
+            OnRender(resources, renderState, cancellationToken);
         }
 
         /// <inheritdoc />
@@ -235,7 +236,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities.Renderers
         }
 
         /// <inheritdoc cref="IRenderer{TRenderState}.Render" />
-        protected abstract void OnRender(DirectXResources resources, TRenderState renderState);
+        protected abstract void OnRender(DirectXResources resources, TRenderState renderState, CancellationToken cancellationToken);
 
         /// <inheritdoc cref="IEntity.Pause" />
         protected virtual void OnPause(DirectXResources resources)

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Drawing;
@@ -48,7 +48,7 @@ namespace BouncyBox.VorpalEngine.DebuggingGame.Scenes.Root
         {
         }
 
-        protected override void OnUpdateGameState()
+        protected override void OnUpdateGameState(CancellationToken cancellationToken)
         {
             RootSceneGameState sceneGameState = _gameStateManager.GameState.SceneStates.Root!;
 
@@ -155,7 +155,7 @@ namespace BouncyBox.VorpalEngine.DebuggingGame.Scenes.Root
 
             if (sceneGameState.UpdateDelay > TimeSpan.Zero)
             {
-                Thread.Sleep(sceneGameState.UpdateDelay);
+                cancellationToken.WaitHandle.WaitOne(sceneGameState.UpdateDelay);
             }
         }
 

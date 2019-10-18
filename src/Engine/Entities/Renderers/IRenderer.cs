@@ -1,4 +1,5 @@
-﻿using BouncyBox.VorpalEngine.Engine.DirectX;
+﻿using System.Threading;
+using BouncyBox.VorpalEngine.Engine.DirectX;
 using TerraFX.Interop;
 
 namespace BouncyBox.VorpalEngine.Engine.Entities.Renderers
@@ -36,6 +37,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities.Renderers
         ///     Renders a render state.
         /// </summary>
         /// <param name="renderState">The render state to render.</param>
-        void Render(TRenderState renderState);
+        /// <param name="cancellationToken">A cancellation token.</param>
+        void Render(TRenderState renderState, CancellationToken cancellationToken);
     }
 }

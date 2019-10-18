@@ -94,7 +94,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
             if (_windowHandle == IntPtr.Zero || _isRenderWindowMinimized || clientRect.right == 0 || clientRect.bottom == 0)
             {
                 // Reduce CPU utilization
-                Thread.Sleep(_minimizedRenderWindowSleepDuration);
+                cancellationToken.WaitHandle.WaitOne(_minimizedRenderWindowSleepDuration);
                 return;
             }
 
@@ -128,7 +128,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
 
                 if (sleepDuration > TimeSpan.Zero)
                 {
-                    Thread.Sleep(sleepDuration);
+                    cancellationToken.WaitHandle.WaitOne(sleepDuration);
                 }
             }
 

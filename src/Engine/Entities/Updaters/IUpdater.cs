@@ -1,4 +1,5 @@
 ﻿using System.Drawing;
+using System.Threading;
 
 namespace BouncyBox.VorpalEngine.Engine.Entities.Updaters
 {
@@ -33,7 +34,8 @@ namespace BouncyBox.VorpalEngine.Engine.Entities.Updaters
         /// <summary>
         ///     Updates the game state.
         /// </summary>
-        void UpdateGameState();
+        /// <param name="cancellationToken">A cancellation token.</param>
+        void UpdateGameState(CancellationToken cancellationToken);
 
         /// <summary>
         ///     Prepares a render state for rendering.

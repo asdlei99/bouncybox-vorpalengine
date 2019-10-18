@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
-using System.Linq;
 using System.Threading;
 using BouncyBox.VorpalEngine.Engine.DirectX;
 using BouncyBox.VorpalEngine.Engine.DirectX.ComObjects;
@@ -121,7 +120,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
 
         /// <inheritdoc />
         /// <exception cref="InvalidOperationException">Thrown when the thread executing this method is not the update thread.</exception>
-        public void Update()
+        public void Update(CancellationToken cancellationToken)
         {
             _interfaces.ThreadManager.VerifyProcessThread(ProcessThread.Update);
 
@@ -134,7 +133,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
 
             foreach (IUpdater<TRenderState> updater in updaters)
             {
-                updater.UpdateGameState();
+                updater.UpdateGameState(cancellationToken);
             }
 
             var renderState = new TRenderState();
@@ -222,7 +221,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
             }
 
             // Ensure there is a state to render
-            TRenderState? renderState = _renderStateManager.GetRenderStateForRendering(cancellationToken);
+            TRenderState? renderState = _renderStateManager.GetNextRenderState();
 
             if (renderState == null)
             {
@@ -248,7 +247,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
             // Render renderers
             foreach (IRenderer<TRenderState> renderer in renderers)
             {
-                renderer.Render(renderState);
+                renderer.Render(renderState, cancellationToken);
             }
 
             // End drawing

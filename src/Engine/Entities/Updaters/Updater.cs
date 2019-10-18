@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Threading;
 using BouncyBox.VorpalEngine.Engine.Input.Keyboard;
 using BouncyBox.VorpalEngine.Engine.Input.XInput;
 using BouncyBox.VorpalEngine.Engine.Messaging;
@@ -107,7 +108,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities.Updaters
         ///     <see cref="UpdateWhenPaused" />, and <see cref="UpdateWhenSuspended" /> values determine that updating should not occur.
         /// </summary>
         /// <exception cref="InvalidOperationException">Thrown when the thread executing this method is not the update thread.</exception>
-        public void UpdateGameState()
+        public void UpdateGameState(CancellationToken cancellationToken)
         {
             Interfaces.ThreadManager.VerifyProcessThread(ProcessThread.Update);
 
@@ -116,7 +117,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities.Updaters
 
             if (ShouldUpdateGameStateAndPrepareRenderState())
             {
-                OnUpdateGameState();
+                OnUpdateGameState(cancellationToken);
             }
         }
 
@@ -237,15 +238,10 @@ namespace BouncyBox.VorpalEngine.Engine.Entities.Updaters
         {
         }
 
-        /// <summary>
-        ///     Updates the game state.
-        /// </summary>
-        protected abstract void OnUpdateGameState();
+        /// <inheritdoc cref="IUpdater{TRenderState}.UpdateGameState" />
+        protected abstract void OnUpdateGameState(CancellationToken cancellationToken);
 
-        /// <summary>
-        ///     Prepares a render state for rendering.
-        /// </summary>
-        /// <param name="renderState">A render state.</param>
+        /// <inheritdoc cref="IUpdater{TRenderState}.PrepareRenderState" />
         protected abstract void OnPrepareRenderState(TRenderState renderState);
 
         /// <inheritdoc cref="IEntity.Pause" />

@@ -74,7 +74,8 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         /// <summary>
         ///     Updates the game state.
         /// </summary>
-        void Update();
+        /// <param name="cancellationToken">A cancellation token.</param>
+        void Update(CancellationToken cancellationToken);
 
         /// <summary>
         ///     Initializes renderer resources.
@@ -96,7 +97,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         /// <summary>
         ///     Renders a render state.
         /// </summary>
-        /// <param name="cancellationToken">A cancellation token</param>
+        /// <param name="cancellationToken">A cancellation token.</param>
         /// <returns>Returns a tuple containing the result of the rendering attempt and a frametime if a frame was rendered.</returns>
         (RenderResult result, TimeSpan frametime) Render(CancellationToken cancellationToken);
     }
