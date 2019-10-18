@@ -147,12 +147,10 @@ namespace BouncyBox.VorpalEngine.Engine.Game
 
             // Process Win32 messages
 
-            UIntPtr? wParam;
-
-            do
+            while (true)
             {
                 // Process Win32 messages
-                wParam = ProcessWin32Messages();
+                ProcessWin32Messages();
 
                 // Dispatch queued messages to their destination queues
                 Interfaces.GlobalConcurrentMessageQueue.DispatchQueued();
@@ -177,7 +175,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
                 // The user tried to close the render window or an unhandled exception occurred on an engine thread
                 _serilogLogger.LogDebug("Exit requested");
                 break;
-            } while (wParam == null);
+            }
 
             // The main thread decrements the count by 1
             countdownEvent.Signal();
@@ -209,23 +207,15 @@ namespace BouncyBox.VorpalEngine.Engine.Game
         /// <summary>
         ///     Process Win32 messages.
         /// </summary>
-        /// <returns>Returns the WParam of the WM_QUIT message if it's received; otherwise, returns null.</returns>
-        private static unsafe UIntPtr? ProcessWin32Messages()
+        private static unsafe void ProcessWin32Messages()
         {
             MSG msg;
 
             while (User32.PeekMessageW(&msg, IntPtr.Zero, 0, 0, User32.PM_REMOVE) == Windows.TRUE)
             {
-                if (msg.message == User32.WM_QUIT)
-                {
-                    return msg.wParam;
-                }
-
                 User32.TranslateMessage(&msg);
                 User32.DispatchMessageW(&msg);
             }
-
-            return null;
         }
 
         /// <summary>
