@@ -243,7 +243,7 @@ namespace BouncyBox.VorpalEngine.Engine.Forms
 
             _globalMessagePublisherSubscriber.Publish<RenderWindowClosingMessage>();
 
-            return HandleResult.InvokeBaseWndProc;
+            return HandleResult.Return;
         }
 
         /// <summary>
