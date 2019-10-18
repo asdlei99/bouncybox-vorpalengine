@@ -10,7 +10,6 @@ using BouncyBox.VorpalEngine.Engine.Threads;
 using Serilog.Events;
 using TerraFX.Interop;
 using User32 = TerraFX.Interop.User32;
-using Windows = TerraFX.Interop.Windows;
 
 namespace BouncyBox.VorpalEngine.Engine.Game
 {
@@ -217,7 +216,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
 
             RECT clientRect;
 
-            if (User32.GetClientRect(_windowHandle, &clientRect) == Windows.FALSE)
+            if (User32.GetClientRect(_windowHandle, &clientRect) == TerraFX.Interop.Windows.FALSE)
             {
                 throw Win32ExceptionHelper.GetException();
             }

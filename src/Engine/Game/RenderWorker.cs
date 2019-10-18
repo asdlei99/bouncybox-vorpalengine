@@ -8,7 +8,6 @@ using BouncyBox.VorpalEngine.Engine.Messaging.GlobalMessages;
 using BouncyBox.VorpalEngine.Engine.Threads;
 using TerraFX.Interop;
 using User32 = TerraFX.Interop.User32;
-using Windows = TerraFX.Interop.Windows;
 
 namespace BouncyBox.VorpalEngine.Engine.Game
 {
@@ -85,7 +84,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
         {
             var clientRect = new RECT();
 
-            if (_windowHandle != IntPtr.Zero && User32.GetClientRect(_windowHandle, &clientRect) == Windows.FALSE)
+            if (_windowHandle != IntPtr.Zero && User32.GetClientRect(_windowHandle, &clientRect) == TerraFX.Interop.Windows.FALSE)
             {
                 throw Win32ExceptionHelper.GetException();
             }

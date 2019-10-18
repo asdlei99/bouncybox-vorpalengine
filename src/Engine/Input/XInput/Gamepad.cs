@@ -33,8 +33,8 @@ namespace BouncyBox.VorpalEngine.Engine.Input.XInput
 
             return result switch
             {
-                Windows.ERROR_SUCCESS => GetAudioDeviceIdsResult.Success,
-                Windows.ERROR_DEVICE_NOT_CONNECTED => GetAudioDeviceIdsResult.DeviceNotConnected,
+                Interop.Windows.ERROR_SUCCESS => GetAudioDeviceIdsResult.Success,
+                Interop.Windows.ERROR_DEVICE_NOT_CONNECTED => GetAudioDeviceIdsResult.DeviceNotConnected,
                 _ => throw new Win32Exception((int)result)
             };
         }
@@ -46,7 +46,7 @@ namespace BouncyBox.VorpalEngine.Engine.Input.XInput
         {
             XInput14.XINPUT_BATTERY_INFORMATION xInputBatteryInformation;
 
-            return XInput14.XInputGetBatteryInformation(UserIndex, devType, &xInputBatteryInformation) == Windows.ERROR_SUCCESS
+            return XInput14.XInputGetBatteryInformation(UserIndex, devType, &xInputBatteryInformation) == Interop.Windows.ERROR_SUCCESS
                        ? xInputBatteryInformation
                        : (XInput14.XINPUT_BATTERY_INFORMATION?)null;
         }
@@ -62,8 +62,8 @@ namespace BouncyBox.VorpalEngine.Engine.Input.XInput
 
             return result switch
             {
-                Windows.ERROR_SUCCESS => (GetCapabilitiesResult.Success, xInputCapabilities),
-                Windows.ERROR_DEVICE_NOT_CONNECTED => (GetCapabilitiesResult.DeviceNotConnected, (XInput14.XINPUT_CAPABILITIES?)null),
+                Interop.Windows.ERROR_SUCCESS => (GetCapabilitiesResult.Success, xInputCapabilities),
+                Interop.Windows.ERROR_DEVICE_NOT_CONNECTED => (GetCapabilitiesResult.DeviceNotConnected, (XInput14.XINPUT_CAPABILITIES?)null),
                 _ => throw new Win32Exception((int)result)
             };
         }
@@ -80,8 +80,8 @@ namespace BouncyBox.VorpalEngine.Engine.Input.XInput
 
             return result switch
             {
-                Windows.ERROR_SUCCESS => (GetDSoundAudioDeviceGuidsResult.Success, dSoundRenderGuid, dSoundCaptureGuid),
-                Windows.ERROR_DEVICE_NOT_CONNECTED => (GetDSoundAudioDeviceGuidsResult.DeviceNotConnected, (Guid?)null, (Guid?)null),
+                Interop.Windows.ERROR_SUCCESS => (GetDSoundAudioDeviceGuidsResult.Success, dSoundRenderGuid, dSoundCaptureGuid),
+                Interop.Windows.ERROR_DEVICE_NOT_CONNECTED => (GetDSoundAudioDeviceGuidsResult.DeviceNotConnected, (Guid?)null, (Guid?)null),
                 _ => throw new Win32Exception((int)result)
             };
         }
@@ -97,9 +97,9 @@ namespace BouncyBox.VorpalEngine.Engine.Input.XInput
 
             return result switch
             {
-                Windows.ERROR_SUCCESS => (GetKeystrokeResult.Success, new XInputKeystroke(ref xInputKeystroke)),
-                Windows.ERROR_EMPTY => (GetKeystrokeResult.Empty, (XInputKeystroke?)null),
-                Windows.ERROR_DEVICE_NOT_CONNECTED => (GetKeystrokeResult.DeviceNotConnected, (XInputKeystroke?)null),
+                Interop.Windows.ERROR_SUCCESS => (GetKeystrokeResult.Success, new XInputKeystroke(ref xInputKeystroke)),
+                Interop.Windows.ERROR_EMPTY => (GetKeystrokeResult.Empty, (XInputKeystroke?)null),
+                Interop.Windows.ERROR_DEVICE_NOT_CONNECTED => (GetKeystrokeResult.DeviceNotConnected, (XInputKeystroke?)null),
                 _ => throw new Win32Exception((int)result)
             };
         }
@@ -115,8 +115,8 @@ namespace BouncyBox.VorpalEngine.Engine.Input.XInput
 
             return result switch
             {
-                Windows.ERROR_SUCCESS => (GetStateResult.Success, new XInputState(xInputState)),
-                Windows.ERROR_DEVICE_NOT_CONNECTED => (GetStateResult.DeviceNotConnected, (XInputState?)null),
+                Interop.Windows.ERROR_SUCCESS => (GetStateResult.Success, new XInputState(xInputState)),
+                Interop.Windows.ERROR_DEVICE_NOT_CONNECTED => (GetStateResult.DeviceNotConnected, (XInputState?)null),
                 _ => throw new Win32Exception((int)result)
             };
         }
@@ -131,8 +131,8 @@ namespace BouncyBox.VorpalEngine.Engine.Input.XInput
 
             return result switch
             {
-                Windows.ERROR_SUCCESS => SetStateResult.Success,
-                Windows.ERROR_DEVICE_NOT_CONNECTED => SetStateResult.DeviceNotConnected,
+                Interop.Windows.ERROR_SUCCESS => SetStateResult.Success,
+                Interop.Windows.ERROR_DEVICE_NOT_CONNECTED => SetStateResult.DeviceNotConnected,
                 _ => throw new Win32Exception((int)result)
             };
         }

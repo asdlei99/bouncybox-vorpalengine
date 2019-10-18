@@ -21,7 +21,7 @@ namespace BouncyBox.VorpalEngine.Engine.DirectX.ComObjects
         /// </param>
         public static void CheckResultHandle(int hr, string exceptionMessage, bool allowNoInterface = false)
         {
-            if (Windows.SUCCEEDED(hr) || allowNoInterface && unchecked((uint)hr) == Interop.Windows.E_NOINTERFACE)
+            if (TerraFX.Interop.Windows.SUCCEEDED(hr) || allowNoInterface && unchecked((uint)hr) == Interop.Windows.E_NOINTERFACE)
             {
                 return;
             }

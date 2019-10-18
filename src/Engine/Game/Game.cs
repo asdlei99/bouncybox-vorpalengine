@@ -147,7 +147,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
 
             // Process Win32 messages
 
-            while (true)
+            do
             {
                 // Process Win32 messages
                 ProcessWin32Messages();
@@ -165,17 +165,10 @@ namespace BouncyBox.VorpalEngine.Engine.Game
 
                 _renderForm.HandleDispatchedMessages();
                 _gameExecutionStateManager.HandleDispatchedMessages();
+            } while (!_exitManualResetEvent.IsSet);
 
-                if (!_exitManualResetEvent.IsSet)
-                {
-                    // No exit requested
-                    continue;
-                }
-
-                // The user tried to close the render window or an unhandled exception occurred on an engine thread
-                _serilogLogger.LogDebug("Exit requested");
-                break;
-            }
+            // The user tried to close the render window or an unhandled exception occurred on an engine thread
+            _serilogLogger.LogDebug("Exit requested");
 
             // The main thread decrements the count by 1
             countdownEvent.Signal();
@@ -183,7 +176,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
             IReadOnlyCollection<(EngineThread thread, Exception exception)> unhandledExceptions =
                 Interfaces.ThreadManager.RequestEngineThreadTerminationAndWaitForTermination(countdownEvent);
 
-            // The render window must be disposed of last to avoid additional unhandled exceptions
+            // The render window must be disposed of last to avoid additional unhandled exceptions on render threads
             // (e.g., the render thread attempting to use resources tied to the window handle)
             _renderForm.Dispose();
 
@@ -211,7 +204,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
         {
             MSG msg;
 
-            while (User32.PeekMessageW(&msg, IntPtr.Zero, 0, 0, User32.PM_REMOVE) == Windows.TRUE)
+            while (User32.PeekMessageW(&msg, IntPtr.Zero, 0, 0, User32.PM_REMOVE) == TerraFX.Interop.Windows.TRUE)
             {
                 User32.TranslateMessage(&msg);
                 User32.DispatchMessageW(&msg);

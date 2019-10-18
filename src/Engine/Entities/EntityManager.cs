@@ -257,7 +257,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
             TimeSpan frametime = TimeSpan.FromTicks(Stopwatch.GetTimestamp() - startTimestamp);
 
             // Check if the render target needs to be recreated
-            if (endDrawResult == Windows.D2DERR_RECREATE_TARGET)
+            if (endDrawResult == TerraFX.Interop.Windows.D2DERR_RECREATE_TARGET)
             {
                 return (RenderResult.RecreateTarget, TimeSpan.Zero);
             }

@@ -1,7 +1,6 @@
 ﻿using System;
 using BouncyBox.VorpalEngine.Engine.Interop;
 using TerraFX.Interop;
-using Windows = TerraFX.Interop.Windows;
 
 namespace BouncyBox.VorpalEngine.Engine.DirectX.ComObjects
 {
@@ -37,7 +36,7 @@ namespace BouncyBox.VorpalEngine.Engine.DirectX.ComObjects
                     Width = 0,
                     Height = 0,
                     Format = format,
-                    Stereo = Windows.FALSE,
+                    Stereo = TerraFX.Interop.Windows.FALSE,
                     SampleDesc =
                         new DXGI_SAMPLE_DESC
                         {
