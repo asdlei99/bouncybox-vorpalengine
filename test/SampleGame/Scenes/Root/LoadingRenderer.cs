@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Threading;
 using BouncyBox.VorpalEngine.Engine;
 using BouncyBox.VorpalEngine.Engine.DirectX;
 using BouncyBox.VorpalEngine.Engine.DirectX.ComObjects;
@@ -34,7 +35,7 @@ namespace BouncyBox.VorpalEngine.SampleGame.Scenes.Root
             _textFormat?.Dispose();
         }
 
-        protected override void OnRender(DirectXResources resources, RenderState renderState)
+        protected override void OnRender(DirectXResources resources, RenderState renderState, CancellationToken cancellationToken)
         {
             Debug.Assert(renderState.SceneStates.Loading != null);
 

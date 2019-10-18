@@ -97,7 +97,7 @@ namespace BouncyBox.VorpalEngine.DebuggingGame.Scenes.Root
 
             if (sceneRenderState.RenderDelayInMilliseconds > 0)
             {
-                cancellationToken.WaitHandle.WaitOne(sceneRenderState.RenderDelayInMilliseconds);
+                cancellationToken.WaitHandle.WaitOne((int)sceneRenderState.RenderDelayInMilliseconds);
             }
         }
     }

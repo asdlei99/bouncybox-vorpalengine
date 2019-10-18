@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Threading;
 using BouncyBox.VorpalEngine.Engine;
 using BouncyBox.VorpalEngine.Engine.Math;
 using BouncyBox.VorpalEngine.SampleGame.States.Render;
@@ -22,7 +23,7 @@ namespace BouncyBox.VorpalEngine.SampleGame.Scenes.Root
         {
         }
 
-        protected override void OnUpdateGameState()
+        protected override void OnUpdateGameState(CancellationToken cancellationToken)
         {
             _opacityStopwatch.Start();
         }

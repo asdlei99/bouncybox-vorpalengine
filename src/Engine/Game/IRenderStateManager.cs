@@ -1,13 +1,10 @@
-﻿using System;
-using System.Threading;
-
-namespace BouncyBox.VorpalEngine.Engine.Game
+﻿namespace BouncyBox.VorpalEngine.Engine.Game
 {
     /// <summary>
     ///     <para>Represents an object that manages render states.</para>
     ///     <para>Render states are created after every update and represent just the information necessary to render the game world.</para>
     /// </summary>
-    public interface IRenderStateManager<TRenderState> : IDisposable
+    public interface IRenderStateManager<TRenderState>
         where TRenderState : class
     {
         /// <summary>
@@ -17,13 +14,11 @@ namespace BouncyBox.VorpalEngine.Engine.Game
         void ProvideNextRenderState(TRenderState state);
 
         /// <summary>
-        ///     Gets a prepared render state for rendering.
+        ///     Gets the next render state.
         /// </summary>
-        /// <param name="cancellationToken">A cancellation token.</param>
         /// <returns>
-        ///     Returns a prepared render state if one exists and is newer than the previously retrieved render state; otherwise,
-        ///     returns null.
+        ///     Returns the next render state, if one exists; otherwise, returns null.
         /// </returns>
-        TRenderState? GetRenderStateForRendering(CancellationToken cancellationToken = default);
+        TRenderState? GetNextRenderState();
     }
 }
