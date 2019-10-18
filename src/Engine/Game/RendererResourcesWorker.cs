@@ -135,6 +135,12 @@ namespace BouncyBox.VorpalEngine.Engine.Game
             _initializationFailed = false;
         }
 
+        /// <inheritdoc />
+        protected override void OnCleanUp()
+        {
+            ReleaseResources();
+        }
+
         /// <summary>
         ///     Initializes DirectX and renderer resources.
         /// </summary>
