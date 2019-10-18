@@ -12,9 +12,8 @@ using BouncyBox.VorpalEngine.Engine.Messaging.GlobalMessages;
 using BouncyBox.VorpalEngine.Engine.Threads;
 using TerraFX.Interop;
 using User32 = TerraFX.Interop.User32;
-using Windows = TerraFX.Interop.Windows;
 
-namespace BouncyBox.VorpalEngine.Engine.Forms
+namespace BouncyBox.VorpalEngine.Engine.Windows
 {
     /// <summary>
     ///     A window used as a rendering target.
@@ -92,11 +91,11 @@ namespace BouncyBox.VorpalEngine.Engine.Forms
                 {
                     dwFlags = User32.RIDEV_INPUTSINK,
                     hwndTarget = Handle,
-                    usUsage = Windows.HID_USAGE_GENERIC_KEYBOARD,
-                    usUsagePage = Windows.HID_USAGE_PAGE_GENERIC
+                    usUsage = TerraFX.Interop.Windows.HID_USAGE_GENERIC_KEYBOARD,
+                    usUsagePage = TerraFX.Interop.Windows.HID_USAGE_PAGE_GENERIC
                 };
 
-            if (User32.RegisterRawInputDevices(&rawInputDevice, 1, (uint)sizeof(RAWINPUTDEVICE)) == Windows.FALSE)
+            if (User32.RegisterRawInputDevices(&rawInputDevice, 1, (uint)sizeof(RAWINPUTDEVICE)) == TerraFX.Interop.Windows.FALSE)
             {
                 throw Win32ExceptionHelper.GetException();
             }
@@ -498,7 +497,7 @@ namespace BouncyBox.VorpalEngine.Engine.Forms
 
             monitorInfoExW._base.cbSize = (uint)sizeof(MONITORINFOEXW);
 
-            if (User32.GetMonitorInfoW(monitorHandle, &monitorInfoExW._base) == Windows.FALSE)
+            if (User32.GetMonitorInfoW(monitorHandle, &monitorInfoExW._base) == TerraFX.Interop.Windows.FALSE)
             {
                 throw Win32ExceptionHelper.GetException();
             }
@@ -509,7 +508,7 @@ namespace BouncyBox.VorpalEngine.Engine.Forms
 
             displayDeviceW.cb = (uint)sizeof(DISPLAY_DEVICEW);
 
-            if (User32.EnumDisplayDevicesW(monitorInfoExW.szDevice, 0, &displayDeviceW, 0) == Windows.FALSE)
+            if (User32.EnumDisplayDevicesW(monitorInfoExW.szDevice, 0, &displayDeviceW, 0) == TerraFX.Interop.Windows.FALSE)
             {
                 throw Win32ExceptionHelper.GetException();
             }

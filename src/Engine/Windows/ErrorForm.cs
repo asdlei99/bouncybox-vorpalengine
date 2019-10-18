@@ -7,7 +7,7 @@ using System.Windows.Forms;
 using CommandLine;
 using CommandLine.Text;
 
-namespace BouncyBox.VorpalEngine.Engine.Forms
+namespace BouncyBox.VorpalEngine.Engine.Windows
 {
     /// <summary>
     ///     A window used to display fatal error messages.
