@@ -1,18 +1,19 @@
-﻿using BouncyBox.VorpalEngine.DebuggingGame.States.Game;
-using BouncyBox.VorpalEngine.DebuggingGame.States.Render;
-using BouncyBox.VorpalEngine.Engine;
+﻿using BouncyBox.VorpalEngine.Engine;
 using BouncyBox.VorpalEngine.Engine.Bootstrap;
 using BouncyBox.VorpalEngine.Engine.Entities;
 using BouncyBox.VorpalEngine.Engine.Game;
 using BouncyBox.VorpalEngine.Engine.Scenes;
+using BouncyBox.VorpalEngine.SampleGame.Scenes;
+using BouncyBox.VorpalEngine.SampleGame.States.Game;
+using BouncyBox.VorpalEngine.SampleGame.States.Render;
 
-namespace BouncyBox.VorpalEngine.DebuggingGame
+namespace BouncyBox.VorpalEngine.SampleGame
 {
-    public class DebuggingGame : Game<GameState, RenderState, SceneKey>
+    public class Game : Game<GameState, RenderState, SceneKey>
     {
         public static readonly CommonGameSettings CommonGameSettings = new CommonGameSettings();
 
-        public DebuggingGame(
+        public Game(
             IInterfaces interfaces,
             IGameExecutionStateManager gameExecutionStateManager,
             IEntityManager<GameState, RenderState> entityManager,

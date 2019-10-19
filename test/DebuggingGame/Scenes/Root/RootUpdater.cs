@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Linq;
 using System.Threading;
 using BouncyBox.Common.NetStandard21;
+using BouncyBox.VorpalEngine.DebuggingGame.Entities.Updaters;
 using BouncyBox.VorpalEngine.DebuggingGame.States.Game;
 using BouncyBox.VorpalEngine.DebuggingGame.States.Render;
 using BouncyBox.VorpalEngine.Engine;
@@ -80,35 +81,35 @@ namespace BouncyBox.VorpalEngine.DebuggingGame.Scenes.Root
             }
             if (downKeys.Contains(User32.VirtualKey.VK_OEM_PLUS))
             {
-                int index = Math.Max(0, Math.Min(Resolutions.IndexOf(DebuggingGame.CommonGameSettings.RequestedResolution) + 1, Resolutions.Length - 1));
+                int index = Math.Max(0, Math.Min(Resolutions.IndexOf(Game.CommonGameSettings.RequestedResolution) + 1, Resolutions.Length - 1));
 
-                DebuggingGame.CommonGameSettings.RequestedResolution = Resolutions[index];
+                Game.CommonGameSettings.RequestedResolution = Resolutions[index];
 
-                GlobalMessagePublisherSubscriber.Publish(new ResolutionRequestedMessage(DebuggingGame.CommonGameSettings.RequestedResolution));
+                GlobalMessagePublisherSubscriber.Publish(new ResolutionRequestedMessage(Game.CommonGameSettings.RequestedResolution));
             }
             if (downKeys.Contains(User32.VirtualKey.VK_OEM_MINUS))
             {
-                int index = Math.Max(0, Math.Min(Resolutions.IndexOf(DebuggingGame.CommonGameSettings.RequestedResolution) - 1, Resolutions.Length - 1));
+                int index = Math.Max(0, Math.Min(Resolutions.IndexOf(Game.CommonGameSettings.RequestedResolution) - 1, Resolutions.Length - 1));
 
-                DebuggingGame.CommonGameSettings.RequestedResolution = Resolutions[index];
+                Game.CommonGameSettings.RequestedResolution = Resolutions[index];
 
-                GlobalMessagePublisherSubscriber.Publish(new ResolutionRequestedMessage(DebuggingGame.CommonGameSettings.RequestedResolution));
+                GlobalMessagePublisherSubscriber.Publish(new ResolutionRequestedMessage(Game.CommonGameSettings.RequestedResolution));
             }
             if (downKeys.Contains(User32.VirtualKey.V))
             {
-                DebuggingGame.CommonGameSettings.EnableVSync = !DebuggingGame.CommonGameSettings.EnableVSync;
+                Game.CommonGameSettings.EnableVSync = !Game.CommonGameSettings.EnableVSync;
             }
             if (downKeys.Contains(User32.VirtualKey.W))
             {
                 // ReSharper disable once SwitchStatementMissingSomeCases
-                switch (DebuggingGame.CommonGameSettings.WindowedMode)
+                switch (Game.CommonGameSettings.WindowedMode)
                 {
                     case WindowedMode.BorderedWindowed:
-                        DebuggingGame.CommonGameSettings.WindowedMode = WindowedMode.BorderlessWindowed;
+                        Game.CommonGameSettings.WindowedMode = WindowedMode.BorderlessWindowed;
                         GlobalMessagePublisherSubscriber.Publish(new WindowedModeRequestedMessage(WindowedMode.BorderlessWindowed));
                         break;
                     case WindowedMode.BorderlessWindowed:
-                        DebuggingGame.CommonGameSettings.WindowedMode = WindowedMode.BorderedWindowed;
+                        Game.CommonGameSettings.WindowedMode = WindowedMode.BorderedWindowed;
                         GlobalMessagePublisherSubscriber.Publish(new WindowedModeRequestedMessage(WindowedMode.BorderedWindowed));
                         break;
                 }

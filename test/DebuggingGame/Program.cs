@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Immutable;
 using Autofac;
+using BouncyBox.VorpalEngine.DebuggingGame.Scenes;
 using BouncyBox.VorpalEngine.DebuggingGame.States.Game;
 using BouncyBox.VorpalEngine.DebuggingGame.States.Render;
 using BouncyBox.VorpalEngine.Engine.Bootstrap;
@@ -28,12 +29,12 @@ namespace BouncyBox.VorpalEngine.DebuggingGame
             MessageLogFilter.ShouldLogMessageTypeDelegate = a => !ignoredMessageTypes.Contains(a);
 #endif
 
-            return GameFactory.CreateAndRun<DebuggingGame, GameState, RenderState, SceneKey>(SceneKey.Root, args, RegisterComponents);
+            return GameFactory.CreateAndRun<Game, GameState, RenderState, SceneKey>(SceneKey.Root, args, RegisterComponents);
         }
 
         private static void RegisterComponents(ContainerBuilder containerBuilder)
         {
-            containerBuilder.RegisterInstance(DebuggingGame.CommonGameSettings).As<ICommonGameSettings>().SingleInstance();
+            containerBuilder.RegisterInstance(Game.CommonGameSettings).As<ICommonGameSettings>().SingleInstance();
             containerBuilder.RegisterType<GameStateManager<GameState>>().As<IGameStateManager<GameState>>().SingleInstance();
             containerBuilder.RegisterType<RenderStateManager<RenderState>>().As<IRenderStateManager<RenderState>>().SingleInstance();
             containerBuilder.RegisterType<SceneFactory>().As<ISceneFactory<GameState, RenderState, SceneKey>>().SingleInstance();

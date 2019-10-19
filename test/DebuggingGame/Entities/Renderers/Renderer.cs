@@ -1,8 +1,8 @@
-﻿using BouncyBox.VorpalEngine.Engine;
+﻿using BouncyBox.VorpalEngine.DebuggingGame.States.Render;
+using BouncyBox.VorpalEngine.Engine;
 using BouncyBox.VorpalEngine.Engine.Entities.Renderers;
-using BouncyBox.VorpalEngine.SampleGame.States.Render;
 
-namespace BouncyBox.VorpalEngine.SampleGame
+namespace BouncyBox.VorpalEngine.DebuggingGame.Entities.Renderers
 {
     public abstract class Renderer : Renderer<RenderState>
     {

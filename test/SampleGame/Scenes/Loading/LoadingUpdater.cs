@@ -3,9 +3,10 @@ using System.Diagnostics;
 using System.Threading;
 using BouncyBox.VorpalEngine.Engine;
 using BouncyBox.VorpalEngine.Engine.Math;
+using BouncyBox.VorpalEngine.SampleGame.Entities.Updaters;
 using BouncyBox.VorpalEngine.SampleGame.States.Render;
 
-namespace BouncyBox.VorpalEngine.SampleGame.Scenes.Root
+namespace BouncyBox.VorpalEngine.SampleGame.Scenes.Loading
 {
     public class LoadingUpdater : Updater
     {

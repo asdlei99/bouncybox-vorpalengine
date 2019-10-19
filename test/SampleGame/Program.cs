@@ -3,6 +3,7 @@ using Autofac;
 using BouncyBox.VorpalEngine.Engine.Bootstrap;
 using BouncyBox.VorpalEngine.Engine.Game;
 using BouncyBox.VorpalEngine.Engine.Scenes;
+using BouncyBox.VorpalEngine.SampleGame.Scenes;
 using BouncyBox.VorpalEngine.SampleGame.States.Game;
 using BouncyBox.VorpalEngine.SampleGame.States.Render;
 
@@ -13,7 +14,7 @@ namespace BouncyBox.VorpalEngine.SampleGame
         [STAThread]
         private static int Main(string[] args)
         {
-            return GameFactory.CreateAndRun<SampleGame, GameState, RenderState, SceneKey>(SceneKey.Root, args, RegisterComponents);
+            return GameFactory.CreateAndRun<Game, GameState, RenderState, SceneKey>(SceneKey.Root, args, RegisterComponents);
         }
 
         private static void RegisterComponents(ContainerBuilder containerBuilder)

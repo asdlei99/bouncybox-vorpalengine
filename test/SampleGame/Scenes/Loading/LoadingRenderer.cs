@@ -3,10 +3,11 @@ using System.Threading;
 using BouncyBox.VorpalEngine.Engine;
 using BouncyBox.VorpalEngine.Engine.DirectX;
 using BouncyBox.VorpalEngine.Engine.DirectX.ComObjects;
+using BouncyBox.VorpalEngine.SampleGame.Entities.Renderers;
 using BouncyBox.VorpalEngine.SampleGame.States.Render;
 using TerraFX.Interop;
 
-namespace BouncyBox.VorpalEngine.SampleGame.Scenes.Root
+namespace BouncyBox.VorpalEngine.SampleGame.Scenes.Loading
 {
     public class LoadingRenderer : Renderer
     {

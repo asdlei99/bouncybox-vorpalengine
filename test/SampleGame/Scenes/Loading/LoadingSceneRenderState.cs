@@ -1,4 +1,4 @@
-﻿namespace BouncyBox.VorpalEngine.SampleGame.Scenes.Root
+﻿namespace BouncyBox.VorpalEngine.SampleGame.Scenes.Loading
 {
     public class LoadingSceneRenderState
     {

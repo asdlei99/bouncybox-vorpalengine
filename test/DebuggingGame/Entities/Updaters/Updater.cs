@@ -2,7 +2,7 @@
 using BouncyBox.VorpalEngine.Engine;
 using BouncyBox.VorpalEngine.Engine.Entities.Updaters;
 
-namespace BouncyBox.VorpalEngine.DebuggingGame
+namespace BouncyBox.VorpalEngine.DebuggingGame.Entities.Updaters
 {
     public abstract class Updater : Updater<RenderState>
     {

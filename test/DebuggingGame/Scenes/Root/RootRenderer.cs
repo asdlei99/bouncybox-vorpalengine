@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Text;
 using System.Threading;
+using BouncyBox.VorpalEngine.DebuggingGame.Entities.Renderers;
 using BouncyBox.VorpalEngine.DebuggingGame.States.Render;
 using BouncyBox.VorpalEngine.Engine;
 using BouncyBox.VorpalEngine.Engine.DirectX;

@@ -4,7 +4,7 @@ using BouncyBox.VorpalEngine.Engine;
 using BouncyBox.VorpalEngine.Engine.Entities;
 using BouncyBox.VorpalEngine.Engine.Scenes;
 
-namespace BouncyBox.VorpalEngine.DebuggingGame
+namespace BouncyBox.VorpalEngine.DebuggingGame.Scenes
 {
     public abstract class Scene : Scene<GameState, RenderState, SceneKey>
     {

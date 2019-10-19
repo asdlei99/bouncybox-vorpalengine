@@ -2,12 +2,12 @@
 using BouncyBox.VorpalEngine.Engine;
 using BouncyBox.VorpalEngine.Engine.Entities;
 using BouncyBox.VorpalEngine.Engine.Scenes;
-using BouncyBox.VorpalEngine.SampleGame.Scenes.Root;
+using BouncyBox.VorpalEngine.SampleGame.Scenes.Loading;
 using BouncyBox.VorpalEngine.SampleGame.Scenes.Title;
 using BouncyBox.VorpalEngine.SampleGame.States.Game;
 using BouncyBox.VorpalEngine.SampleGame.States.Render;
 
-namespace BouncyBox.VorpalEngine.SampleGame
+namespace BouncyBox.VorpalEngine.SampleGame.Scenes
 {
     public class SceneFactory : ISceneFactory<GameState, RenderState, SceneKey>
     {
@@ -24,7 +24,7 @@ namespace BouncyBox.VorpalEngine.SampleGame
         {
             return sceneKey switch
             {
-                SceneKey.Root => (IScene<SceneKey>)new RootScene(_interfaces, _entityManager),
+                SceneKey.Root => (IScene<SceneKey>)new LoadingScene(_interfaces, _entityManager),
                 SceneKey.Title => new TitleScene(_interfaces, _entityManager),
                 _ => throw new ArgumentOutOfRangeException(nameof(sceneKey), sceneKey, null)
             };

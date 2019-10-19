@@ -3,11 +3,11 @@ using BouncyBox.VorpalEngine.Engine.Entities;
 using BouncyBox.VorpalEngine.SampleGame.States.Game;
 using BouncyBox.VorpalEngine.SampleGame.States.Render;
 
-namespace BouncyBox.VorpalEngine.SampleGame.Scenes.Root
+namespace BouncyBox.VorpalEngine.SampleGame.Scenes.Loading
 {
-    public class RootScene : Scene
+    public class LoadingScene : Scene
     {
-        public RootScene(IInterfaces interfaces, IEntityManager<GameState, RenderState> entityManager) : base(interfaces, entityManager, SceneKey.Root)
+        public LoadingScene(IInterfaces interfaces, IEntityManager<GameState, RenderState> entityManager) : base(interfaces, entityManager, SceneKey.Root)
         {
             AddUpdaters(new LoadingUpdater(interfaces));
             AddRenderers(new LoadingRenderer(interfaces));

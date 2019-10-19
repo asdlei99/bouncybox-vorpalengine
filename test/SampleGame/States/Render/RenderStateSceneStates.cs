@@ -1,4 +1,4 @@
-﻿using BouncyBox.VorpalEngine.SampleGame.Scenes.Root;
+﻿using BouncyBox.VorpalEngine.SampleGame.Scenes.Loading;
 
 namespace BouncyBox.VorpalEngine.SampleGame.States.Render
 {
