@@ -149,6 +149,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
 
                 _renderForm.HandleDispatchedMessages();
                 _gameExecutionStateManager.HandleDispatchedMessages();
+                _entityManager.HandleDispatchedMessages();
             } while (!_exitManualResetEvent.IsSet);
 
             // The user tried to close the render window or an unhandled exception occurred on an engine thread

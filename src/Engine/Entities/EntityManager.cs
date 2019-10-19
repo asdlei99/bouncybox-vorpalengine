@@ -9,6 +9,8 @@ using BouncyBox.VorpalEngine.Engine.Entities.Renderers;
 using BouncyBox.VorpalEngine.Engine.Entities.Updaters;
 using BouncyBox.VorpalEngine.Engine.Game;
 using BouncyBox.VorpalEngine.Engine.Logging;
+using BouncyBox.VorpalEngine.Engine.Messaging;
+using BouncyBox.VorpalEngine.Engine.Messaging.GlobalMessages;
 using TerraFX.Interop;
 using ProcessThread = BouncyBox.VorpalEngine.Engine.Threads.ProcessThread;
 
@@ -20,6 +22,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         where TRenderState : class, new()
     {
         private readonly IGameExecutionStateManager _gameExecutionStateManager;
+        private readonly ConcurrentMessagePublisherSubscriber<IGlobalMessage> _globalMessagePublisherSubscriber;
         private readonly IInterfaces _interfaces;
         private readonly EntityCollection<IRenderer<TRenderState>> _renderers = new EntityCollection<IRenderer<TRenderState>>();
         private readonly object _renderersLockObject = new object();
@@ -28,8 +31,22 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         private readonly EntityCollection<IUpdater<TRenderState>> _updaters = new EntityCollection<IUpdater<TRenderState>>();
         private readonly object _updatersLockObject = new object();
         private DirectXResources? _directXResources;
+        private bool _shouldRenderersPause;
+        private bool _shouldRenderersResume;
+        private bool _shouldRenderersSuspend;
+        private bool _shouldRenderersUnpause;
+        private bool _shouldUpdatersPause;
+        private bool _shouldUpdatersResume;
+        private bool _shouldUpdatersSuspend;
+        private bool _shouldUpdatersUnpause;
 
         /// <summary>Initializes a new instance of the <see cref="EntityManager{TGameState,TRenderState}" /> type.</summary>
+        /// <remarks>
+        ///     <para>Subscribes to the <see cref="GamePausedMessage" /> global message.</para>
+        ///     <para>Subscribes to the <see cref="GameUnpausedMessage" /> global message.</para>
+        ///     <para>Subscribes to the <see cref="GameSuspendedMessage" /> global message.</para>
+        ///     <para>Subscribes to the <see cref="GameResumedMessage" /> global message.</para>
+        /// </remarks>
         /// <param name="interfaces">An <see cref="IInterfaces" /> implementation.</param>
         /// <param name="gameExecutionStateManager">An <see cref="IGameExecutionStateManager" /> implementation.</param>
         /// <param name="renderStateManager">An <see cref="IRenderStateManager{TRenderState}" /> implementation.</param>
@@ -42,6 +59,13 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         {
             context = context.CopyAndPush(nameof(EntityManager<TGameState, TRenderState>));
 
+            _globalMessagePublisherSubscriber =
+                ConcurrentMessagePublisherSubscriber<IGlobalMessage>
+                    .Create(interfaces)
+                    .Subscribe<GamePausedMessage>(HandleGamePausedMessage)
+                    .Subscribe<GameUnpausedMessage>(HandleGameUnpausedMessage)
+                    .Subscribe<GameSuspendedMessage>(HandleGameSuspendedMessage)
+                    .Subscribe<GameResumedMessage>(HandleGameResumedMessage);
             _serilogLogger = new ContextSerilogLogger(interfaces.SerilogLogger, context);
             _interfaces = interfaces;
             _gameExecutionStateManager = gameExecutionStateManager;
@@ -148,6 +172,27 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
 
             foreach (IUpdater<TRenderState> updater in updaters)
             {
+                if (_shouldUpdatersPause)
+                {
+                    updater.Pause();
+                    _shouldUpdatersPause = false;
+                }
+                else if (_shouldUpdatersUnpause)
+                {
+                    updater.Unpause();
+                    _shouldUpdatersUnpause = false;
+                }
+                if (_shouldUpdatersSuspend)
+                {
+                    updater.Suspend();
+                    _shouldUpdatersSuspend = false;
+                }
+                else if (_shouldUpdatersResume)
+                {
+                    updater.Resume();
+                    _shouldUpdatersResume = false;
+                }
+
                 updater.UpdateGameState(cancellationToken);
             }
 
@@ -229,6 +274,14 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
             }
         }
 
+        /// <summary>
+        ///     Handles dispatched messages.
+        /// </summary>
+        public void HandleDispatchedMessages()
+        {
+            _globalMessagePublisherSubscriber.HandleDispatched();
+        }
+
         /// <inheritdoc />
         /// <exception cref="InvalidOperationException">Thrown when the thread executing this method is not the update thread.</exception>
         public unsafe (RenderResult result, TimeSpan frametime) Render(CancellationToken cancellationToken)
@@ -268,6 +321,27 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
             // Render renderers
             foreach (IRenderer<TRenderState> renderer in renderers)
             {
+                if (_shouldRenderersPause)
+                {
+                    renderer.Pause();
+                    _shouldRenderersPause = false;
+                }
+                else if (_shouldRenderersUnpause)
+                {
+                    renderer.Unpause();
+                    _shouldRenderersUnpause = false;
+                }
+                if (_shouldRenderersSuspend)
+                {
+                    renderer.Suspend();
+                    _shouldRenderersSuspend = false;
+                }
+                else if (_shouldRenderersResume)
+                {
+                    renderer.Resume();
+                    _shouldRenderersResume = false;
+                }
+
                 renderer.Render(renderState, cancellationToken);
             }
 
@@ -312,6 +386,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         {
             _interfaces.ThreadManager.VerifyProcessThread(ProcessThread.Main);
 
+            _globalMessagePublisherSubscriber.Dispose();
             _renderers?.Dispose();
             _updaters?.Dispose();
         }
@@ -333,6 +408,38 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
                     entity.Suspend();
                 }
             }
+        }
+
+        /// <summary>Handles the <see cref="GamePausedMessage" /> global message.</summary>
+        /// <param name="message">The message being handled.</param>
+        private void HandleGamePausedMessage(GamePausedMessage message)
+        {
+            _shouldUpdatersPause = true;
+            _shouldRenderersPause = true;
+        }
+
+        /// <summary>Handles the <see cref="GameUnpausedMessage" /> global message.</summary>
+        /// <param name="message">The message being handled.</param>
+        private void HandleGameUnpausedMessage(GameUnpausedMessage message)
+        {
+            _shouldUpdatersUnpause = true;
+            _shouldRenderersUnpause = true;
+        }
+
+        /// <summary>Handles the <see cref="GameSuspendedMessage" /> global message.</summary>
+        /// <param name="message">The message being handled.</param>
+        private void HandleGameSuspendedMessage(GameSuspendedMessage message)
+        {
+            _shouldUpdatersSuspend = true;
+            _shouldRenderersSuspend = true;
+        }
+
+        /// <summary>Handles the <see cref="GameResumedMessage" /> global message.</summary>
+        /// <param name="message">The message being handled.</param>
+        private void HandleGameResumedMessage(GameResumedMessage message)
+        {
+            _shouldUpdatersResume = true;
+            _shouldRenderersResume = true;
         }
     }
 }

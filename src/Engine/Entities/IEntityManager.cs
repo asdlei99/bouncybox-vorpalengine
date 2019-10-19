@@ -68,6 +68,9 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         /// <summary>Releases renderer resources.</summary>
         void ReleaseRendererResources();
 
+        /// <summary>Handles dispatched messages.</summary>
+        void HandleDispatchedMessages();
+
         /// <summary>Renders a render state.</summary>
         /// <param name="cancellationToken">A cancellation token.</param>
         /// <returns>Returns a tuple containing the result of the rendering attempt and a frametime if a frame was rendered.</returns>

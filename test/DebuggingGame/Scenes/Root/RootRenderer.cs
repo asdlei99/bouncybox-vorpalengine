@@ -24,6 +24,8 @@ namespace BouncyBox.VorpalEngine.DebuggingGame.Scenes.Root
         {
         }
 
+        protected override bool RenderWhenSuspended { get; set; } = true;
+
         protected override unsafe void OnInitializeResources(DirectXResources resources)
         {
             DXGI_RGBA brushColor = DXGIFactory.CreateRgba(1, 1, 1, 1);

@@ -48,6 +48,9 @@ namespace BouncyBox.VorpalEngine.DebuggingGame.Scenes.Root
         {
         }
 
+        protected override bool UpdateWhenPaused { get; set; } = true;
+        protected override bool UpdateWhenSuspended { get; set; } = true;
+
         protected override void OnUpdateGameState(CancellationToken cancellationToken)
         {
             RootSceneGameState sceneGameState = _gameStateManager.GameState.SceneStates.Root!;

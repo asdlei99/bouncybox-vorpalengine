@@ -10,8 +10,8 @@ namespace BouncyBox.VorpalEngine.Engine.Game
         private readonly ConcurrentMessagePublisherSubscriber<IGlobalMessage> _globalMessagePublisherSubscriber;
         private readonly ContextSerilogLogger _serilogLogger;
         private bool _isDisposed;
-        private bool _isGamePaused;
-        private bool _isGameSuspended;
+        private bool _isPaused;
+        private bool _isSuspended;
 
         /// <summary>Initializes a new instance of the <see cref="GameExecutionStateManager" /> type.</summary>
         /// <remarks>
@@ -50,7 +50,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
         }
 
         /// <inheritdoc />
-        public GameExecutionState GameExecutionState => new GameExecutionState(_isGamePaused, _isGameSuspended);
+        public GameExecutionState GameExecutionState => new GameExecutionState(_isPaused, _isSuspended);
 
         /// <inheritdoc />
         public void HandleDispatchedMessages()
@@ -65,55 +65,67 @@ namespace BouncyBox.VorpalEngine.Engine.Game
         }
 
         /// <summary>Handles the <see cref="PauseGameMessage" /> global message.</summary>
+        /// <remarks>Publishes the <see cref="GamePausedMessage" /> global message.</remarks>
         /// <param name="message">The message being handled.</param>
         private void HandlePauseGameMessage(PauseGameMessage message)
         {
-            if (_isGamePaused)
+            if (_isPaused)
             {
                 return;
             }
 
             _serilogLogger.LogInformation("Game paused");
-            _isGamePaused = true;
+            _isPaused = true;
+
+            _globalMessagePublisherSubscriber.Publish<GamePausedMessage>();
         }
 
         /// <summary>Handles the <see cref="UnpauseGameMessage" /> global message.</summary>
+        /// <remarks>Publishes the <see cref="GameUnpausedMessage" /> global message.</remarks>
         /// <param name="message">The message being handled.</param>
         private void HandleUnpauseGameMessage(UnpauseGameMessage message)
         {
-            if (!_isGamePaused)
+            if (!_isPaused)
             {
                 return;
             }
 
             _serilogLogger.LogInformation("Game unpaused");
-            _isGamePaused = false;
+            _isPaused = false;
+
+            _globalMessagePublisherSubscriber.Publish<GameUnpausedMessage>();
         }
 
         /// <summary>Handles the <see cref="SuspendGameMessage" /> global message.</summary>
+        /// <remarks>Publishes the <see cref="GameSuspendedMessage" /> global message.</remarks>
         /// <param name="message">The message being handled.</param>
         private void HandleSuspendGameMessage(SuspendGameMessage message)
         {
-            if (_isGameSuspended)
+            if (_isSuspended)
             {
                 return;
             }
 
             _serilogLogger.LogInformation("Game suspended");
-            _isGameSuspended = true;
+            _isSuspended = true;
+
+            _globalMessagePublisherSubscriber.Publish<GameSuspendedMessage>();
         }
 
         /// <summary>Handles the <see cref="ResumeGameMessage" /> global message.</summary>
+        /// <remarks>Publishes the <see cref="GameResumedMessage" /> global message.</remarks>
         /// <param name="message">The message being handled.</param>
         private void HandleResumeGameMessage(ResumeGameMessage message)
         {
-            if (!_isGameSuspended)
+            if (!_isSuspended)
             {
                 return;
             }
 
             _serilogLogger.LogInformation("Game resumed");
-            _isGameSuspended = false;
+            _isSuspended = false;
+
+            _globalMessagePublisherSubscriber.Publish<GameResumedMessage>();
         }
     }
 }
