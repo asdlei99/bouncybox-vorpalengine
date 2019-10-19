@@ -226,6 +226,8 @@ namespace BouncyBox.VorpalEngine.Engine.Game
         /// <summary>Releases DirectX and renderer resources.</summary>
         private void ReleaseResources()
         {
+            _serilogLogger.LogDebug("Releasing resources");
+
             _entityManager.ReleaseRendererResources();
 
             _d3d11Device?.Dispose();

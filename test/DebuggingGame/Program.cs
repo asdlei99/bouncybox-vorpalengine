@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Immutable;
 using Autofac;
 using BouncyBox.VorpalEngine.DebuggingGame.States.Game;
 using BouncyBox.VorpalEngine.DebuggingGame.States.Render;
 using BouncyBox.VorpalEngine.Engine.Bootstrap;
 using BouncyBox.VorpalEngine.Engine.Game;
 using BouncyBox.VorpalEngine.Engine.Messaging;
+using BouncyBox.VorpalEngine.Engine.Messaging.GlobalMessages;
 using BouncyBox.VorpalEngine.Engine.Scenes;
 
 namespace BouncyBox.VorpalEngine.DebuggingGame
@@ -15,8 +17,15 @@ namespace BouncyBox.VorpalEngine.DebuggingGame
         private static int Main(string[] args)
         {
 #if DEBUG
-            MessageLogFilter.ShouldLogMessageDelegate = a => true;
-            MessageLogFilter.ShouldLogMessageTypeDelegate = a => true;
+            ImmutableArray<Type> ignoredMessageTypes =
+                new[]
+                {
+                    typeof(EngineUpdateStatsMessage),
+                    typeof(EngineRenderStatsMessage)
+                }.ToImmutableArray();
+
+            MessageLogFilter.ShouldLogMessageDelegate = a => !ignoredMessageTypes.Contains(a.GetType());
+            MessageLogFilter.ShouldLogMessageTypeDelegate = a => !ignoredMessageTypes.Contains(a);
 #endif
 
             return GameFactory.CreateAndRun<DebuggingGame, GameState, RenderState, SceneKey>(SceneKey.Root, args, RegisterComponents);

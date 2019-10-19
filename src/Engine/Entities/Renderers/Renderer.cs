@@ -63,7 +63,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities.Renderers
         protected virtual bool RenderWhenPaused { get; set; } = true;
 
         /// <summary>Gets or sets a value that determines whether to render when the game execution state is suspended.</summary>
-        protected virtual bool RenderWhenSuspended { get; set; } = false;
+        protected virtual bool RenderWhenSuspended { get; set; }
 
         /// <inheritdoc />
         public uint Order { get; }

@@ -76,10 +76,10 @@ namespace BouncyBox.VorpalEngine.Engine.Entities.Updaters
         protected bool IsSuspended { get; private set; }
 
         /// <summary>Gets or sets a value that determines whether to update when the game execution state is paused.</summary>
-        protected virtual bool UpdateWhenPaused { get; set; } = true;
+        protected virtual bool UpdateWhenPaused { get; set; }
 
         /// <summary>Gets or sets a value that determines whether to update when the game execution state is suspended.</summary>
-        protected virtual bool UpdateWhenSuspended { get; set; } = false;
+        protected virtual bool UpdateWhenSuspended { get; set; }
 
         /// <inheritdoc />
         public uint Order { get; }

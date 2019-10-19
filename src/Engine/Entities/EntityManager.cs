@@ -8,6 +8,7 @@ using BouncyBox.VorpalEngine.Engine.DirectX.ComObjects;
 using BouncyBox.VorpalEngine.Engine.Entities.Renderers;
 using BouncyBox.VorpalEngine.Engine.Entities.Updaters;
 using BouncyBox.VorpalEngine.Engine.Game;
+using BouncyBox.VorpalEngine.Engine.Logging;
 using TerraFX.Interop;
 using ProcessThread = BouncyBox.VorpalEngine.Engine.Threads.ProcessThread;
 
@@ -23,6 +24,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         private readonly EntityCollection<IRenderer<TRenderState>> _renderers = new EntityCollection<IRenderer<TRenderState>>();
         private readonly object _renderersLockObject = new object();
         private readonly IRenderStateManager<TRenderState> _renderStateManager;
+        private readonly ContextSerilogLogger _serilogLogger;
         private readonly EntityCollection<IUpdater<TRenderState>> _updaters = new EntityCollection<IUpdater<TRenderState>>();
         private readonly object _updatersLockObject = new object();
         private DirectXResources? _directXResources;
@@ -31,11 +33,28 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         /// <param name="interfaces">An <see cref="IInterfaces" /> implementation.</param>
         /// <param name="gameExecutionStateManager">An <see cref="IGameExecutionStateManager" /> implementation.</param>
         /// <param name="renderStateManager">An <see cref="IRenderStateManager{TRenderState}" /> implementation.</param>
-        public EntityManager(IInterfaces interfaces, IGameExecutionStateManager gameExecutionStateManager, IRenderStateManager<TRenderState> renderStateManager)
+        /// <param name="context">A nested context.</param>
+        public EntityManager(
+            IInterfaces interfaces,
+            IGameExecutionStateManager gameExecutionStateManager,
+            IRenderStateManager<TRenderState> renderStateManager,
+            NestedContext context)
         {
+            context = context.CopyAndPush(nameof(EntityManager<TGameState, TRenderState>));
+
+            _serilogLogger = new ContextSerilogLogger(interfaces.SerilogLogger, context);
             _interfaces = interfaces;
             _gameExecutionStateManager = gameExecutionStateManager;
             _renderStateManager = renderStateManager;
+        }
+
+        /// <summary>Initializes a new instance of the <see cref="EntityManager{TGameState,TRenderState}" /> type.</summary>
+        /// <param name="interfaces">An <see cref="IInterfaces" /> implementation.</param>
+        /// <param name="gameExecutionStateManager">An <see cref="IGameExecutionStateManager" /> implementation.</param>
+        /// <param name="renderStateManager">An <see cref="IRenderStateManager{TRenderState}" /> implementation.</param>
+        public EntityManager(IInterfaces interfaces, IGameExecutionStateManager gameExecutionStateManager, IRenderStateManager<TRenderState> renderStateManager)
+            : this(interfaces, gameExecutionStateManager, renderStateManager, NestedContext.None())
+        {
         }
 
         /// <inheritdoc />
@@ -148,6 +167,8 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         {
             _interfaces.ThreadManager.VerifyProcessThread(ProcessThread.RendererResources);
 
+            _serilogLogger.LogDebug("Initializing renderer resources");
+
             ImmutableArray<IRenderer<TRenderState>> renderers;
 
             lock (_renderersLockObject)
@@ -167,6 +188,8 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         public void ResizeRendererResources(D2D_SIZE_U clientSize)
         {
             _interfaces.ThreadManager.VerifyProcessThread(ProcessThread.RendererResources);
+
+            _serilogLogger.LogDebug("Resizing renderer resources");
 
             ImmutableArray<IRenderer<TRenderState>> renderers;
 
@@ -189,6 +212,8 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         public void ReleaseRendererResources()
         {
             _interfaces.ThreadManager.VerifyProcessThread(ProcessThread.RendererResources);
+
+            _serilogLogger.LogDebug("Releasing renderer resources");
 
             ImmutableArray<IRenderer<TRenderState>> renderers;
 
