@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "DebuggingGame": {
+    "SampleGame": {
       "commandName": "Project",
       "commandLineArgs": "--minimumloglevel Information"
     }
