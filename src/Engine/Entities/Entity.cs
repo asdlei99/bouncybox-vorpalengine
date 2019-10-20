@@ -332,9 +332,11 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
 
         /// <summary>Creates a render request. <see cref="RenderRequest.RenderOrder" /> is set to <see cref="IEntity.RenderOrder" />.</summary>
         /// <returns>A render request.</returns>
-        protected RenderRequest CreateRenderRequest(Action<DirectXResources, CancellationToken> renderDelegate)
+        protected RenderRequest? CreateRenderRequest(Action<DirectXResources, CancellationToken> renderDelegate)
         {
-            return new RenderRequest(RenderOrder, renderDelegate);
+            return !IsPaused || RenderWhenPaused || !IsSuspended || RenderWhenSuspended
+                       ? new RenderRequest(RenderOrder, renderDelegate)
+                       : (RenderRequest?)null;
         }
 
         /// <inheritdoc cref="Pause" />
