@@ -56,7 +56,7 @@ namespace BouncyBox.VorpalEngine.DebuggingGame.Scenes.Root
         protected override bool UpdateWhenSuspended { get; } = true;
         protected override bool RenderWhenSuspended { get; } = true;
 
-        protected override void OnUpdateGameState(CancellationToken cancellationToken)
+        protected override UpdateGameStateResult OnUpdateGameState(CancellationToken cancellationToken)
         {
             RootSceneGameState sceneGameState = _gameStateManager.GameState.SceneStates.Root!;
 
@@ -165,6 +165,8 @@ namespace BouncyBox.VorpalEngine.DebuggingGame.Scenes.Root
             {
                 cancellationToken.WaitHandle.WaitOne(sceneGameState.UpdateDelay);
             }
+
+            return UpdateGameStateResult.Render;
         }
 
         protected override Action<DirectXResources, CancellationToken> OnGetRenderDelegate()

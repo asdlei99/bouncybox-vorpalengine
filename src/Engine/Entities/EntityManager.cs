@@ -53,6 +53,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         private bool _shouldSuspend;
         private bool _shouldUnpause;
         private IntPtr _windowHandle = IntPtr.Zero;
+        private readonly List<IEntity> _entitiesToRender = new List<IEntity>();
 
         /// <summary>Initializes a new instance of the <see cref="EntityManager{TGameState}" /> type.</summary>
         /// <remarks>
@@ -181,10 +182,17 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
                     _shouldResume = false;
                 }
 
-                entity.UpdateGameState(cancellationToken);
+                if (entity.UpdateGameState(cancellationToken) == UpdateGameStateResult.Render)
+                {
+                    // The entity is requesting a render
+                    _entitiesToRender.Add(entity);
+                }
             }
 
-            Interlocked.Exchange(ref _renderDelegates, entities.Select(a => a.GetRenderDelegate()).Where(a => a != null).Select(a => a!).ToImmutableArray());
+            Interlocked.Exchange(ref _renderDelegates, _entitiesToRender.Select(a => a.GetRenderDelegate()).Where(a => a != null).Select(a => a!).ToImmutableArray());
+
+            // Clear the list of entities requesting renders
+            _entitiesToRender.Clear();
         }
 
         /// <inheritdoc />

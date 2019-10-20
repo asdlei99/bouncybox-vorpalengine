@@ -232,17 +232,14 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         ///     Thrown when the thread executing this method is not the
         ///     <see cref="ProcessThread.Update" /> thread.
         /// </exception>
-        public void UpdateGameState(CancellationToken cancellationToken)
+        public UpdateGameStateResult UpdateGameState(CancellationToken cancellationToken)
         {
             _interfaces.ThreadManager.VerifyProcessThread(ProcessThread.Update);
 
             // Handle dispatched messages
             GlobalMessagePublisherSubscriber.HandleDispatched();
 
-            if (ShouldUpdateGameState())
-            {
-                OnUpdateGameState(cancellationToken);
-            }
+            return ShouldUpdateGameState() ? OnUpdateGameState(cancellationToken) : UpdateGameStateResult.DoNotRender;
         }
 
         /// <inheritdoc />
@@ -366,8 +363,9 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         }
 
         /// <inheritdoc cref="UpdateGameState" />
-        protected virtual void OnUpdateGameState(CancellationToken cancellationToken)
+        protected virtual UpdateGameStateResult OnUpdateGameState(CancellationToken cancellationToken)
         {
+            return UpdateGameStateResult.DoNotRender;
         }
 
         /// <inheritdoc cref="GetRenderDelegate" />

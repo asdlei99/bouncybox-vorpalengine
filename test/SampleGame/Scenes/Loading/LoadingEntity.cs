@@ -26,9 +26,11 @@ namespace BouncyBox.VorpalEngine.SampleGame.Scenes.Loading
         {
         }
 
-        protected override void OnUpdateGameState(CancellationToken cancellationToken)
+        protected override UpdateGameStateResult OnUpdateGameState(CancellationToken cancellationToken)
         {
             _opacityStopwatch.Start();
+
+            return UpdateGameStateResult.Render;
         }
 
         protected override Action<DirectXResources, CancellationToken> OnGetRenderDelegate()
