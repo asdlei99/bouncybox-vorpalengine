@@ -23,25 +23,19 @@ namespace BouncyBox.VorpalEngine.Engine
     {
         private readonly List<string> _contexts = new List<string>();
 
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="NestedContext" /> type.
-        /// </summary>
+        /// <summary>Initializes a new instance of the <see cref="NestedContext" /> type.</summary>
         private NestedContext()
         {
         }
 
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="NestedContext" /> type.
-        /// </summary>
+        /// <summary>Initializes a new instance of the <see cref="NestedContext" /> type.</summary>
         /// <param name="context">A context.</param>
         public NestedContext(string context)
         {
             Push(context);
         }
 
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="NestedContext" /> type.
-        /// </summary>
+        /// <summary>Initializes a new instance of the <see cref="NestedContext" /> type.</summary>
         /// <param name="context">A context type.</param>
         /// <param name="fullTypeName">A value that determines whether the full or short type name is used for the context.</param>
         public NestedContext(Type context, bool fullTypeName = false)
@@ -49,9 +43,7 @@ namespace BouncyBox.VorpalEngine.Engine
             Push(context, fullTypeName);
         }
 
-        /// <summary>
-        ///     Gets a value indicating whether the context is empty.
-        /// </summary>
+        /// <summary>Gets a value indicating whether the context is empty.</summary>
         public bool IsEmpty => _contexts.Count == 0;
 
         private string DebuggerDisplay => $"Context = {BuildString()}";
@@ -68,18 +60,14 @@ namespace BouncyBox.VorpalEngine.Engine
             return GetEnumerator();
         }
 
-        /// <summary>
-        ///     Pushes a context onto the list.
-        /// </summary>
+        /// <summary>Pushes a context onto the list.</summary>
         /// <param name="context">A context.</param>
         public void Push(string context)
         {
             _contexts.Add(context);
         }
 
-        /// <summary>
-        ///     Pushes a context onto the list.
-        /// </summary>
+        /// <summary>Pushes a context onto the list.</summary>
         /// <param name="context">A context type.</param>
         /// <param name="fullTypeName">A value that determines whether the full or short type name is used for the context.</param>
         public void Push(Type context, bool fullTypeName = false)
@@ -87,17 +75,13 @@ namespace BouncyBox.VorpalEngine.Engine
             _contexts.Add((fullTypeName ? context.FullName : context.Name) ?? "Unknown type");
         }
 
-        /// <summary>
-        ///     Pushes another nested context onto the list.
-        /// </summary>
+        /// <summary>Pushes another nested context onto the list.</summary>
         public void Push(NestedContext context)
         {
             _contexts.AddRange(context._contexts);
         }
 
-        /// <summary>
-        ///     Copies the nested context to a new nested context.
-        /// </summary>
+        /// <summary>Copies the nested context to a new nested context.</summary>
         /// <returns>Returns the new nested context.</returns>
         public NestedContext Copy()
         {
@@ -108,9 +92,7 @@ namespace BouncyBox.VorpalEngine.Engine
             return nestedContext;
         }
 
-        /// <summary>
-        ///     Copies the nested context to a new nested context, then pushes the specified context.
-        /// </summary>
+        /// <summary>Copies the nested context to a new nested context, then pushes the specified context.</summary>
         /// <param name="context">A context.</param>
         /// <returns>Returns the new nested context.</returns>
         public NestedContext CopyAndPush(string context)
@@ -122,9 +104,7 @@ namespace BouncyBox.VorpalEngine.Engine
             return nestedContext;
         }
 
-        /// <summary>
-        ///     Copies the nested context to a new nested context, then pushes the specified context.
-        /// </summary>
+        /// <summary>Copies the nested context to a new nested context, then pushes the specified context.</summary>
         /// <param name="context">A context type.</param>
         /// <param name="fullTypeName">A value that determines whether the full or short type name is used for the context.</param>
         /// <returns>Returns the new nested context.</returns>
@@ -137,9 +117,7 @@ namespace BouncyBox.VorpalEngine.Engine
             return nestedContext;
         }
 
-        /// <summary>
-        ///     Copies the nested context to a new nested context, then pushes the specified nested context.
-        /// </summary>
+        /// <summary>Copies the nested context to a new nested context, then pushes the specified nested context.</summary>
         /// <param name="context">A nested context.</param>
         /// <returns>Returns the new nested context.</returns>
         public NestedContext CopyAndPush(NestedContext context)
@@ -151,9 +129,7 @@ namespace BouncyBox.VorpalEngine.Engine
             return this;
         }
 
-        /// <summary>
-        ///     Builds a string from the list of contexts.
-        /// </summary>
+        /// <summary>Builds a string from the list of contexts.</summary>
         /// <param name="separator">The separator that separates each context in the string.</param>
         /// <param name="unknownContext">The phrase to use when the context is unknown.</param>
         /// <returns>Returns the concatenated contexts.</returns>
@@ -168,9 +144,7 @@ namespace BouncyBox.VorpalEngine.Engine
             return DebuggerDisplay;
         }
 
-        /// <summary>
-        ///     Creates a new nested context with no context.
-        /// </summary>
+        /// <summary>Creates a new nested context with no context.</summary>
         /// <returns>Returns the new nested context.</returns>
         public static NestedContext None()
         {

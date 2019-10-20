@@ -4,8 +4,6 @@ using BouncyBox.VorpalEngine.Engine.Bootstrap;
 using BouncyBox.VorpalEngine.Engine.Game;
 using BouncyBox.VorpalEngine.Engine.Scenes;
 using BouncyBox.VorpalEngine.SampleGame.Scenes;
-using BouncyBox.VorpalEngine.SampleGame.States.Game;
-using BouncyBox.VorpalEngine.SampleGame.States.Render;
 
 namespace BouncyBox.VorpalEngine.SampleGame
 {
@@ -14,15 +12,14 @@ namespace BouncyBox.VorpalEngine.SampleGame
         [STAThread]
         private static int Main(string[] args)
         {
-            return GameFactory.CreateAndRun<Game, GameState, RenderState, SceneKey>(SceneKey.Root, args, RegisterComponents);
+            return GameFactory.CreateAndRun<Game, GameState, SceneKey>(SceneKey.Root, args, RegisterComponents);
         }
 
         private static void RegisterComponents(ContainerBuilder containerBuilder)
         {
             containerBuilder.RegisterType<CommonGameSettings>().As<ICommonGameSettings>().SingleInstance();
             containerBuilder.RegisterType<GameStateManager<GameState>>().As<IGameStateManager<GameState>>().SingleInstance();
-            containerBuilder.RegisterType<RenderStateManager<RenderState>>().As<IRenderStateManager<RenderState>>().SingleInstance();
-            containerBuilder.RegisterType<SceneFactory>().As<ISceneFactory<GameState, RenderState, SceneKey>>().SingleInstance();
+            containerBuilder.RegisterType<SceneFactory>().As<ISceneFactory<SceneKey>>().SingleInstance();
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace BouncyBox.VorpalEngine.DebuggingGame.States.Game
+﻿namespace BouncyBox.VorpalEngine.SampleGame
 {
     public class GameState
     {

@@ -1,6 +1,4 @@
-﻿using BouncyBox.VorpalEngine.DebuggingGame.States.Game;
-using BouncyBox.VorpalEngine.DebuggingGame.States.Render;
-using BouncyBox.VorpalEngine.Engine;
+﻿using BouncyBox.VorpalEngine.Engine;
 using BouncyBox.VorpalEngine.Engine.Entities;
 using BouncyBox.VorpalEngine.Engine.Game;
 
@@ -10,13 +8,12 @@ namespace BouncyBox.VorpalEngine.DebuggingGame.Scenes.Root
     {
         private readonly IGameStateManager<GameState> _gameStateManager;
 
-        public RootScene(IInterfaces interfaces, IGameStateManager<GameState> gameStateManager, IEntityManager<GameState, RenderState> entityManager)
+        public RootScene(IInterfaces interfaces, IGameStateManager<GameState> gameStateManager, IEntityManager<GameState> entityManager)
             : base(interfaces, entityManager, SceneKey.Root)
         {
             _gameStateManager = gameStateManager;
 
-            AddUpdaters(new RootUpdater(interfaces, gameStateManager));
-            AddRenderers(new RootRenderer(interfaces));
+            AddEntities(new RootEntity(interfaces, gameStateManager));
         }
 
         protected override void OnLoad()

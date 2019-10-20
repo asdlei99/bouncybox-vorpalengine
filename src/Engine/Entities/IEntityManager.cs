@@ -1,79 +1,49 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
-using BouncyBox.VorpalEngine.Engine.DirectX;
-using BouncyBox.VorpalEngine.Engine.Entities.Renderers;
-using BouncyBox.VorpalEngine.Engine.Entities.Updaters;
-using TerraFX.Interop;
 
 namespace BouncyBox.VorpalEngine.Engine.Entities
 {
     /// <summary>Represents an object that manages entities.</summary>
-    public interface IEntityManager<out TGameState, out TRenderState> : IDisposable
+    public interface IEntityManager<out TGameState> : IDisposable
         where TGameState : class
-        where TRenderState : class
     {
-        /// <summary>Adds updaters to the collection.</summary>
-        /// <param name="updaters">The updaters to add.</param>
+        /// <summary>Adds entities to the collection.</summary>
+        /// <param name="entities">The entities to add.</param>
         /// <returns>Returns the entity manager.</returns>
-        IEntityManager<TGameState, TRenderState> Add(IEnumerable<IUpdater<TRenderState>> updaters);
+        IEntityManager<TGameState> Add(IEnumerable<IEntity> entities);
 
-        /// <summary>Adds updaters to the collection.</summary>
-        /// <param name="updaters">The updaters to add.</param>
+        /// <summary>Adds entities to the collection.</summary>
+        /// <param name="entities">The entities to add.</param>
         /// <returns>Returns the entity manager.</returns>
-        IEntityManager<TGameState, TRenderState> Add(params IUpdater<TRenderState>[] updaters);
+        IEntityManager<TGameState> Add(params IEntity[] entities);
 
-        /// <summary>Adds renderers to the collection.</summary>
-        /// <param name="renderers">The renderers to add.</param>
+        /// <summary>Removes entities from the collection.</summary>
+        /// <param name="entities">The entities to remove.</param>
         /// <returns>Returns the entity manager.</returns>
-        IEntityManager<TGameState, TRenderState> Add(IEnumerable<IRenderer<TRenderState>> renderers);
+        IEntityManager<TGameState> Remove(IEnumerable<IEntity> entities);
 
-        /// <summary>Adds renderers to the collection.</summary>
-        /// <param name="renderers">The renderers to add.</param>
+        /// <summary>Removes entities from the collection.</summary>
+        /// <param name="entities">The entities to remove.</param>
         /// <returns>Returns the entity manager.</returns>
-        IEntityManager<TGameState, TRenderState> Add(params IRenderer<TRenderState>[] renderers);
-
-        /// <summary>Removes updaters from the collection.</summary>
-        /// <param name="updaters">The updaters to remove.</param>
-        /// <returns>Returns the entity manager.</returns>
-        IEntityManager<TGameState, TRenderState> Remove(IEnumerable<IUpdater<TRenderState>> updaters);
-
-        /// <summary>Removes updaters from the collection.</summary>
-        /// <param name="updaters">The updaters to remove.</param>
-        /// <returns>Returns the entity manager.</returns>
-        IEntityManager<TGameState, TRenderState> Remove(params IUpdater<TRenderState>[] updaters);
-
-        /// <summary>Removes renderers from the collection.</summary>
-        /// <param name="renderers">The renderers to remove.</param>
-        /// <returns>Returns the entity manager.</returns>
-        IEntityManager<TGameState, TRenderState> Remove(IEnumerable<IRenderer<TRenderState>> renderers);
-
-        /// <summary>Removes renderers from the collection.</summary>
-        /// <param name="renderers">The renderers to remove.</param>
-        /// <returns>Returns the entity manager.</returns>
-        IEntityManager<TGameState, TRenderState> Remove(params IRenderer<TRenderState>[] renderers);
+        IEntityManager<TGameState> Remove(params IEntity[] entities);
 
         /// <summary>Updates the game state.</summary>
         /// <param name="cancellationToken">A cancellation token.</param>
-        void Update(CancellationToken cancellationToken);
+        void Update(CancellationToken cancellationToken = default);
 
-        /// <summary>Initializes renderer resources.</summary>
-        /// <param name="resources">DirectX resources.</param>
-        void InitializeRendererResources(DirectXResources resources);
-
-        /// <summary>Resizes renderer resources to account for the new render window client size.</summary>
-        /// <param name="clientSize">The size of the render window's client area.</param>
-        void ResizeRendererResources(D2D_SIZE_U clientSize);
-
-        /// <summary>Releases renderer resources.</summary>
-        void ReleaseRendererResources();
-
-        /// <summary>Handles dispatched messages.</summary>
-        void HandleDispatchedMessages();
+        /// <summary>Initialized render resources.</summary>
+        void ReleaseRenderResources(CancellationToken cancellationToken = default);
 
         /// <summary>Renders a render state.</summary>
         /// <param name="cancellationToken">A cancellation token.</param>
         /// <returns>Returns a tuple containing the result of the rendering attempt and a frametime if a frame was rendered.</returns>
-        (RenderResult result, TimeSpan frametime) Render(CancellationToken cancellationToken);
+        (RenderResult result, TimeSpan frametime) Render(CancellationToken cancellationToken = default);
+
+        /// <summary>Handles dispatched update messages.</summary>
+        void HandleDispatchedUpdateMessages();
+
+        /// <summary>Handles dispatched render resources messages.</summary>
+        void HandleDispatchedRenderResourcesMessages();
     }
 }

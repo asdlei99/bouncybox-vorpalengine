@@ -3,9 +3,7 @@ using System.Collections.Generic;
 
 namespace BouncyBox.VorpalEngine.Engine.Calculators
 {
-    /// <summary>
-    ///     Accumulates values up to a capacity, then drops the oldest value as a new value is accumulated.
-    /// </summary>
+    /// <summary>Accumulates values up to a capacity, then drops the oldest value as a new value is accumulated.</summary>
     public abstract class Accumulator<T>
     {
         private int _currentIndex = -1;

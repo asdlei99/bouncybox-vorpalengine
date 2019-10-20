@@ -1,42 +1,59 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using BouncyBox.Common.NetStandard21;
 using BouncyBox.VorpalEngine.Engine.Entities;
-using BouncyBox.VorpalEngine.Engine.Entities.Renderers;
-using BouncyBox.VorpalEngine.Engine.Entities.Updaters;
+using BouncyBox.VorpalEngine.Engine.Messaging;
 using BouncyBox.VorpalEngine.Engine.Threads;
 
 namespace BouncyBox.VorpalEngine.Engine.Scenes
 {
-    /// <summary>A collection of updaters and renderers that form one logical game unit.</summary>
-    public abstract class Scene<TGameState, TRenderState, TSceneKey> : IScene<TSceneKey>
+    /// <summary>A collection of entities that form one logical game unit.</summary>
+    public abstract class Scene<TGameState, TSceneKey> : IScene<TSceneKey>
         where TGameState : class
-        where TRenderState : class, new()
         where TSceneKey : struct, Enum
     {
-        private readonly IEntityManager<TGameState, TRenderState> _entityManager;
+        private readonly HashSet<IEntity> _entities = new HashSet<IEntity>();
+        private readonly IEntityManager<TGameState> _entityManager;
+        private readonly ConcurrentMessagePublisherSubscriber<IGlobalMessage> _globalMessagePublisherSubscriber;
         private readonly IInterfaces _interfaces;
-        private readonly HashSet<IRenderer<TRenderState>> _renderers = new HashSet<IRenderer<TRenderState>>();
-        private readonly HashSet<IUpdater<TRenderState>> _updaters = new HashSet<IUpdater<TRenderState>>();
+        private bool _isDisposed;
 
-        /// <summary>Initializes a new instance of the <see cref="Scene{TGameState,TRenderState,TSceneKey}" /> type.</summary>
+        /// <summary>Initializes a new instance of the <see cref="Scene{TGameState,TSceneKey}" /> type.</summary>
         /// <param name="interfaces">An <see cref="IInterfaces" /> implementation.</param>
-        /// <param name="entityManager">An <see cref="IEntityManager{TGameState,TRenderState}" /> implementation.</param>
+        /// <param name="entityManager">An <see cref="IEntityManager{TGameState}" /> implementation.</param>
         /// <param name="key">The scene's key.</param>
-        /// <exception cref="InvalidOperationException">Thrown when the thread executing this method is not the render thread.</exception>
-        protected Scene(IInterfaces interfaces, IEntityManager<TGameState, TRenderState> entityManager, TSceneKey key)
+        /// <param name="context">A nested context.</param>
+        protected Scene(IInterfaces interfaces, IEntityManager<TGameState> entityManager, TSceneKey key, NestedContext context)
         {
+            context = context.CopyAndPush(nameof(Scene<TGameState, TSceneKey>));
+
             _interfaces = interfaces;
             _entityManager = entityManager;
             Key = key;
+
+            _globalMessagePublisherSubscriber = ConcurrentMessagePublisherSubscriber<IGlobalMessage>.Create(interfaces, context);
+        }
+
+        /// <summary>Initializes a new instance of the <see cref="Scene{TGameState,TSceneKey}" /> type.</summary>
+        /// <param name="interfaces">An <see cref="IInterfaces" /> implementation.</param>
+        /// <param name="entityManager">An <see cref="IEntityManager{TGameState}" /> implementation.</param>
+        /// <param name="key">The scene's key.</param>
+        protected Scene(IInterfaces interfaces, IEntityManager<TGameState> entityManager, TSceneKey key) : this(
+            interfaces,
+            entityManager,
+            key,
+            NestedContext.None())
+        {
         }
 
         /// <inheritdoc />
         public TSceneKey Key { get; }
 
         /// <inheritdoc />
-        /// <exception cref="InvalidOperationException">Thrown when the thread executing this method is not the update thread.</exception>
+        /// <exception cref="InvalidOperationException">
+        ///     Thrown when the thread executing this method is not the
+        ///     <see cref="ProcessThread.Update" /> thread.
+        /// </exception>
         public void Load()
         {
             _interfaces.ThreadManager.VerifyProcessThread(ProcessThread.Update);
@@ -45,13 +62,22 @@ namespace BouncyBox.VorpalEngine.Engine.Scenes
         }
 
         /// <inheritdoc />
-        /// <exception cref="InvalidOperationException">Thrown when the thread executing this method is not the update thread.</exception>
+        /// <exception cref="InvalidOperationException">
+        ///     Thrown when the thread executing this method is not the
+        ///     <see cref="ProcessThread.Update" /> thread.
+        /// </exception>
         public void Unload()
         {
             _interfaces.ThreadManager.VerifyProcessThread(ProcessThread.Update);
 
-            OnUnload();
             ClearEntities();
+            OnUnload();
+        }
+
+        /// <inheritdoc />
+        public void Dispose()
+        {
+            DisposeHelper.Dispose(() => { _globalMessagePublisherSubscriber?.Dispose(); }, ref _isDisposed, _interfaces.ThreadManager, ProcessThread.Main);
         }
 
         /// <inheritdoc cref="IScene{TSceneKey}.Load" />
@@ -64,123 +90,72 @@ namespace BouncyBox.VorpalEngine.Engine.Scenes
         {
         }
 
-        /// <summary>Adds updaters to the scene.</summary>
-        /// <param name="updaters">The updaters to add.</param>
+        /// <summary>Adds entities to the scene.</summary>
+        /// <param name="entities">The entities to add.</param>
         /// <returns>Returns the scene.</returns>
-        /// <exception cref="InvalidOperationException">Thrown when the thread executing this method is not the update thread.</exception>
-        protected IScene<TSceneKey> AddUpdaters(IEnumerable<IUpdater<TRenderState>> updaters)
+        /// <exception cref="InvalidOperationException">
+        ///     Thrown when the thread executing this method is not the
+        ///     <see cref="ProcessThread.Update" /> thread.
+        /// </exception>
+        protected IScene<TSceneKey> AddEntities(IEnumerable<IEntity> entities)
         {
             _interfaces.ThreadManager.VerifyProcessThread(ProcessThread.Update);
 
-            updaters = updaters.ToImmutableArray();
+            entities = entities.ToImmutableArray();
 
-            _updaters.AddRange(updaters);
-            _entityManager.Add(updaters);
+            _entities.UnionWith(entities);
+            _entityManager.Add(entities);
 
             return this;
         }
 
-        /// <summary>Adds updaters to the scene.</summary>
-        /// <param name="updaters">The updaters to add.</param>
+        /// <summary>Adds entities to the scene.</summary>
+        /// <param name="entities">The entities to add.</param>
         /// <returns>Returns the scene.</returns>
-        /// <exception cref="InvalidOperationException">Thrown when the thread executing this method is not the update thread.</exception>
-        protected IScene<TSceneKey> AddUpdaters(params IUpdater<TRenderState>[] updaters)
+        /// <exception cref="InvalidOperationException">
+        ///     Thrown when the thread executing this method is not the
+        ///     <see cref="ProcessThread.Update" /> thread.
+        /// </exception>
+        protected IScene<TSceneKey> AddEntities(params IEntity[] entities)
         {
-            return AddUpdaters((IEnumerable<IUpdater<TRenderState>>)updaters);
+            return AddEntities((IEnumerable<IEntity>)entities);
         }
 
-        /// <summary>Adds renderers to the scene.</summary>
-        /// <param name="renderers">The renderers to add.</param>
+        /// <summary>Removes entities from the scene.</summary>
+        /// <param name="entities">The entities to remove.</param>
         /// <returns>Returns the scene.</returns>
-        /// <exception cref="InvalidOperationException">Thrown when the thread executing this method is not the update thread.</exception>
-        protected IScene<TSceneKey> AddRenderers(IEnumerable<IRenderer<TRenderState>> renderers)
+        /// <exception cref="InvalidOperationException">
+        ///     Thrown when the thread executing this method is not the
+        ///     <see cref="ProcessThread.Update" /> thread.
+        /// </exception>
+        protected IScene<TSceneKey> RemoveEntities(IEnumerable<IEntity> entities)
         {
             _interfaces.ThreadManager.VerifyProcessThread(ProcessThread.Update);
 
-            renderers = renderers.ToImmutableArray();
+            ImmutableArray<IEntity> entitiesToRemove = entities.ToImmutableArray();
 
-            _renderers.AddRange(renderers);
-            _entityManager.Add(renderers);
+            _entities.ExceptWith(entitiesToRemove);
+            _entityManager.Remove(entitiesToRemove);
 
             return this;
         }
 
-        /// <summary>Adds renderers to the scene.</summary>
-        /// <param name="renderers">The renderers to add.</param>
+        /// <summary>Removes entities from the scene.</summary>
+        /// <param name="entities">The entities to remove.</param>
         /// <returns>Returns the scene.</returns>
-        /// <exception cref="InvalidOperationException">Thrown when the thread executing this method is not the update thread.</exception>
-        protected IScene<TSceneKey> AddRenderers(params IRenderer<TRenderState>[] renderers)
+        /// <exception cref="InvalidOperationException">
+        ///     Thrown when the thread executing this method is not the
+        ///     <see cref="ProcessThread.Update" /> thread.
+        /// </exception>
+        protected IScene<TSceneKey> RemoveEntities(params IEntity[] entities)
         {
-            return AddRenderers((IEnumerable<IRenderer<TRenderState>>)renderers);
+            return RemoveEntities((IEnumerable<IEntity>)entities);
         }
 
-        /// <summary>Removes updaters from the scene.</summary>
-        /// <param name="updaters">The updaters to remove.</param>
-        /// <returns>Returns the scene.</returns>
-        /// <exception cref="InvalidOperationException">Thrown when the thread executing this method is not the update thread.</exception>
-        protected IScene<TSceneKey> RemoveUpdaters(IEnumerable<IUpdater<TRenderState>> updaters)
-        {
-            _interfaces.ThreadManager.VerifyProcessThread(ProcessThread.Update);
-
-            updaters = updaters.ToImmutableArray();
-
-            _updaters.RemoveRange(updaters);
-            _entityManager.Remove(updaters);
-
-            return this;
-        }
-
-        /// <summary>Removes updaters from the scene.</summary>
-        /// <param name="updaters">The updaters to remove.</param>
-        /// <returns>Returns the scene.</returns>
-        /// <exception cref="InvalidOperationException">Thrown when the thread executing this method is not the update thread.</exception>
-        protected IScene<TSceneKey> RemoveUpdaters(params IUpdater<TRenderState>[] updaters)
-        {
-            return RemoveUpdaters((IEnumerable<IUpdater<TRenderState>>)updaters);
-        }
-
-        /// <summary>Removes renderers from the scene.</summary>
-        /// <param name="renderers">The renderers to remove.</param>
-        /// <returns>Returns the scene.</returns>
-        /// <exception cref="InvalidOperationException">Thrown when the thread executing this method is not the update thread.</exception>
-        protected IScene<TSceneKey> RemoveRenderers(IEnumerable<IRenderer<TRenderState>> renderers)
-        {
-            _interfaces.ThreadManager.VerifyProcessThread(ProcessThread.Update);
-
-            renderers = renderers.ToImmutableArray();
-
-            _renderers.RemoveRange(renderers);
-            _entityManager.Remove(renderers);
-
-            return this;
-        }
-
-        /// <summary>Removes renderers from the scene.</summary>
-        /// <param name="renderers">The renderers to remove.</param>
-        /// <returns>Returns the scene.</returns>
-        /// <exception cref="InvalidOperationException">Thrown when the thread executing this method is not the update thread.</exception>
-        protected IScene<TSceneKey> RemoveRenderers(params IRenderer<TRenderState>[] renderers)
-        {
-            return RemoveRenderers((IEnumerable<IRenderer<TRenderState>>)renderers);
-        }
-
-        /// <summary>Removes all updaters from the scene.</summary>
-        protected void ClearUpdaters()
-        {
-            RemoveUpdaters(_updaters);
-        }
-
-        /// <summary>Removes all renderers from the scene.</summary>
-        protected void ClearRenderers()
-        {
-            RemoveRenderers(_renderers);
-        }
-
-        /// <summary>Removes all updaters and renderers from the scene.</summary>
+        /// <summary>Removes all entities from the scene.</summary>
         protected void ClearEntities()
         {
-            RemoveUpdaters(_updaters);
-            RemoveRenderers(_renderers);
+            RemoveEntities(_entities);
         }
     }
 }

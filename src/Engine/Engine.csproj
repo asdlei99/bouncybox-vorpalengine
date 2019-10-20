@@ -12,8 +12,8 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Autofac" Version="4.9.4" />
-    <PackageReference Include="BouncyBox.Common.NetStandard21" Version="1.1.0.65" />
-    <PackageReference Include="BouncyBox.Common.NetStandard21.Logging" Version="1.1.0.65" />
+    <PackageReference Include="BouncyBox.Common.NetStandard21" Version="2.0.0.68" />
+    <PackageReference Include="BouncyBox.Common.NetStandard21.Logging" Version="2.0.0.68" />
     <PackageReference Include="CommandLineParser" Version="2.6.0" />
     <PackageReference Include="Enums.NET" Version="2.3.2" />
     <PackageReference Include="Serilog.Sinks.Debug" Version="1.0.1" />

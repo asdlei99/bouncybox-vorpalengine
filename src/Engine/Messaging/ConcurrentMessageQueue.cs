@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using BouncyBox.Common.NetStandard21.Logging;
 using BouncyBox.VorpalEngine.Engine.Logging;
 
@@ -102,8 +101,6 @@ namespace BouncyBox.VorpalEngine.Engine.Messaging
         /// <inheritdoc />
         public void Unsubscribe(IEnumerable<SubscriptionToken> tokens, NestedContext context)
         {
-            tokens = tokens.ToImmutableArray();
-
             foreach (SubscriptionToken token in tokens)
             {
                 _subscriptionsByMessageType[token.MessageType].TryRemove(token, out _);

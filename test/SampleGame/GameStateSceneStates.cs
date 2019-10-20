@@ -1,6 +1,6 @@
 ﻿using BouncyBox.VorpalEngine.SampleGame.Scenes.Loading;
 
-namespace BouncyBox.VorpalEngine.SampleGame.States.Game
+namespace BouncyBox.VorpalEngine.SampleGame
 {
     public class GameStateSceneStates
     {

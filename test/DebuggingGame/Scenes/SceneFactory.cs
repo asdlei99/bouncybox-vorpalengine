@@ -1,7 +1,5 @@
 ﻿using System;
 using BouncyBox.VorpalEngine.DebuggingGame.Scenes.Root;
-using BouncyBox.VorpalEngine.DebuggingGame.States.Game;
-using BouncyBox.VorpalEngine.DebuggingGame.States.Render;
 using BouncyBox.VorpalEngine.Engine;
 using BouncyBox.VorpalEngine.Engine.Entities;
 using BouncyBox.VorpalEngine.Engine.Game;
@@ -9,13 +7,13 @@ using BouncyBox.VorpalEngine.Engine.Scenes;
 
 namespace BouncyBox.VorpalEngine.DebuggingGame.Scenes
 {
-    public class SceneFactory : ISceneFactory<GameState, RenderState, SceneKey>
+    public class SceneFactory : ISceneFactory<SceneKey>
     {
-        private readonly IEntityManager<GameState, RenderState> _entityManager;
+        private readonly IEntityManager<GameState> _entityManager;
         private readonly IGameStateManager<GameState> _gameStateManager;
         private readonly IInterfaces _interfaces;
 
-        public SceneFactory(IInterfaces interfaces, IGameStateManager<GameState> gameStateManager, IEntityManager<GameState, RenderState> entityManager)
+        public SceneFactory(IInterfaces interfaces, IGameStateManager<GameState> gameStateManager, IEntityManager<GameState> entityManager)
         {
             _interfaces = interfaces;
             _gameStateManager = gameStateManager;

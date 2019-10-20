@@ -12,14 +12,13 @@ using BouncyBox.VorpalEngine.Engine.Threads;
 namespace BouncyBox.VorpalEngine.Engine.Game
 {
     /// <summary>An engine thread worker that updates the game state.</summary>
-    internal sealed class UpdateWorker<TGameState, TRenderState> : EngineThreadWorker
+    internal sealed class UpdateWorker<TGameState> : EngineThreadWorker
         where TGameState : class
-        where TRenderState : class
     {
         private const double UpdatesPerSecondMultiplier = 1.15;
         private readonly TimeSpan _engineStatsFrequency = TimeSpan.FromSeconds(1);
         private readonly Stopwatch _engineStatsStopwatch = Stopwatch.StartNew();
-        private readonly IEntityManager<TGameState, TRenderState> _entityManager;
+        private readonly IEntityManager<TGameState> _entityManager;
         private readonly TimeSpan _minimizedRenderWindowSleepDuration = TimeSpan.FromMilliseconds(100);
         private readonly TimeSpan _renderWindowDeactivatedUpdatePeriod = TimeSpan.FromSeconds(1) / (30 * UpdatesPerSecondMultiplier);
         private readonly ISceneManager _sceneManager;
@@ -29,24 +28,24 @@ namespace BouncyBox.VorpalEngine.Engine.Game
         private bool _isRenderWindowMinimized;
         private TimeSpan _updatePeriod = TimeSpan.FromSeconds(1) / (60 * UpdatesPerSecondMultiplier); // Default to 60 Hz
 
-        /// <summary>Initializes a new instance of the <see cref="UpdateWorker{TGameState,TRenderState}" />.</summary>
+        /// <summary>Initializes a new instance of the <see cref="UpdateWorker{TGameState}" />.</summary>
         /// <param name="interfaces">An <see cref="IInterfaces" /> implementation.</param>
-        /// <param name="entityManager">An <see cref="IEntityManager{TGameState,TRenderState}" /> implementation.</param>
+        /// <param name="entityManager">An <see cref="IEntityManager{TGameState}" /> implementation.</param>
         /// <param name="sceneManager">An <see cref="ISceneManager" /> implementation.</param>
         /// <param name="context">A nested context.</param>
-        public UpdateWorker(IInterfaces interfaces, IEntityManager<TGameState, TRenderState> entityManager, ISceneManager sceneManager, NestedContext context)
-            : base(interfaces, EngineThread.Update, context.CopyAndPush(nameof(UpdateWorker<TGameState, TRenderState>)))
+        public UpdateWorker(IInterfaces interfaces, IEntityManager<TGameState> entityManager, ISceneManager sceneManager, NestedContext context)
+            : base(interfaces, EngineThread.Update, context.CopyAndPush(nameof(UpdateWorker<TGameState>)))
         {
             _entityManager = entityManager;
             _sceneManager = sceneManager;
             _serilogLogger = new ContextSerilogLogger(interfaces.SerilogLogger, context);
         }
 
-        /// <summary>Initializes a new instance of the <see cref="UpdateWorker{TGameState,TRenderState}" /> type.</summary>
+        /// <summary>Initializes a new instance of the <see cref="UpdateWorker{TGameState}" /> type.</summary>
         /// <param name="interfaces">An <see cref="IInterfaces" /> implementation.</param>
-        /// <param name="entityManager">An <see cref="IEntityManager{TGameState,TRenderState}" /> implementation.</param>
+        /// <param name="entityManager">An <see cref="IEntityManager{TGameState}" /> implementation.</param>
         /// <param name="sceneManager">An <see cref="ISceneManager" /> implementation.</param>
-        public UpdateWorker(IInterfaces interfaces, IEntityManager<TGameState, TRenderState> entityManager, ISceneManager sceneManager)
+        public UpdateWorker(IInterfaces interfaces, IEntityManager<TGameState> entityManager, ISceneManager sceneManager)
             : this(interfaces, entityManager, sceneManager, NestedContext.None())
         {
         }
@@ -70,7 +69,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
         }
 
         /// <inheritdoc />
-        protected override void OnDoWork(CancellationToken cancellationToken)
+        protected override void OnDoWork(CancellationToken cancellationToken = default)
         {
             // If the render window is minimized then don't update the game state
             if (_isRenderWindowMinimized)
@@ -83,7 +82,9 @@ namespace BouncyBox.VorpalEngine.Engine.Game
             long timestamp = Stopwatch.GetTimestamp();
 
             // Handle dispatched messages
+
             _sceneManager.HandleDispatchedMessages();
+            _entityManager.HandleDispatchedUpdateMessages();
 
             // Update the game state
             _entityManager.Update(cancellationToken);

@@ -2,9 +2,7 @@
 
 namespace BouncyBox.VorpalEngine.Engine.DirectX
 {
-    /// <summary>
-    ///     Extensions for the <see cref="D2D_RECT_U" /> type.
-    /// </summary>
+    /// <summary>Extensions for the <see cref="D2D_RECT_U" /> type.</summary>
     public static class D2DRectUExtensions
     {
         /// <summary>Converts the <see cref="D2D_RECT_U" /> to a <see cref="D2D_RECT_F" />.</summary>

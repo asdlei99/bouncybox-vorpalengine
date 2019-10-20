@@ -16,12 +16,11 @@ using TerraFX.Interop;
 namespace BouncyBox.VorpalEngine.Engine.Game
 {
     /// <summary>Base class for all games. This class manages the update and render loops and the windows message loop.</summary>
-    public abstract class Game<TGameState, TRenderState, TSceneKey> : IDisposable
+    public abstract class Game<TGameState, TSceneKey> : IDisposable
         where TGameState : class
-        where TRenderState : class, new()
         where TSceneKey : struct, Enum
     {
-        private readonly IEntityManager<TGameState, TRenderState> _entityManager;
+        private readonly IEntityManager<TGameState> _entityManager;
         private readonly ManualResetEventSlim _exitManualResetEvent = new ManualResetEventSlim();
         private readonly IGameExecutionStateManager _gameExecutionStateManager;
         private readonly ConcurrentMessagePublisherSubscriber<IGlobalMessage> _globalMessagePublisherSubscriber;
@@ -31,23 +30,23 @@ namespace BouncyBox.VorpalEngine.Engine.Game
         private bool _isDisposed;
         private RenderForm? _renderForm;
 
-        /// <summary>Initializes a new instance of the <see cref="Game{TGameState,TRenderState,TSceneKey}" /> type.</summary>
+        /// <summary>Initializes a new instance of the <see cref="Game{TGameState,TSceneKey}" /> type.</summary>
         /// <remarks>Subscribes to the <see cref="RenderWindowClosingMessage" /> global message.</remarks>
         /// <param name="interfaces">An <see cref="IInterfaces" /> implementation.</param>
         /// <param name="gameExecutionStateManager">An <see cref="IGameExecutionStateManager" /> implementation.</param>
-        /// <param name="entityManager">An <see cref="IEntityManager{TGameState,TRenderState}" /> implementation.</param>
+        /// <param name="entityManager">An <see cref="IEntityManager{TGameState}" /> implementation.</param>
         /// <param name="sceneManager">An <see cref="ISceneManager" /> implementation.</param>
         /// <param name="programOptions">Parsed command line arguments.</param>
         /// <param name="context">A nested context.</param>
         protected Game(
             IInterfaces interfaces,
             IGameExecutionStateManager gameExecutionStateManager,
-            IEntityManager<TGameState, TRenderState> entityManager,
+            IEntityManager<TGameState> entityManager,
             ISceneManager sceneManager,
             ProgramOptions programOptions,
             NestedContext context)
         {
-            context = context.CopyAndPush(nameof(Game<TGameState, TRenderState, TSceneKey>));
+            context = context.CopyAndPush(nameof(Game<TGameState, TSceneKey>));
 
             Interfaces = interfaces;
             _gameExecutionStateManager = gameExecutionStateManager;
@@ -61,17 +60,17 @@ namespace BouncyBox.VorpalEngine.Engine.Game
                     .Subscribe<RenderWindowClosingMessage>(HandleRenderWindowClosingMessage);
         }
 
-        /// <summary>Initializes a new instance of the <see cref="Game{TGameState,TRenderState,TSceneKey}" /> type.</summary>
+        /// <summary>Initializes a new instance of the <see cref="Game{TGameState,TSceneKey}" /> type.</summary>
         /// <remarks>Subscribes to the <see cref="RenderWindowClosingMessage" /> global message.</remarks>
         /// <param name="interfaces">An <see cref="IInterfaces" /> implementation.</param>
         /// <param name="gameExecutionStateManager">An <see cref="IGameExecutionStateManager" /> implementation.</param>
-        /// <param name="entityManager">An <see cref="IEntityManager{TGameState,TRenderState}" /> implementation.</param>
+        /// <param name="entityManager">An <see cref="IEntityManager{TGameState}" /> implementation.</param>
         /// <param name="sceneManager">An <see cref="ISceneManager" /> implementation.</param>
         /// <param name="programOptions">Parsed command line arguments.</param>
         protected Game(
             IInterfaces interfaces,
             IGameExecutionStateManager gameExecutionStateManager,
-            IEntityManager<TGameState, TRenderState> entityManager,
+            IEntityManager<TGameState> entityManager,
             ISceneManager sceneManager,
             ProgramOptions programOptions)
             : this(interfaces, gameExecutionStateManager, entityManager, sceneManager, programOptions, NestedContext.None())
@@ -100,9 +99,9 @@ namespace BouncyBox.VorpalEngine.Engine.Game
         /// <exception cref="Exception">Thrown when an engine thread threw an unhandled exception.</exception>
         public RunResult Run(TSceneKey initialSceneKey)
         {
-            var updateWorker = new UpdateWorker<TGameState, TRenderState>(Interfaces, _entityManager, _sceneManager);
-            var renderWorker = new RenderWorker<TGameState, TRenderState>(Interfaces, _entityManager);
-            var rendererResourcesWorker = new RendererResourcesWorker<TGameState, TRenderState>(Interfaces, _entityManager);
+            var updateWorker = new UpdateWorker<TGameState>(Interfaces, _entityManager, _sceneManager);
+            var renderWorker = new RenderWorker<TGameState>(Interfaces, _entityManager);
+            var renderResourcesWorker = new RenderResourcesWorker<TGameState>(Interfaces, _entityManager);
             // The main thread increments the count by 1
             var countdownEvent = new CountdownEvent(1);
 
@@ -117,7 +116,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
             _serilogLogger.LogDebug("Starting threads");
 
             Interfaces.ThreadManager.StartEngineThread(updateWorker, EngineThread.Update, countdownEvent, _exitManualResetEvent);
-            Interfaces.ThreadManager.StartEngineThread(rendererResourcesWorker, EngineThread.RendererResources, countdownEvent, _exitManualResetEvent);
+            Interfaces.ThreadManager.StartEngineThread(renderResourcesWorker, EngineThread.RenderResources, countdownEvent, _exitManualResetEvent);
             Interfaces.ThreadManager.StartEngineThread(renderWorker, EngineThread.Render, countdownEvent, _exitManualResetEvent);
 
             // Show the render window
@@ -149,7 +148,6 @@ namespace BouncyBox.VorpalEngine.Engine.Game
 
                 _renderForm.HandleDispatchedMessages();
                 _gameExecutionStateManager.HandleDispatchedMessages();
-                _entityManager.HandleDispatchedMessages();
             } while (!_exitManualResetEvent.IsSet);
 
             // The user tried to close the render window or an unhandled exception occurred on an engine thread

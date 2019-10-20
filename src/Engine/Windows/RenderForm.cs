@@ -118,7 +118,10 @@ namespace BouncyBox.VorpalEngine.Engine.Windows
         }
 
         /// <summary>Instructs the global message publisher/subscriber to handle messages to which this object subscribed.</summary>
-        /// <exception cref="InvalidOperationException">Thrown when the thread executing this method is not the main thread.</exception>
+        /// <exception cref="InvalidOperationException">
+        ///     Thrown when the thread executing this method is not the
+        ///     <see cref="ProcessThread.Main" /> thread.
+        /// </exception>
         public void HandleDispatchedMessages()
         {
             _interfaces.ThreadManager.VerifyProcessThread(ProcessThread.Main);

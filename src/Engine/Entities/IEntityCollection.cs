@@ -1,14 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace BouncyBox.VorpalEngine.Engine.Entities
 {
     /// <summary>Represents a collection of entities.</summary>
-    public interface IEntityCollection<TEntity> : IReadOnlyCollection<TEntity>, IDisposable
+    public interface IEntityCollection<TEntity> : IReadOnlyCollection<TEntity>
         where TEntity : IEntity
     {
-        /// <summary>Gets a read-only collection of the entities in the collection, sorted by <see cref="IEntity.Order" />.</summary>
-        IReadOnlyCollection<TEntity> SortedByOrder { get; }
+        /// <summary>
+        ///     Gets a read-only collection of the entities in the collection ordered by <see cref="IEntity.UpdateOrder" /> in ascending
+        ///     order.
+        /// </summary>
+        IReadOnlyCollection<TEntity> OrderedByUpdateOrder { get; }
+
+        /// <summary>
+        ///     Gets a read-only collection of the entities in the collection ordered by <see cref="IEntity.RenderOrder" /> in ascending
+        ///     order.
+        /// </summary>
+        IReadOnlyCollection<TEntity> OrderedByRenderOrder { get; }
 
         /// <summary>Adds entities to the collection.</summary>
         /// <param name="entities">The entities to add.</param>

@@ -9,14 +9,13 @@ using EnumsNET;
 namespace BouncyBox.VorpalEngine.Engine.Scenes
 {
     /// <summary>Manages a collection of scenes.</summary>
-    public class SceneManager<TGameState, TRenderState, TSceneKey> : ISceneManager
+    public class SceneManager<TGameState, TSceneKey> : ISceneManager
         where TGameState : class
-        where TRenderState : class, new()
         where TSceneKey : struct, Enum
     {
         private readonly ConcurrentMessagePublisherSubscriber<IGlobalMessage> _globalMessagePublisherSubscriber;
         private readonly IInterfaces _interfaces;
-        private readonly ISceneFactory<TGameState, TRenderState, TSceneKey> _sceneFactory;
+        private readonly ISceneFactory<TSceneKey> _sceneFactory;
 
         private readonly Dictionary<TSceneKey, IScene<TSceneKey>> _scenesBySceneKey =
             new Dictionary<TSceneKey, IScene<TSceneKey>>();
@@ -24,17 +23,17 @@ namespace BouncyBox.VorpalEngine.Engine.Scenes
         private readonly ContextSerilogLogger _serilogLogger;
         private bool _isDisposed;
 
-        /// <summary>Initializes a new instance of the <see cref="SceneManager{TGameState,TRenderState,TSceneKey}" /> type.</summary>
+        /// <summary>Initializes a new instance of the <see cref="SceneManager{TGameState,TSceneKey}" /> type.</summary>
         /// <remarks>
         ///     <para>Subscribes to the <see cref="LoadSceneMessage{TSceneKey}" /> global message.</para>
         ///     <para>Subscribes to the <see cref="UnloadSceneMessage{TSceneKey}" /> global message.</para>
         /// </remarks>
         /// <param name="interfaces">An <see cref="IInterfaces" /> implementation.</param>
-        /// <param name="sceneFactory">An <see cref="ISceneFactory{TGameState,TRenderState,TSceneKey}" /> implementation.</param>
+        /// <param name="sceneFactory">An <see cref="ISceneFactory{TSceneKey}" /> implementation.</param>
         /// <param name="context">A nested context.</param>
-        public SceneManager(IInterfaces interfaces, ISceneFactory<TGameState, TRenderState, TSceneKey> sceneFactory, NestedContext context)
+        public SceneManager(IInterfaces interfaces, ISceneFactory<TSceneKey> sceneFactory, NestedContext context)
         {
-            context = context.CopyAndPush(nameof(SceneManager<TGameState, TRenderState, TSceneKey>));
+            context = context.CopyAndPush(nameof(SceneManager<TGameState, TSceneKey>));
 
             _interfaces = interfaces;
             _sceneFactory = sceneFactory;
@@ -46,20 +45,23 @@ namespace BouncyBox.VorpalEngine.Engine.Scenes
                     .Subscribe<UnloadSceneMessage<TSceneKey>>(HandleUnloadSceneMessage);
         }
 
-        /// <summary>Initializes a new instance of the <see cref="SceneManager{TGameState,TRenderState,TSceneKey}" /> type.</summary>
+        /// <summary>Initializes a new instance of the <see cref="SceneManager{TGameState,TSceneKey}" /> type.</summary>
         /// <remarks>
         ///     <para>Subscribes to the <see cref="LoadSceneMessage{TSceneKey}" /> global message.</para>
         ///     <para>Subscribes to the <see cref="UnloadSceneMessage{TSceneKey}" /> global message.</para>
         /// </remarks>
         /// <param name="interfaces">An <see cref="IInterfaces" /> implementation.</param>
-        /// <param name="sceneFactory">An <see cref="ISceneFactory{TGameState,TRenderState,TSceneKey}" /> implementation.</param>
-        public SceneManager(IInterfaces interfaces, ISceneFactory<TGameState, TRenderState, TSceneKey> sceneFactory)
+        /// <param name="sceneFactory">An <see cref="ISceneFactory{TSceneKey}" /> implementation.</param>
+        public SceneManager(IInterfaces interfaces, ISceneFactory<TSceneKey> sceneFactory)
             : this(interfaces, sceneFactory, NestedContext.None())
         {
         }
 
         /// <inheritdoc />
-        /// <exception cref="InvalidOperationException">Thrown when the thread executing this method is not the main thread.</exception>
+        /// <exception cref="InvalidOperationException">
+        ///     Thrown when the thread executing this method is not the
+        ///     <see cref="ProcessThread.Main" /> thread.
+        /// </exception>
         public void HandleDispatchedMessages()
         {
             _interfaces.ThreadManager.VerifyProcessThread(ProcessThread.Update);
@@ -68,7 +70,10 @@ namespace BouncyBox.VorpalEngine.Engine.Scenes
         }
 
         /// <inheritdoc />
-        /// <exception cref="InvalidOperationException">Thrown when the thread executing this method is not the main thread.</exception>
+        /// <exception cref="InvalidOperationException">
+        ///     Thrown when the thread executing this method is not the
+        ///     <see cref="ProcessThread.Main" /> thread.
+        /// </exception>
         public void Dispose()
         {
             DisposeHelper.Dispose(() => { _globalMessagePublisherSubscriber?.Dispose(); }, ref _isDisposed, _interfaces.ThreadManager, ProcessThread.Main);

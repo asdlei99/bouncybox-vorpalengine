@@ -1,14 +1,12 @@
 ﻿using BouncyBox.VorpalEngine.Engine;
 using BouncyBox.VorpalEngine.Engine.Entities;
 using BouncyBox.VorpalEngine.Engine.Scenes;
-using BouncyBox.VorpalEngine.SampleGame.States.Game;
-using BouncyBox.VorpalEngine.SampleGame.States.Render;
 
 namespace BouncyBox.VorpalEngine.SampleGame.Scenes
 {
-    public abstract class Scene : Scene<GameState, RenderState, SceneKey>
+    public abstract class Scene : Scene<GameState, SceneKey>
     {
-        protected Scene(IInterfaces interfaces, IEntityManager<GameState, RenderState> entityManager, SceneKey key) : base(interfaces, entityManager, key)
+        protected Scene(IInterfaces interfaces, IEntityManager<GameState> entityManager, SceneKey key) : base(interfaces, entityManager, key)
         {
         }
     }

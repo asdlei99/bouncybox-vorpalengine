@@ -46,13 +46,12 @@ namespace BouncyBox.VorpalEngine.Engine.Bootstrap
         /// <param name="args">Raw command line arguments.</param>
         /// <param name="componentRegistrationDelegate">A delegate that will be called when the IoC container registers components.</param>
         /// <returns>Returns an executable exit code.</returns>
-        public static int CreateAndRun<TGame, TGameState, TRenderState, TSceneKey>(
+        public static int CreateAndRun<TGame, TGameState, TSceneKey>(
             TSceneKey initialSceneKey,
             IEnumerable<string>? args = null,
             Action<ContainerBuilder>? componentRegistrationDelegate = null)
-            where TGame : Game<TGameState, TRenderState, TSceneKey>
+            where TGame : Game<TGameState, TSceneKey>
             where TGameState : class, new()
-            where TRenderState : class, new()
             where TSceneKey : struct, Enum
         {
             // Parse command line arguments
@@ -79,7 +78,7 @@ namespace BouncyBox.VorpalEngine.Engine.Bootstrap
 
             containerBuilder.RegisterInstance(serilogLogger).As<ISerilogLogger>().SingleInstance();
             containerBuilder.RegisterType<TGame>().AsSelf().SingleInstance();
-            containerBuilder.RegisterType<EntityManager<TGameState, TRenderState>>().As<IEntityManager<TGameState, TRenderState>>().SingleInstance();
+            containerBuilder.RegisterType<EntityManager<TGameState>>().As<IEntityManager<TGameState>>().SingleInstance();
             containerBuilder.Register(a => new GameExecutionStateManager(a.Resolve<IInterfaces>())).As<IGameExecutionStateManager>().SingleInstance();
             containerBuilder
                 .Register(
@@ -94,7 +93,7 @@ namespace BouncyBox.VorpalEngine.Engine.Bootstrap
                 .As<IInterfaces>()
                 .SingleInstance();
             containerBuilder.RegisterType<Keyboard>().As<IKeyboard>().SingleInstance();
-            containerBuilder.RegisterType<SceneManager<TGameState, TRenderState, TSceneKey>>().As<ISceneManager>().SingleInstance();
+            containerBuilder.RegisterType<SceneManager<TGameState, TSceneKey>>().As<ISceneManager>().SingleInstance();
             containerBuilder.RegisterType<StatefulGamepad>().As<IStatefulGamepad>().SingleInstance();
             containerBuilder.Register(a => new ThreadManager(a.Resolve<ISerilogLogger>(), mainThread)).As<IThreadManager>().SingleInstance();
             containerBuilder.RegisterInstance(programOptions).AsSelf().SingleInstance();

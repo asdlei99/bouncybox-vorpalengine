@@ -22,7 +22,10 @@ namespace BouncyBox.VorpalEngine.Engine.Threads
         /// <param name="serilogLogger">An <see cref="ISerilogLogger" /> implementation.</param>
         /// <param name="mainThread">The main thread.</param>
         /// <param name="context">A nested context.</param>
-        /// <exception cref="InvalidOperationException">Thrown when the thread executing this method is not the main thread.</exception>
+        /// <exception cref="InvalidOperationException">
+        ///     Thrown when the thread executing this method is not the
+        ///     <see cref="ProcessThread.Main" /> thread.
+        /// </exception>
         public ThreadManager(ISerilogLogger serilogLogger, Thread mainThread, NestedContext context)
         {
             context = context.CopyAndPush(nameof(ThreadManager));
@@ -39,7 +42,10 @@ namespace BouncyBox.VorpalEngine.Engine.Threads
         /// <summary>Initializes a new instance of the <see cref="ThreadManager" /> type.</summary>
         /// <param name="serilogLogger">An <see cref="ISerilogLogger" /> implementation.</param>
         /// <param name="mainThread">The main thread.</param>
-        /// <exception cref="InvalidOperationException">Thrown when the thread executing this method is not the main thread.</exception>
+        /// <exception cref="InvalidOperationException">
+        ///     Thrown when the thread executing this method is not the
+        ///     <see cref="ProcessThread.Main" /> thread.
+        /// </exception>
         public ThreadManager(ISerilogLogger serilogLogger, Thread mainThread) : this(serilogLogger, mainThread, NestedContext.None())
         {
         }
@@ -64,7 +70,10 @@ namespace BouncyBox.VorpalEngine.Engine.Threads
         }
 
         /// <inheritdoc />
-        /// <exception cref="InvalidOperationException">Thrown when the thread executing this method is not the main thread.</exception>
+        /// <exception cref="InvalidOperationException">
+        ///     Thrown when the thread executing this method is not the
+        ///     <see cref="ProcessThread.Main" /> thread.
+        /// </exception>
         /// <exception cref="InvalidOperationException">Thrown when the specified thread is already started.</exception>
         public void StartEngineThread(
             IEngineThreadWorker threadWorker,
@@ -94,7 +103,10 @@ namespace BouncyBox.VorpalEngine.Engine.Threads
         }
 
         /// <inheritdoc />
-        /// <exception cref="InvalidOperationException">Thrown when the thread executing this method is not the main thread.</exception>
+        /// <exception cref="InvalidOperationException">
+        ///     Thrown when the thread executing this method is not the
+        ///     <see cref="ProcessThread.Main" /> thread.
+        /// </exception>
         public IReadOnlyCollection<(EngineThread thread, Exception exception)> RequestEngineThreadTerminationAndWaitForTermination(
             CountdownEvent terminationCountdownEvent)
         {

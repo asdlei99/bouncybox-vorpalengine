@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using BouncyBox.VorpalEngine.Engine.Threads;
 
 namespace BouncyBox.VorpalEngine.Engine.Messaging
 {
@@ -22,7 +23,10 @@ namespace BouncyBox.VorpalEngine.Engine.Messaging
         }
 
         /// <inheritdoc />
-        /// <exception cref="InvalidOperationException">Thrown when the thread executing this method is not the render thread.</exception>
+        /// <exception cref="InvalidOperationException">
+        ///     Thrown when the thread executing this method is not the
+        ///     <see cref="ProcessThread.Render" /> thread.
+        /// </exception>
         public void Dispose()
         {
             DisposeHelper.Dispose(

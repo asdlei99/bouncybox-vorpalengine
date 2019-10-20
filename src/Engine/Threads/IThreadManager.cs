@@ -8,7 +8,7 @@ namespace BouncyBox.VorpalEngine.Engine.Threads
     public interface IThreadManager : IDisposable
     {
         /// <summary>Verifies that the currently-executing thread is the specified thread.</summary>
-        /// <param name="thread">The process thread to verify.</param>
+        /// <param name="thread">The currently-executing thread must be the specified thread.</param>
         void VerifyProcessThread(ProcessThread thread);
 
         /// <summary>Starts an engine thread.</summary>

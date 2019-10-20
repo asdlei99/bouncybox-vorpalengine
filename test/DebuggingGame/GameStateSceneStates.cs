@@ -1,6 +1,6 @@
 ﻿using BouncyBox.VorpalEngine.DebuggingGame.Scenes.Root;
 
-namespace BouncyBox.VorpalEngine.DebuggingGame.States.Game
+namespace BouncyBox.VorpalEngine.DebuggingGame
 {
     public class GameStateSceneStates
     {
