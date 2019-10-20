@@ -29,6 +29,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         private readonly IGameExecutionStateManager _gameExecutionStateManager;
         private readonly IInterfaces _interfaces;
         private readonly ManualResetEventSlim _renderCompleteManualResetEvent = new ManualResetEventSlim(true);
+        private readonly SortedSet<RenderRequest> _renderRequests = new SortedSet<RenderRequest>(new RenderRequestComparer());
         private readonly ManualResetEventSlim _renderResourcesChangingManualResetEvent = new ManualResetEventSlim(true);
         private readonly ConcurrentMessagePublisherSubscriber<IGlobalMessage> _renderResourcesGlobalMessagePublisherSubscriber;
         private readonly object _renderResourcesLockObject = new object();
@@ -53,7 +54,6 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         private bool _shouldSuspend;
         private bool _shouldUnpause;
         private IntPtr _windowHandle = IntPtr.Zero;
-        private readonly List<IEntity> _entitiesToRender = new List<IEntity>();
 
         /// <summary>Initializes a new instance of the <see cref="EntityManager{TGameState}" /> type.</summary>
         /// <remarks>
@@ -182,17 +182,18 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
                     _shouldResume = false;
                 }
 
-                if (entity.UpdateGameState(cancellationToken) == UpdateGameStateResult.Render)
+                RenderRequest? renderRequest = entity.UpdateGameState(cancellationToken);
+
+                if (renderRequest != null)
                 {
                     // The entity is requesting a render
-                    _entitiesToRender.Add(entity);
+                    _renderRequests.Add(renderRequest.Value);
                 }
             }
 
-            Interlocked.Exchange(ref _renderDelegates, _entitiesToRender.Select(a => a.GetRenderDelegate()).Where(a => a != null).Select(a => a!).ToImmutableArray());
+            Interlocked.Exchange(ref _renderDelegates, _renderRequests.Select(a => a.RenderDelegate).ToImmutableArray());
 
-            // Clear the list of entities requesting renders
-            _entitiesToRender.Clear();
+            _renderRequests.Clear();
         }
 
         /// <inheritdoc />
@@ -765,6 +766,16 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
             _refreshPeriod = refreshPeriod;
 
             _updateGlobalMessagePublisherSubscriber.Publish(new RefreshPeriodChangedMessage(refreshPeriod, hz));
+        }
+
+        /// <summary>A comparer that orders render requests by <see cref="RenderRequest.RenderOrder" />.</summary>
+        private class RenderRequestComparer : IComparer<RenderRequest>
+        {
+            /// <inheritdoc />
+            public int Compare(RenderRequest x, RenderRequest y)
+            {
+                return Comparer<uint?>.Default.Compare(x.RenderOrder, y.RenderOrder);
+            }
         }
     }
 }

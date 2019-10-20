@@ -45,15 +45,8 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
 
         /// <summary>Updates the game state.</summary>
         /// <param name="cancellationToken">A cancellation token.</param>
-        /// <returns>The result of the entity updating the game state.</returns>
-        UpdateGameStateResult UpdateGameState(CancellationToken cancellationToken = default);
-
-        /// <summary>
-        ///     Gets a delegate that will be invoked later to render the entity. Except for render resources, the delegate must not
-        ///     capture any objects in a non-thread-safe fashion.
-        /// </summary>
-        /// <returns>Returns a delegate that will be invoked later to render the entity.</returns>
-        Action<DirectXResources, CancellationToken>? GetRenderDelegate();
+        /// <returns>A render request if the entity is requesting a render.</returns>
+        RenderRequest? UpdateGameState(CancellationToken cancellationToken = default);
 
         /// <summary>Initializes render resources.</summary>
         /// <param name="resources">DirectX resources.</param>

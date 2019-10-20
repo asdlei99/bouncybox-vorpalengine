@@ -18,7 +18,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         private readonly object _renderResourcesLockObject = new object();
         private DirectXResources? _directXResources;
         private bool _isDisposed;
-        private bool _isInitialized;
+        private bool _renderResourcesInitialized;
 
         /// <summary>Initializes a new instance of the <see cref="Entity" /></summary>
         /// <param name="interfaces">An <see cref="IInterfaces" /> implementation.</param>
@@ -232,26 +232,29 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         ///     Thrown when the thread executing this method is not the
         ///     <see cref="ProcessThread.Update" /> thread.
         /// </exception>
-        public UpdateGameStateResult UpdateGameState(CancellationToken cancellationToken)
+        public RenderRequest? UpdateGameState(CancellationToken cancellationToken)
         {
             _interfaces.ThreadManager.VerifyProcessThread(ProcessThread.Update);
 
             // Handle dispatched messages
             GlobalMessagePublisherSubscriber.HandleDispatched();
 
-            return ShouldUpdateGameState() ? OnUpdateGameState(cancellationToken) : UpdateGameStateResult.DoNotRender;
-        }
+            if (!ShouldUpdateGameState())
+            {
+                return null;
+            }
 
-        /// <inheritdoc />
-        /// <exception cref="InvalidOperationException">
-        ///     Thrown when the thread executing this method is not the
-        ///     <see cref="ProcessThread.Update" /> thread.
-        /// </exception>
-        public Action<DirectXResources, CancellationToken>? GetRenderDelegate()
-        {
-            _interfaces.ThreadManager.VerifyProcessThread(ProcessThread.Update);
+            RenderRequest? renderRequest = OnUpdateGameState(cancellationToken);
 
-            return ShouldGetRenderDelegate() ? OnGetRenderDelegate() : null;
+            if (renderRequest == null)
+            {
+                return null;
+            }
+
+            lock (_renderResourcesLockObject)
+            {
+                return _renderResourcesInitialized ? renderRequest : null;
+            }
         }
 
         /// <inheritdoc />
@@ -266,7 +269,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
             lock (_renderResourcesLockObject)
             {
                 _directXResources = resources;
-                _isInitialized = true;
+                _renderResourcesInitialized = true;
             }
 
             OnInitializeRenderResources(resources);
@@ -303,7 +306,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
             lock (_renderResourcesLockObject)
             {
                 _directXResources = null;
-                _isInitialized = false;
+                _renderResourcesInitialized = false;
             }
 
             OnReleaseRenderResources();
@@ -325,6 +328,13 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
                     UpdateMessagePublisherSubscriber.Dispose();
                 },
                 ref _isDisposed);
+        }
+
+        /// <summary>Creates a render request. <see cref="RenderRequest.RenderOrder" /> is set to <see cref="IEntity.RenderOrder" />.</summary>
+        /// <returns>A render request.</returns>
+        protected RenderRequest CreateRenderRequest(Action<DirectXResources, CancellationToken> renderDelegate)
+        {
+            return new RenderRequest(RenderOrder, renderDelegate);
         }
 
         /// <inheritdoc cref="Pause" />
@@ -363,13 +373,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         }
 
         /// <inheritdoc cref="UpdateGameState" />
-        protected virtual UpdateGameStateResult OnUpdateGameState(CancellationToken cancellationToken)
-        {
-            return UpdateGameStateResult.DoNotRender;
-        }
-
-        /// <inheritdoc cref="GetRenderDelegate" />
-        protected virtual Action<DirectXResources, CancellationToken>? OnGetRenderDelegate()
+        protected virtual RenderRequest? OnUpdateGameState(CancellationToken cancellationToken)
         {
             return null;
         }
@@ -394,20 +398,6 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         private bool ShouldUpdateGameState()
         {
             return (!IsPaused || UpdateWhenPaused) && (!IsSuspended || UpdateWhenSuspended);
-        }
-
-        /// <summary>Determines if the entity should get a render delegate.</summary>
-        /// <returns>Returns a value indicating whether the entity should get a render delegate.</returns>
-        private bool ShouldGetRenderDelegate()
-        {
-            bool isInitialized;
-
-            lock (_renderResourcesLockObject)
-            {
-                isInitialized = _isInitialized;
-            }
-
-            return isInitialized && (!IsPaused || RenderWhenPaused) && (!IsSuspended || RenderWhenSuspended);
         }
     }
 }

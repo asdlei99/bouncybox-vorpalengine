@@ -56,7 +56,7 @@ namespace BouncyBox.VorpalEngine.DebuggingGame.Scenes.Root
         protected override bool UpdateWhenSuspended { get; } = true;
         protected override bool RenderWhenSuspended { get; } = true;
 
-        protected override UpdateGameStateResult OnUpdateGameState(CancellationToken cancellationToken)
+        protected override RenderRequest? OnUpdateGameState(CancellationToken cancellationToken)
         {
             RootSceneGameState sceneGameState = _gameStateManager.GameState.SceneStates.Root!;
 
@@ -166,12 +166,8 @@ namespace BouncyBox.VorpalEngine.DebuggingGame.Scenes.Root
                 cancellationToken.WaitHandle.WaitOne(sceneGameState.UpdateDelay);
             }
 
-            return UpdateGameStateResult.Render;
-        }
+            // Render delegate
 
-        protected override Action<DirectXResources, CancellationToken> OnGetRenderDelegate()
-        {
-            RootSceneGameState sceneGameState = _gameStateManager.GameState.SceneStates.Root!;
             ulong counter = sceneGameState.Counter;
             double? updatesPerSecond = _latestEngineUpdateStatsMessage?.UpdatesPerSecond;
             double? framesPerSecond = _latestEngineRenderStatsMessage?.FramesPerSecond;
@@ -198,8 +194,8 @@ namespace BouncyBox.VorpalEngine.DebuggingGame.Scenes.Root
             string gamePadLeftThumbPress = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.LeftThumbPress) ? "LTh " : "    ";
             string gamePadRightThumbPress = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.RightThumbPress) ? "RTh" : "";
 
-            return
-                (resources, cancellationToken) =>
+            return CreateRenderRequest(
+                (resources, token) =>
                 {
                     DXGI_ADAPTER_DESC dxgiAdapterDesc = resources.DXGIAdapter.GetDesc();
                     string adapter;
@@ -263,7 +259,7 @@ namespace BouncyBox.VorpalEngine.DebuggingGame.Scenes.Root
                     {
                         cancellationToken.WaitHandle.WaitOne((int)renderDelayInMilliseconds);
                     }
-                };
+                });
         }
 
         protected override unsafe void OnInitializeRenderResources(DirectXResources resources)

@@ -26,25 +26,20 @@ namespace BouncyBox.VorpalEngine.SampleGame.Scenes.Loading
         {
         }
 
-        protected override UpdateGameStateResult OnUpdateGameState(CancellationToken cancellationToken)
+        protected override RenderRequest? OnUpdateGameState(CancellationToken cancellationToken)
         {
             _opacityStopwatch.Start();
 
-            return UpdateGameStateResult.Render;
-        }
-
-        protected override Action<DirectXResources, CancellationToken> OnGetRenderDelegate()
-        {
             float triangleOpacity = _loadingIndicatorTriangleWave.Value;
 
-            return
-                (resources, cancellationToken) =>
+            return CreateRenderRequest(
+                (resources, token) =>
                 {
                     D2D_RECT_F loading1Rect = resources.ClientRect.ToD2DRectF();
 
                     _brush!.Opacity = triangleOpacity;
                     resources.D2D1DeviceContext.DrawText("Loading", _textFormat!, loading1Rect, _brush);
-                };
+                });
         }
 
         protected override unsafe void OnInitializeRenderResources(DirectXResources resources)
