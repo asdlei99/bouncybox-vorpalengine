@@ -16,13 +16,16 @@ This engine is really just a hobby project at this time. I don't have any grand 
 
 Bouncy Box is my not-yet-registered LLC. You'll see this name references in various namespaces and other artifacts. For now it's synonymous with my person. This name is subject to change.
 
-## Technology requirements and recommendations
+## Engine requirements and recommendations
 
-- Windows 10 (preferably 1903)
+- Platform Update for Windows 7 or newer
 - A GPU that supports DirectX 11
 - A gamepad that supports XInput or can be mapped with a mapping application like [DS4Windows](https://ryochan7.github.io/ds4windows-site/)
+
+## Software development requirements and recommendations
+
 - [Visual Studio 2019](https://visualstudio.microsoft.com/vs/)
-- [ReSharper](https://www.jetbrains.com/resharper/) (optional)
+- [ReSharper](https://www.jetbrains.com/resharper/)
 
 ## Platform interop
 
