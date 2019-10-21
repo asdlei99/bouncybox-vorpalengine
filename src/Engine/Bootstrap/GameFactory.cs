@@ -10,6 +10,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using Autofac;
 using BouncyBox.Common.NetStandard21.Logging;
+using BouncyBox.VorpalEngine.Engine.DirectX.ComObjects;
 using BouncyBox.VorpalEngine.Engine.Entities;
 using BouncyBox.VorpalEngine.Engine.Game;
 using BouncyBox.VorpalEngine.Engine.Input.Keyboard;
@@ -21,6 +22,7 @@ using BouncyBox.VorpalEngine.Engine.Threads;
 using BouncyBox.VorpalEngine.Engine.Windows;
 using CommandLine;
 using Serilog;
+using TerraFX.Interop;
 
 namespace BouncyBox.VorpalEngine.Engine.Bootstrap
 {
@@ -64,6 +66,11 @@ namespace BouncyBox.VorpalEngine.Engine.Bootstrap
             if (Environment.OSVersion.Version < WindowsVersion.MinimumVersion)
             {
                 throw new PlatformNotSupportedException("Only Platform Update for Microsoft Windows 7 or newer is supported.");
+            }
+
+            if (Environment.OSVersion.Version >= WindowsVersion.Windows10Version1803)
+            {
+                ComObject.CheckResultHandle(DXGI.DXGIDeclareAdapterRemovalSupport(), "Failed to declare DXGI adapter removal support.");
             }
 
             // Parse command line arguments
