@@ -26,7 +26,7 @@ namespace BouncyBox.VorpalEngine.SampleGame.Scenes.Loading
         {
         }
 
-        protected override void OnUpdateGameState(CancellationToken cancellationToken)
+        protected override void OnUpdateGameState(in CancellationToken cancellationToken)
         {
             _opacityStopwatch.Start();
         }
@@ -40,7 +40,7 @@ namespace BouncyBox.VorpalEngine.SampleGame.Scenes.Loading
                 };
         }
 
-        protected override unsafe void OnInitializeRenderResources(DirectXResources resources)
+        protected override unsafe void OnInitializeRenderResources(in DirectXResources resources)
         {
             DXGI_RGBA brushColor = DXGIFactory.CreateRgba(1, 1, 1, 1);
 
@@ -54,7 +54,10 @@ namespace BouncyBox.VorpalEngine.SampleGame.Scenes.Loading
             _textFormat?.Dispose();
         }
 
-        protected override EntityRenderResult OnRender(DirectXResources resources, LoadingEntityRenderState renderState, CancellationToken cancellationToken)
+        protected override EntityRenderResult OnRender(
+            in DirectXResources resources,
+            in LoadingEntityRenderState renderState,
+            in CancellationToken cancellationToken)
         {
             D2D_RECT_F loading1Rect = resources.ClientRect.ToD2DRectF();
 

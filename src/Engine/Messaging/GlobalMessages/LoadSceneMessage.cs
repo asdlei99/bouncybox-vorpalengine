@@ -3,7 +3,7 @@
 namespace BouncyBox.VorpalEngine.Engine.Messaging.GlobalMessages
 {
     /// <summary>A global message requesting a scene be loaded.</summary>
-    public struct LoadSceneMessage<TSceneKey> : IGlobalMessage
+    public readonly struct LoadSceneMessage<TSceneKey> : IGlobalMessage
         where TSceneKey : struct, Enum
     {
         /// <summary>Initializes a new instance of the <see cref="LoadSceneMessage{TSceneKey}" /> type.</summary>

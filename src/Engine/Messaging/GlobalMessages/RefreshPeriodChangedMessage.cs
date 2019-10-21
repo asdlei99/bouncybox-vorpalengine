@@ -3,7 +3,7 @@
 namespace BouncyBox.VorpalEngine.Engine.Messaging.GlobalMessages
 {
     /// <summary>A global message indicating that the refresh period changed.</summary>
-    public struct RefreshPeriodChangedMessage : IGlobalMessage
+    public readonly struct RefreshPeriodChangedMessage : IGlobalMessage
     {
         /// <summary>Initializes a new instance of the <see cref="RefreshPeriodChangedMessage" /> type.</summary>
         /// <param name="refreshPeriod">The new refresh period.</param>

@@ -15,18 +15,20 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
 
         /// <summary>Initializes render resources.</summary>
         /// <param name="resources">DirectX resources.</param>
-        void InitializeRenderResources(DirectXResources resources);
+        void InitializeRenderResources(in DirectXResources resources);
 
         /// <summary>Resizes render resources to account for the new render window client size.</summary>
+        /// <param name="resources">DirectX resources.</param>
         /// <param name="clientSize">The size of the render window's client area.</param>
-        void ResizeRenderResources(D2D_SIZE_U clientSize);
+        void ResizeRenderResources(in DirectXResources resources, in D2D_SIZE_U clientSize);
 
         /// <summary>Releases render resources created by this entity.</summary>
         void ReleaseRenderResources();
 
         /// <summary>Renders the entity.</summary>
+        /// <param name="resources">DirectX resources.</param>
         /// <param name="cancellationToken">A cancellation token.</param>
         /// <returns>Returns the result of the render attempt.</returns>
-        EntityRenderResult Render(CancellationToken cancellationToken);
+        EntityRenderResult Render(in DirectXResources resources, in CancellationToken cancellationToken);
     }
 }

@@ -101,6 +101,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
         {
             var updateWorker = new UpdateWorker<TGameState>(Interfaces, _entityManager, _sceneManager);
             var renderWorker = new RenderWorker<TGameState>(Interfaces, _entityManager);
+            var updateResourcesWorker = new UpdateResourcesWorker(Interfaces);
             var renderResourcesWorker = new RenderResourcesWorker<TGameState>(Interfaces, _entityManager);
             // The main thread increments the count by 1
             var countdownEvent = new CountdownEvent(1);
@@ -115,6 +116,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
 
             _serilogLogger.LogDebug("Starting threads");
 
+            Interfaces.ThreadManager.StartEngineThread(updateResourcesWorker, EngineThread.UpdateResources, countdownEvent, _exitManualResetEvent);
             Interfaces.ThreadManager.StartEngineThread(updateWorker, EngineThread.Update, countdownEvent, _exitManualResetEvent);
             Interfaces.ThreadManager.StartEngineThread(renderResourcesWorker, EngineThread.RenderResources, countdownEvent, _exitManualResetEvent);
             Interfaces.ThreadManager.StartEngineThread(renderWorker, EngineThread.Render, countdownEvent, _exitManualResetEvent);

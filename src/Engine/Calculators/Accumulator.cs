@@ -27,22 +27,15 @@ namespace BouncyBox.VorpalEngine.Engine.Calculators
         /// <summary>Gets the accumulated values.</summary>
         protected Span<T> Values => new Span<T>(_values, 0, Count);
 
-        /// <summary>Accumulates a value.</summary>
-        /// <param name="value">A value.</param>
-        public void Accumulate(T value)
-        {
-            _currentIndex = _currentIndex + 1 == Capacity ? 0 : _currentIndex + 1;
-            _values[_currentIndex] = value;
-            Count = System.Math.Min(Count + 1, _values.Length);
-        }
-
         /// <summary>Accumulates values.</summary>
         /// <param name="values">Values.</param>
         public void Accumulate(IEnumerable<T> values)
         {
             foreach (T value in values)
             {
-                Accumulate(value);
+                _currentIndex = _currentIndex + 1 == Capacity ? 0 : _currentIndex + 1;
+                _values[_currentIndex] = value;
+                Count = System.Math.Min(Count + 1, _values.Length);
             }
         }
 

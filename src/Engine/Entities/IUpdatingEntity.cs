@@ -24,6 +24,6 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
 
         /// <summary>Updates the game state.</summary>
         /// <param name="cancellationToken">A cancellation token.</param>
-        void UpdateGameState(CancellationToken cancellationToken);
+        void UpdateGameState(in CancellationToken cancellationToken);
     }
 }

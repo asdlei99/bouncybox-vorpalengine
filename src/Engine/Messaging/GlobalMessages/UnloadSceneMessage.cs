@@ -3,7 +3,7 @@
 namespace BouncyBox.VorpalEngine.Engine.Messaging.GlobalMessages
 {
     /// <summary>A global message requesting a scene be unloaded.</summary>
-    public struct UnloadSceneMessage<TSceneKey> : IGlobalMessage
+    public readonly struct UnloadSceneMessage<TSceneKey> : IGlobalMessage
         where TSceneKey : struct, Enum
     {
         /// <summary>Initializes a new instance of the <see cref="UnloadSceneMessage{TSceneKey}" /> type.</summary>

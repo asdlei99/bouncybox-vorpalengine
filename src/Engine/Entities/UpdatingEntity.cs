@@ -108,7 +108,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         ///     Thrown when the thread executing this method is not the
         ///     <see cref="Threads.ProcessThread.Update" /> thread.
         /// </exception>
-        public void UpdateGameState(CancellationToken cancellationToken)
+        public void UpdateGameState(in CancellationToken cancellationToken)
         {
             Interfaces.ThreadManager.VerifyProcessThread(ProcessThread.Update);
 
@@ -137,7 +137,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         }
 
         /// <inheritdoc cref="UpdateGameState" />
-        protected virtual void OnUpdateGameState(CancellationToken cancellationToken)
+        protected virtual void OnUpdateGameState(in CancellationToken cancellationToken)
         {
         }
 

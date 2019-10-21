@@ -1,7 +1,7 @@
 ﻿namespace BouncyBox.VorpalEngine.Engine.Resources
 {
     /// <summary>Uniquely describes a resource.</summary>
-    public struct ResourceDescriptor
+    public readonly struct ResourceDescriptor
     {
         /// <summary>Gets the type of the resource.</summary>
         public ResourceType Type { get; }

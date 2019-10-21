@@ -26,4 +26,7 @@
     <PackageReference Include="TerraFX.Interop.User32" Version="10.0.18362-alpha-20191016.2" />
     <PackageReference Include="TerraFX.Interop.Windows" Version="10.0.18362-alpha-20191016.2" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
 </Project>

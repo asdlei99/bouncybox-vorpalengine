@@ -3,7 +3,7 @@
 namespace BouncyBox.VorpalEngine.Engine.Input.XInput
 {
     /// <summary>The state of an XInput gamepad.</summary>
-    public struct XInputState
+    public readonly struct XInputState
     {
         /// <summary>Initializes a new instance of the <see cref="XInputState" /> type.</summary>
         /// <param name="xInputState">The <see cref="XInput14.XINPUT_STATE" /> to map.</param>

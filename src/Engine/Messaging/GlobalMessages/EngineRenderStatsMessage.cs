@@ -3,7 +3,7 @@
 namespace BouncyBox.VorpalEngine.Engine.Messaging.GlobalMessages
 {
     /// <summary>A global message that reports engine render statistics.</summary>
-    public struct EngineRenderStatsMessage : IGlobalMessage
+    public readonly struct EngineRenderStatsMessage : IGlobalMessage
     {
         /// <summary>Initializes a new instance of the <see cref="EngineRenderStatsMessage" /> type.</summary>
         /// <param name="framesPerSecond">The number of rendered frames per second.</param>

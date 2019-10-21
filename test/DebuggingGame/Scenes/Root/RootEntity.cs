@@ -56,7 +56,7 @@ namespace BouncyBox.VorpalEngine.DebuggingGame.Scenes.Root
         protected override bool UpdateWhenSuspended { get; } = true;
         protected override bool RenderWhenSuspended { get; } = true;
 
-        protected override void OnUpdateGameState(CancellationToken cancellationToken)
+        protected override void OnUpdateGameState(in CancellationToken cancellationToken)
         {
             RootSceneGameState sceneGameState = _gameStateManager.GameState.SceneStates.Root!;
 
@@ -202,7 +202,7 @@ namespace BouncyBox.VorpalEngine.DebuggingGame.Scenes.Root
                 };
         }
 
-        protected override unsafe void OnInitializeRenderResources(DirectXResources resources)
+        protected override unsafe void OnInitializeRenderResources(in DirectXResources resources)
         {
             DXGI_RGBA brushColor = DXGIFactory.CreateRgba(1, 1, 1, 1);
 
@@ -216,7 +216,10 @@ namespace BouncyBox.VorpalEngine.DebuggingGame.Scenes.Root
             _textFormat?.Dispose();
         }
 
-        protected override EntityRenderResult OnRender(DirectXResources resources, RootEntityRenderState renderState, CancellationToken cancellationToken)
+        protected override EntityRenderResult OnRender(
+            in DirectXResources resources,
+            in RootEntityRenderState renderState,
+            in CancellationToken cancellationToken)
         {
             DXGI_ADAPTER_DESC dxgiAdapterDesc = resources.DXGIAdapter.GetDesc();
             string adapter;

@@ -47,9 +47,8 @@ namespace BouncyBox.VorpalEngine.Engine.Game
         }
 
         /// <inheritdoc />
-        /// <remarks>Publishes the <see cref="RecreateRenderTargetMessage" /> global message.</remarks>
         /// <exception cref="ArgumentOutOfRangeException">Thrown when the result of rendering is an unexpected value.</exception>
-        protected override void OnDoWork(CancellationToken cancellationToken)
+        protected override void OnDoWork(in CancellationToken cancellationToken)
         {
             long timestamp = Stopwatch.GetTimestamp();
 
@@ -60,9 +59,6 @@ namespace BouncyBox.VorpalEngine.Engine.Game
                 case RenderResult.FrameRendered:
                     break;
                 case RenderResult.FrameSkipped:
-                    return;
-                case RenderResult.RecreateTarget:
-                    GlobalMessagePublisherSubscriber.Publish<RecreateRenderTargetMessage>();
                     return;
                 default:
                     throw new ArgumentOutOfRangeException();

@@ -3,7 +3,7 @@
 namespace BouncyBox.VorpalEngine.Engine.Messaging.GlobalMessages
 {
     /// <summary>A global message requesting a change to the resolution.</summary>
-    public struct ResolutionRequestedMessage : IGlobalMessage
+    public readonly struct ResolutionRequestedMessage : IGlobalMessage
     {
         /// <summary>Initializes a new instance of the <see cref="ResolutionRequestedMessage" /> type.</summary>
         /// <param name="resolution">The requested resolution.</param>

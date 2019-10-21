@@ -7,9 +7,6 @@
         FrameRendered,
 
         /// <summary>The frame was skipped.</summary>
-        FrameSkipped,
-
-        /// <summary>The render target needs to be recreated.</summary>
-        RecreateTarget
+        FrameSkipped
     }
 }

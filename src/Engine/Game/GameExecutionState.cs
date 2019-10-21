@@ -1,7 +1,7 @@
 ﻿namespace BouncyBox.VorpalEngine.Engine.Game
 {
     /// <summary>Game execution state.</summary>
-    public struct GameExecutionState
+    public readonly struct GameExecutionState
     {
         /// <summary>Initializes a new instance of the <see cref="GameExecutionState" /> type.</summary>
         /// <param name="isPaused">A value indicating if the game is paused.</param>

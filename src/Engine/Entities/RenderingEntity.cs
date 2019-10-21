@@ -1,18 +1,14 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Threading;
 using BouncyBox.VorpalEngine.Engine.DirectX;
+using BouncyBox.VorpalEngine.Engine.Threads;
 using TerraFX.Interop;
-using ProcessThread = BouncyBox.VorpalEngine.Engine.Threads.ProcessThread;
 
 namespace BouncyBox.VorpalEngine.Engine.Entities
 {
     /// <summary>An entity that renders itself.</summary>
     public class RenderingEntity : Entity, IRenderingEntity
     {
-        private readonly object _renderResourcesLockObject = new object();
-        private DirectXResources? _directXResources;
-
         /// <summary>Initializes a new instance of the <see cref="RenderingEntity" /> type.</summary>
         /// <param name="interfaces">An <see cref="IInterfaces" /> implementation.</param>
         /// <param name="renderOrder">
@@ -49,35 +45,11 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         ///     Thrown when the thread executing this method is not the
         ///     <see cref="Threads.ProcessThread.RenderResources" /> thread.
         /// </exception>
-        public void InitializeRenderResources(DirectXResources resources)
+        public void InitializeRenderResources(in DirectXResources resources)
         {
             Interfaces.ThreadManager.VerifyProcessThread(ProcessThread.RenderResources);
-
-            lock (_renderResourcesLockObject)
-            {
-                _directXResources = resources;
-            }
 
             OnInitializeRenderResources(resources);
-        }
-
-        /// <inheritdoc />
-        /// <exception cref="InvalidOperationException">
-        ///     Thrown when the thread executing this method is not the
-        ///     <see cref="ProcessThread.RenderResources" /> thread.
-        /// </exception>
-        public void ResizeRenderResources(D2D_SIZE_U clientSize)
-        {
-            Interfaces.ThreadManager.VerifyProcessThread(ProcessThread.RenderResources);
-
-            lock (_renderResourcesLockObject)
-            {
-                Debug.Assert(_directXResources != null);
-
-                _directXResources = new DirectXResources(_directXResources.Value, clientSize);
-            }
-
-            OnResizeRenderResources(clientSize);
         }
 
         /// <inheritdoc />
@@ -89,36 +61,36 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         {
             Interfaces.ThreadManager.VerifyProcessThread(ProcessThread.RenderResources);
 
-            lock (_renderResourcesLockObject)
-            {
-                _directXResources = null;
-            }
-
             OnReleaseRenderResources();
         }
 
         /// <inheritdoc />
-        public EntityRenderResult Render(CancellationToken cancellationToken)
+        public EntityRenderResult Render(in DirectXResources resources, in CancellationToken cancellationToken)
         {
             Interfaces.ThreadManager.VerifyProcessThread(ProcessThread.Render);
 
-            if (!ShouldRender(out DirectXResources? resources))
-            {
-                return EntityRenderResult.FrameSkipped;
-            }
+            return ShouldRender() ? OnRender(resources, cancellationToken) : EntityRenderResult.FrameSkipped;
+        }
 
-            Debug.Assert(resources != null);
+        /// <inheritdoc />
+        /// <exception cref="InvalidOperationException">
+        ///     Thrown when the thread executing this method is not the
+        ///     <see cref="ProcessThread.RenderResources" /> thread.
+        /// </exception>
+        public void ResizeRenderResources(in DirectXResources resources, in D2D_SIZE_U clientSize)
+        {
+            Interfaces.ThreadManager.VerifyProcessThread(ProcessThread.RenderResources);
 
-            return OnRender(resources.Value, cancellationToken);
+            OnResizeRenderResources(resources, clientSize);
         }
 
         /// <inheritdoc cref="InitializeRenderResources" />
-        protected virtual void OnInitializeRenderResources(DirectXResources resources)
+        protected virtual void OnInitializeRenderResources(in DirectXResources resources)
         {
         }
 
         /// <inheritdoc cref="ResizeRenderResources" />
-        protected virtual void OnResizeRenderResources(D2D_SIZE_U clientSize)
+        protected virtual void OnResizeRenderResources(in DirectXResources resources, in D2D_SIZE_U clientSize)
         {
         }
 
@@ -131,27 +103,16 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         /// <param name="resources">DirectX resources.</param>
         /// <param name="cancellationToken">A cancellation token.</param>
         /// <returns>Returns the result of the entity's render attempt.</returns>
-        protected virtual EntityRenderResult OnRender(DirectXResources resources, CancellationToken cancellationToken)
+        protected virtual EntityRenderResult OnRender(in DirectXResources resources, in CancellationToken cancellationToken)
         {
             return EntityRenderResult.FrameSkipped;
         }
 
         /// <summary>Determines if the entity should render.</summary>
-        /// <param name="resources">The DirectX resources to use when rendering.</param>
         /// <returns>Returns a value indicating whether the entity should render.</returns>
-        private bool ShouldRender(out DirectXResources? resources)
+        private bool ShouldRender()
         {
-            lock (_renderResourcesLockObject)
-            {
-                if (_directXResources == null || IsPaused && !RenderWhenPaused || IsSuspended && !RenderWhenSuspended)
-                {
-                    resources = null;
-                    return false;
-                }
-
-                resources = _directXResources.Value;
-                return true;
-            }
+            return (!IsPaused || RenderWhenPaused) && (!IsSuspended || RenderWhenSuspended);
         }
     }
 }

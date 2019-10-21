@@ -4,7 +4,7 @@ using TerraFX.Interop;
 namespace BouncyBox.VorpalEngine.Engine.DirectX
 {
     /// <summary>Provides DirectX resources and render window client area dimensions.</summary>
-    public struct DirectXResources
+    public readonly struct DirectXResources
     {
         /// <summary>Initializes a new instance of the <see cref="DirectXResources" /> type.</summary>
         /// <param name="dxgiAdapter">A <see cref="DXGIAdapter" />.</param>
@@ -28,20 +28,6 @@ namespace BouncyBox.VorpalEngine.Engine.DirectX
             DWriteFactory1 = dWriteFactory1;
             ClientSize = clientSize;
             ClientRect = D2DFactory.CreateRectU(D2DFactory.ZeroPoint2U, clientSize);
-        }
-
-        /// <summary>
-        ///     <para>Initializes a new instance of the <see cref="DirectXResources" /> type.</para>
-        ///     <para>
-        ///         This constructor is intended to be used when DirectX resources are unchanged but the render window's client area
-        ///         changes.
-        ///     </para>
-        /// </summary>
-        /// <param name="resources">DirectX resources.</param>
-        /// <param name="clientSize">The size of the render window's client area.</param>
-        public DirectXResources(DirectXResources resources, D2D_SIZE_U clientSize)
-            : this(resources.DXGIAdapter, resources.DXGISwapChain1, resources.D2D1Device, resources.D2D1DeviceContext, resources.DWriteFactory1, clientSize)
-        {
         }
 
         /// <summary>Gets the <see cref="DXGIAdapter" />.</summary>

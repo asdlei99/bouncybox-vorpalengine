@@ -3,7 +3,7 @@
 namespace BouncyBox.VorpalEngine.Engine.Input.XInput
 {
     /// <summary>An XInput keystroke.</summary>
-    public struct XInputKeystroke
+    public readonly struct XInputKeystroke
     {
         /// <summary>Gets the XInput virtual key.</summary>
         public XInputVirtualKey VirtualKey { get; }

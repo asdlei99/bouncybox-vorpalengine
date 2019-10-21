@@ -9,7 +9,7 @@ namespace BouncyBox.VorpalEngine.Engine.Input.Keyboard
 {
     /// <summary>A snapshot of the keyboard.</summary>
     [DebuggerDisplay("{" + nameof(DebuggerDisplay) + "}")]
-    public struct KeyboardSnapshot
+    public readonly struct KeyboardSnapshot
     {
         /// <summary>Initializes a new instance of the <see cref="KeyboardSnapshot" /> type.</summary>
         /// <param name="downKeys">The keys that were down at the time of the snapshot.</param>
@@ -18,7 +18,7 @@ namespace BouncyBox.VorpalEngine.Engine.Input.Keyboard
             DownKeys = downKeys;
         }
 
-        private readonly string DebuggerDisplay => $"DownKeys = {string.Join(", ", DownKeys.Select(a => a.GetName()))}";
+        private string DebuggerDisplay => $"DownKeys = {string.Join(", ", DownKeys.Select(a => a.GetName()))}";
 
         /// <summary>Gets the keys that were down at the time of the snapshot.</summary>
         public IReadOnlyCollection<User32.VirtualKey> DownKeys { get; }
@@ -26,7 +26,7 @@ namespace BouncyBox.VorpalEngine.Engine.Input.Keyboard
         /// <summary>Determines if a key was down at the time of the snapshot.</summary>
         /// <param name="key">A key.</param>
         /// <returns>Returns true if the key was down at the time of the snapshot; otherwise, returns false.</returns>
-        public readonly bool IsKeyDown(User32.VirtualKey key)
+        public bool IsKeyDown(User32.VirtualKey key)
         {
             return DownKeys.Contains(key);
         }
@@ -34,7 +34,7 @@ namespace BouncyBox.VorpalEngine.Engine.Input.Keyboard
         /// <summary>Determines if a key was up at the time of the snapshot.</summary>
         /// <param name="key">A key.</param>
         /// <returns>Returns true if the key was up at the time of the snapshot; otherwise, returns false.</returns>
-        public readonly bool IsKeyUp(User32.VirtualKey key)
+        public bool IsKeyUp(User32.VirtualKey key)
         {
             return !DownKeys.Contains(key);
         }
@@ -42,14 +42,14 @@ namespace BouncyBox.VorpalEngine.Engine.Input.Keyboard
         /// <summary>Compares this snapshot with a previous snapshot to determine which keys are newly-down and newly-up.</summary>
         /// <param name="previousSnapshot">A previous snapshot.</param>
         /// <returns>Returns a tuple containing the newly-down and newly-up keys.</returns>
-        public readonly (IReadOnlyCollection<User32.VirtualKey> downKeys, IReadOnlyCollection<User32.VirtualKey> upKeys) GetChangedKeys(
+        public (IReadOnlyCollection<User32.VirtualKey> downKeys, IReadOnlyCollection<User32.VirtualKey> upKeys) GetChangedKeys(
             ref KeyboardSnapshot previousSnapshot)
         {
             return (DownKeys.Except(previousSnapshot.DownKeys).ToImmutableArray(), previousSnapshot.DownKeys.Except(DownKeys).ToImmutableArray());
         }
 
         /// <inheritdoc />
-        public override readonly string ToString()
+        public override string ToString()
         {
             return DebuggerDisplay;
         }
