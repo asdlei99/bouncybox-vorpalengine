@@ -70,7 +70,8 @@ namespace BouncyBox.VorpalEngine.Engine.Bootstrap
 
             if (Environment.OSVersion.Version >= WindowsVersion.Windows10Version1803)
             {
-                ComObject.CheckResultHandle(DXGI.DXGIDeclareAdapterRemovalSupport(), "Failed to declare DXGI adapter removal support.");
+                // C# Discord says it's safe to ignore errors from this function
+                DXGI.DXGIDeclareAdapterRemovalSupport();
             }
 
             // Parse command line arguments
