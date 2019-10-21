@@ -6,6 +6,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Threading;
 using Autofac;
 using BouncyBox.Common.NetStandard21.Logging;
@@ -54,6 +55,17 @@ namespace BouncyBox.VorpalEngine.Engine.Bootstrap
             where TGameState : class, new()
             where TSceneKey : struct, Enum
         {
+            // Verify platform and platform version
+
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                throw new PlatformNotSupportedException("Only Microsoft Windows is supported.");
+            }
+            if (Environment.OSVersion.Version < WindowsVersion.MinimumVersion)
+            {
+                throw new PlatformNotSupportedException("Only Platform Update for Microsoft Windows 7 or newer is supported.");
+            }
+
             // Parse command line arguments
 
             ProgramOptions? programOptions = null;
