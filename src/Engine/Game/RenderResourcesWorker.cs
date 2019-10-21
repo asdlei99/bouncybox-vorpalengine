@@ -31,7 +31,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
         }
 
         /// <inheritdoc />
-        protected override void OnDoWork(CancellationToken cancellationToken = default)
+        protected override void OnDoWork(CancellationToken cancellationToken)
         {
             // Handle dispatched messages
             _entityManager.HandleDispatchedRenderResourcesMessages();
@@ -43,7 +43,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
         /// <inheritdoc />
         protected override void OnCleanUp()
         {
-            _entityManager.ReleaseRenderResources();
+            _entityManager.ReleaseRenderResources(CancellationToken.None);
         }
     }
 }

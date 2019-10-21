@@ -6,8 +6,11 @@ namespace BouncyBox.VorpalEngine.SampleGame.Scenes.Loading
 {
     public class LoadingScene : Scene
     {
+        public const int UpdateOrder = int.MaxValue;
+        public const int RenderOrder = int.MaxValue;
+
         public LoadingScene(IInterfaces interfaces, IGameStateManager<GameState> gameStateManager, IEntityManager<GameState> entityManager)
-            : base(interfaces, entityManager, SceneKey.Root)
+            : base(interfaces, entityManager, SceneKey.Loading)
         {
             AddEntities(new LoadingEntity(interfaces));
         }

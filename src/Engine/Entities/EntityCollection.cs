@@ -7,28 +7,27 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
     /// <summary>
     ///     <para>Represents a collection of entities.</para>
     ///     <para>
-    ///         Entities added to the collection must have unique <see cref="IEntity.UpdateOrder" /> and
-    ///         <see cref="IEntity.RenderOrder" /> values.
+    ///         Entities added to the collection must have unique <see cref="IUpdatingEntity.UpdateOrder" /> and see
+    ///         cref="IRenderingEntity.RenderOrder" /> values.
     ///     </para>
     /// </summary>
-    public class EntityCollection<TEntity> : IEntityCollection<TEntity>
-        where TEntity : IEntity
+    public class EntityCollection : IEntityCollection
     {
-        private readonly HashSet<TEntity> _entities = new HashSet<TEntity>();
-        private readonly SortedSet<TEntity> _entitiesOrderedByRenderOrder = new SortedSet<TEntity>(new EntityRenderOrderComparer());
-        private readonly SortedSet<TEntity> _entitiesOrderedByUpdateOrder = new SortedSet<TEntity>(new EntityUpdateOrderComparer());
+        private readonly HashSet<IEntity> _entities = new HashSet<IEntity>();
+        private readonly SortedSet<IRenderingEntity> _entitiesOrderedByRenderOrder = new SortedSet<IRenderingEntity>(new EntityRenderOrderComparer());
+        private readonly SortedSet<IUpdatingEntity> _entitiesOrderedByUpdateOrder = new SortedSet<IUpdatingEntity>(new EntityUpdateOrderComparer());
 
         /// <inheritdoc />
         public int Count => _entities.Count;
 
         /// <inheritdoc />
-        public IReadOnlyCollection<TEntity> OrderedByUpdateOrder => _entitiesOrderedByUpdateOrder;
+        public IReadOnlyCollection<IUpdatingEntity> OrderedByUpdateOrder => _entitiesOrderedByUpdateOrder;
 
         /// <inheritdoc />
-        public IReadOnlyCollection<TEntity> OrderedByRenderOrder => _entitiesOrderedByRenderOrder;
+        public IReadOnlyCollection<IRenderingEntity> OrderedByRenderOrder => _entitiesOrderedByRenderOrder;
 
         /// <inheritdoc />
-        public IEnumerator<TEntity> GetEnumerator()
+        public IEnumerator<IEntity> GetEnumerator()
         {
             return _entities.GetEnumerator();
         }
@@ -40,55 +39,73 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         }
 
         /// <inheritdoc />
-        /// <exception cref="InvalidOperationException">Thrown when an entity with a duplicate <see cref="IEntity.UpdateOrder" /> is added.</exception>
-        /// <exception cref="InvalidOperationException">Thrown when an entity with a duplicate <see cref="IEntity.RenderOrder" /> is added.</exception>
-        public void Add(IEnumerable<TEntity> entities)
+        /// <exception cref="InvalidOperationException">
+        ///     Thrown when an entity with a duplicate <see cref="IUpdatingEntity.UpdateOrder" /> is
+        ///     added.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        ///     Thrown when an entity with a duplicate <see cref="IRenderingEntity.RenderOrder" /> is
+        ///     added.
+        /// </exception>
+        public void Add(IEnumerable<IEntity> entities)
         {
-            foreach (TEntity entity in entities)
+            foreach (IEntity entity in entities)
             {
                 if (!_entities.Add(entity))
                 {
                     return;
                 }
 
-                if (!_entitiesOrderedByUpdateOrder.Add(entity))
+                switch (entity)
                 {
-                    throw new InvalidOperationException($"A {typeof(TEntity).FullName} with update order {entity.UpdateOrder} already exists.");
-                }
-                if (!_entitiesOrderedByRenderOrder.Add(entity))
-                {
-                    throw new InvalidOperationException($"A {typeof(TEntity).FullName} with render order {entity.RenderOrder} already exists.");
+                    case IUpdatingEntity updatingEntity when !_entitiesOrderedByUpdateOrder.Add(updatingEntity):
+                        throw new InvalidOperationException($"An entity with update order {updatingEntity.UpdateOrder} already exists.");
+                    case IRenderingEntity renderingEntity when !_entitiesOrderedByRenderOrder.Add(renderingEntity):
+                        throw new InvalidOperationException($"An entity with render order {renderingEntity.RenderOrder} already exists.");
                 }
             }
         }
 
         /// <inheritdoc />
-        /// <exception cref="InvalidOperationException">Thrown when an entity with a duplicate <see cref="IEntity.UpdateOrder" /> is added.</exception>
-        /// <exception cref="InvalidOperationException">Thrown when an entity with a duplicate <see cref="IEntity.RenderOrder" /> is added.</exception>
-        public void Add(params TEntity[] entities)
+        /// <exception cref="InvalidOperationException">
+        ///     Thrown when an entity with a duplicate <see cref="IUpdatingEntity.UpdateOrder" /> is
+        ///     added.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        ///     Thrown when an entity with a duplicate <see cref="IRenderingEntity.RenderOrder" /> is
+        ///     added.
+        /// </exception>
+        public void Add(params IEntity[] entities)
         {
-            Add((IEnumerable<TEntity>)entities);
+            Add((IEnumerable<IEntity>)entities);
         }
 
         /// <inheritdoc />
-        public void Remove(IEnumerable<TEntity> entities)
+        public void Remove(IEnumerable<IEntity> entities)
         {
-            foreach (TEntity entity in entities)
+            foreach (IEntity entity in entities)
             {
                 if (!_entities.Remove(entity))
                 {
                     return;
                 }
 
-                _entitiesOrderedByUpdateOrder.Remove(entity);
-                _entitiesOrderedByRenderOrder.Remove(entity);
+                switch (entity)
+                {
+                    case IUpdatingEntity updatingEntity:
+                        _entitiesOrderedByUpdateOrder.Remove(updatingEntity);
+                        break;
+                    case IRenderingEntity renderingEntity:
+                        _entitiesOrderedByRenderOrder.Remove(renderingEntity);
+                        break;
+                }
             }
         }
 
         /// <inheritdoc />
-        public void Remove(params TEntity[] entities)
+        public void Remove(params IEntity[] entities)
         {
-            Remove((IEnumerable<TEntity>)entities);
+            Remove((IEnumerable<IEntity>)entities);
         }
 
         /// <inheritdoc />
@@ -99,21 +116,21 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
             _entitiesOrderedByRenderOrder.Clear();
         }
 
-        /// <summary>A comparer that orders entities by <see cref="IEntity.UpdateOrder" />.</summary>
-        private class EntityUpdateOrderComparer : IComparer<TEntity>
+        /// <summary>A comparer that orders entities by <see cref="IUpdatingEntity.UpdateOrder" />.</summary>
+        private class EntityUpdateOrderComparer : IComparer<IUpdatingEntity>
         {
             /// <inheritdoc />
-            public int Compare(TEntity x, TEntity y)
+            public int Compare(IUpdatingEntity x, IUpdatingEntity y)
             {
                 return Comparer<uint?>.Default.Compare(x?.UpdateOrder, y?.UpdateOrder);
             }
         }
 
-        /// <summary>A comparer that orders entities by <see cref="IEntity.RenderOrder" />.</summary>
-        private class EntityRenderOrderComparer : IComparer<TEntity>
+        /// <summary>A comparer that orders entities by <see cref="IRenderingEntity.RenderOrder" />.</summary>
+        private class EntityRenderOrderComparer : IComparer<IRenderingEntity>
         {
             /// <inheritdoc />
-            public int Compare(TEntity x, TEntity y)
+            public int Compare(IRenderingEntity x, IRenderingEntity y)
             {
                 return Comparer<uint?>.Default.Compare(x?.RenderOrder, y?.RenderOrder);
             }

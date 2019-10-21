@@ -18,7 +18,7 @@ using User32 = BouncyBox.VorpalEngine.Engine.Interop.User32;
 
 namespace BouncyBox.VorpalEngine.DebuggingGame.Scenes.Root
 {
-    public class RootEntity : Entity
+    public class RootEntity : UpdatingRenderingEntity<RootEntityRenderState>
     {
         private static readonly ImmutableArray<Size> Resolutions =
             new[]
@@ -56,7 +56,7 @@ namespace BouncyBox.VorpalEngine.DebuggingGame.Scenes.Root
         protected override bool UpdateWhenSuspended { get; } = true;
         protected override bool RenderWhenSuspended { get; } = true;
 
-        protected override RenderRequest? OnUpdateGameState(CancellationToken cancellationToken)
+        protected override void OnUpdateGameState(CancellationToken cancellationToken)
         {
             RootSceneGameState sceneGameState = _gameStateManager.GameState.SceneStates.Root!;
 
@@ -165,101 +165,41 @@ namespace BouncyBox.VorpalEngine.DebuggingGame.Scenes.Root
             {
                 cancellationToken.WaitHandle.WaitOne(sceneGameState.UpdateDelay);
             }
+        }
 
-            // Render delegate
+        protected override RootEntityRenderState? OnGetRenderState()
+        {
+            RootSceneGameState sceneGameState = _gameStateManager.GameState.SceneStates.Root!;
 
-            ulong counter = sceneGameState.Counter;
-            double? updatesPerSecond = _latestEngineUpdateStatsMessage?.UpdatesPerSecond;
-            double? framesPerSecond = _latestEngineRenderStatsMessage?.FramesPerSecond;
-            TimeSpan? meanFrametime = _latestEngineRenderStatsMessage?.MeanFrametime;
-            TimeSpan? minimumFrametime = _latestEngineRenderStatsMessage?.MinimumFrametime;
-            TimeSpan? maximumFrametime = _latestEngineRenderStatsMessage?.MaximumFrametime;
-            ulong? frameCount = _latestEngineRenderStatsMessage?.FrameCount;
-            var renderDelayInMilliseconds = (uint)sceneGameState.RenderDelay.TotalMilliseconds;
-            var updateDelayInMilliseconds = (uint)sceneGameState.UpdateDelay.TotalMilliseconds;
-            string gamePadDPadLeft = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.DPadLeft) ? "\u2190" : " ";
-            string gamePadDPadUp = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.DPadLeft) ? "\u2191" : " ";
-            string gamePadDPadRight = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.DPadLeft) ? "\u2192" : " ";
-            string gamePadDPadDown = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.DPadLeft) ? "\u2193" : " ";
-            string gamePadA = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.A) ? "A" : " ";
-            string gamePadB = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.B) ? "B" : " ";
-            string gamePadX = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.X) ? "X" : " ";
-            string gamePadY = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.Y) ? "Y" : " ";
-            string gamePadBack = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.Back) ? "Back " : "     ";
-            string gamePadStart = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.Start) ? "Start " : "      ";
-            string gamePadLeftShoulder = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.LeftShoulder) ? "LS " : "   ";
-            string gamePadRightShoulder = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.RightShoulder) ? "RS " : "   ";
-            string gamePadLeftTrigger = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.LeftTrigger) ? "LTr " : "    ";
-            string gamePadRightTrigger = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.RightTrigger) ? "RTr " : "    ";
-            string gamePadLeftThumbPress = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.LeftThumbPress) ? "LTh " : "    ";
-            string gamePadRightThumbPress = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.RightThumbPress) ? "RTh" : "";
-
-            return CreateRenderRequest(
-                (resources, token) =>
+            return
+                new RootEntityRenderState
                 {
-                    DXGI_ADAPTER_DESC dxgiAdapterDesc = resources.DXGIAdapter.GetDesc();
-                    string adapter;
-
-                    unsafe
-                    {
-                        adapter = new string((char*)dxgiAdapterDesc.Description);
-                    }
-
-                    _stringBuilder
-                        .Clear()
-                        .AppendLine($"Adapter      : {adapter}")
-                        .AppendLine($"Video memory : {Math.Round(dxgiAdapterDesc.DedicatedVideoMemory.ToUInt64() / 1_000_000_000.0, 2)} GB")
-                        .AppendLine()
-                        .AppendLine($"Client size : {resources.ClientSize.width} x {resources.ClientSize.height}")
-                        .AppendLine()
-                        .AppendLine($"UPS : {Math.Round(updatesPerSecond ?? 0, 2, MidpointRounding.AwayFromZero)}")
-                        .AppendLine($"FPS : {Math.Round(framesPerSecond ?? 0, 2, MidpointRounding.AwayFromZero)}")
-                        .AppendLine(
-                            $"FT  : Mean = {meanFrametime?.TotalMilliseconds ?? 0:F3} ms; Min = {minimumFrametime?.TotalMilliseconds:F3} ms; {maximumFrametime?.TotalMilliseconds:F3} ms")
-                        .AppendLine()
-                        .AppendLine($"State counter      : {counter}")
-                        .AppendLine($"Frame count        : {frameCount ?? 0}")
-                        .AppendLine()
-                        .AppendLine($"Update delay : {updateDelayInMilliseconds} ms  [\u2191] Increase delay  [\u2193] Decrease delay")
-                        .AppendLine($"Render delay : {renderDelayInMilliseconds} ms  [\u2192] Increase delay  [\u2190] Decrease delay")
-                        .AppendLine()
-                        .AppendLine("[+] Increase resolution     [-] Decrease resolution")
-                        .AppendLine("[W] Toggle bordered/borderless windowed mode")
-                        .AppendLine("[V] Toggle VSync")
-                        .AppendLine("[P] Toggle pause     [S] Toggle suspend")
-                        .AppendLine("[U] Unload scene")
-                        .AppendLine()
-                        .AppendLine($"Paused    : {(IsPaused ? "Yes" : "No")}")
-                        .AppendLine($"Suspended : {(IsSuspended ? "Yes" : "No")}")
-                        .AppendLine()
-                        .Append("Gamepad: ")
-                        .Append(gamePadDPadLeft)
-                        .Append(gamePadDPadUp)
-                        .Append(gamePadDPadRight)
-                        .Append(gamePadDPadDown)
-                        .Append(" ")
-                        .Append(gamePadA)
-                        .Append(gamePadB)
-                        .Append(gamePadX)
-                        .Append(gamePadY)
-                        .Append(" ")
-                        .Append(gamePadBack)
-                        .Append(gamePadStart)
-                        .Append(" ")
-                        .Append(gamePadLeftShoulder)
-                        .Append(gamePadRightShoulder)
-                        .Append(gamePadLeftTrigger)
-                        .Append(gamePadRightTrigger)
-                        .Append(gamePadLeftThumbPress)
-                        .Append(gamePadRightThumbPress);
-
-                    resources.D2D1DeviceContext.DrawText(_stringBuilder.ToString(), _textFormat!, resources.ClientRect.ToD2DRectF(), _brush!);
-
-                    if (renderDelayInMilliseconds > 0)
-                    {
-                        cancellationToken.WaitHandle.WaitOne((int)renderDelayInMilliseconds);
-                    }
-                });
+                    Counter = sceneGameState.Counter,
+                    UpdatesPerSecond = _latestEngineUpdateStatsMessage?.UpdatesPerSecond,
+                    FramesPerSecond = _latestEngineRenderStatsMessage?.FramesPerSecond,
+                    MeanFrametime = _latestEngineRenderStatsMessage?.MeanFrametime,
+                    MinimumFrametime = _latestEngineRenderStatsMessage?.MinimumFrametime,
+                    MaximumFrametime = _latestEngineRenderStatsMessage?.MaximumFrametime,
+                    FrameCount = _latestEngineRenderStatsMessage?.FrameCount,
+                    RenderDelayInMilliseconds = (uint)sceneGameState.RenderDelay.TotalMilliseconds,
+                    UpdateDelayInMilliseconds = (uint)sceneGameState.UpdateDelay.TotalMilliseconds,
+                    GamePadDPadLeft = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.DPadLeft) ? "\u2190" : " ",
+                    GamePadDPadUp = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.DPadLeft) ? "\u2191" : " ",
+                    GamePadDPadRight = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.DPadLeft) ? "\u2192" : " ",
+                    GamePadDPadDown = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.DPadLeft) ? "\u2193" : " ",
+                    GamePadA = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.A) ? "A" : " ",
+                    GamePadB = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.B) ? "B" : " ",
+                    GamePadX = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.X) ? "X" : " ",
+                    GamePadY = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.Y) ? "Y" : " ",
+                    GamePadBack = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.Back) ? "Back " : "     ",
+                    GamePadStart = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.Start) ? "Start " : "      ",
+                    GamePadLeftShoulder = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.LeftShoulder) ? "LS " : "   ",
+                    GamePadRightShoulder = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.RightShoulder) ? "RS " : "   ",
+                    GamePadLeftTrigger = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.LeftTrigger) ? "LTr " : "    ",
+                    GamePadRightTrigger = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.RightTrigger) ? "RTr " : "    ",
+                    GamePadLeftThumbPress = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.LeftThumbPress) ? "LTh " : "    ",
+                    GamePadRightThumbPress = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.RightThumbPress) ? "RTh" : ""
+                };
         }
 
         protected override unsafe void OnInitializeRenderResources(DirectXResources resources)
@@ -274,6 +214,74 @@ namespace BouncyBox.VorpalEngine.DebuggingGame.Scenes.Root
         {
             _brush?.Dispose();
             _textFormat?.Dispose();
+        }
+
+        protected override EntityRenderResult OnRender(DirectXResources resources, RootEntityRenderState renderState, CancellationToken cancellationToken)
+        {
+            DXGI_ADAPTER_DESC dxgiAdapterDesc = resources.DXGIAdapter.GetDesc();
+            string adapter;
+
+            unsafe
+            {
+                adapter = new string((char*)dxgiAdapterDesc.Description);
+            }
+
+            _stringBuilder
+                .Clear()
+                .AppendLine($"Adapter      : {adapter}")
+                .AppendLine($"Video memory : {Math.Round(dxgiAdapterDesc.DedicatedVideoMemory.ToUInt64() / 1_000_000_000.0, 2)} GB")
+                .AppendLine()
+                .AppendLine($"Client size : {resources.ClientSize.width} x {resources.ClientSize.height}")
+                .AppendLine()
+                .AppendLine($"UPS : {Math.Round(renderState.UpdatesPerSecond ?? 0, 2, MidpointRounding.AwayFromZero)}")
+                .AppendLine($"FPS : {Math.Round(renderState.FramesPerSecond ?? 0, 2, MidpointRounding.AwayFromZero)}")
+                .AppendLine(
+                    $"FT  : Mean = {renderState.MeanFrametime?.TotalMilliseconds ?? 0:F3} ms; Min = {renderState.MinimumFrametime?.TotalMilliseconds:F3} ms; {renderState.MaximumFrametime?.TotalMilliseconds:F3} ms")
+                .AppendLine()
+                .AppendLine($"State counter      : {renderState.Counter}")
+                .AppendLine($"Frame count        : {renderState.FrameCount ?? 0}")
+                .AppendLine()
+                .AppendLine($"Update delay : {renderState.UpdateDelayInMilliseconds} ms  [\u2191] Increase delay  [\u2193] Decrease delay")
+                .AppendLine($"Render delay : {renderState.RenderDelayInMilliseconds} ms  [\u2192] Increase delay  [\u2190] Decrease delay")
+                .AppendLine()
+                .AppendLine("[+] Increase resolution     [-] Decrease resolution")
+                .AppendLine("[W] Toggle bordered/borderless windowed mode")
+                .AppendLine("[V] Toggle VSync")
+                .AppendLine("[P] Toggle pause     [S] Toggle suspend")
+                .AppendLine("[U] Unload scene")
+                .AppendLine()
+                .AppendLine($"Paused    : {(IsPaused ? "Yes" : "No")}")
+                .AppendLine($"Suspended : {(IsSuspended ? "Yes" : "No")}")
+                .AppendLine()
+                .Append("Gamepad: ")
+                .Append(renderState.GamePadDPadLeft)
+                .Append(renderState.GamePadDPadUp)
+                .Append(renderState.GamePadDPadRight)
+                .Append(renderState.GamePadDPadDown)
+                .Append(" ")
+                .Append(renderState.GamePadA)
+                .Append(renderState.GamePadB)
+                .Append(renderState.GamePadX)
+                .Append(renderState.GamePadY)
+                .Append(" ")
+                .Append(renderState.GamePadBack)
+                .Append(renderState.GamePadStart)
+                .Append(" ")
+                .Append(renderState.GamePadLeftShoulder)
+                .Append(renderState.GamePadRightShoulder)
+                .Append(renderState.GamePadLeftTrigger)
+                .Append(renderState.GamePadRightTrigger)
+                .Append(renderState.GamePadLeftThumbPress)
+                .Append(renderState.GamePadRightThumbPress);
+
+            resources.D2D1DeviceContext.DrawText(_stringBuilder.ToString(), _textFormat!, resources.ClientRect.ToD2DRectF(), _brush!);
+
+            if (renderState.RenderDelayInMilliseconds > 0)
+            {
+                cancellationToken.WaitHandle.WaitOne((int)renderState.RenderDelayInMilliseconds);
+            }
+
+            return EntityRenderResult.FrameRendered;
         }
 
         private void HandleEngineUpdateStatsMessage(EngineUpdateStatsMessage message)

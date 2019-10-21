@@ -49,7 +49,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
         /// <inheritdoc />
         /// <remarks>Publishes the <see cref="RecreateRenderTargetMessage" /> global message.</remarks>
         /// <exception cref="ArgumentOutOfRangeException">Thrown when the result of rendering is an unexpected value.</exception>
-        protected override void OnDoWork(CancellationToken cancellationToken = default)
+        protected override void OnDoWork(CancellationToken cancellationToken)
         {
             long timestamp = Stopwatch.GetTimestamp();
 

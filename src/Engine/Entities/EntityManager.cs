@@ -24,12 +24,11 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
     {
         private const DXGI_FORMAT DxgiFormat = DXGI_FORMAT.DXGI_FORMAT_B8G8R8A8_UNORM;
         private const int MaximumRenderResourcesInitializationAttempts = 3;
-        private readonly EntityCollection<IEntity> _entities = new EntityCollection<IEntity>();
+        private readonly EntityCollection _entities = new EntityCollection();
         private readonly object _entitiesLockObject = new object();
         private readonly IGameExecutionStateManager _gameExecutionStateManager;
         private readonly IInterfaces _interfaces;
         private readonly ManualResetEventSlim _renderCompleteManualResetEvent = new ManualResetEventSlim(true);
-        private readonly SortedSet<RenderRequest> _renderRequests = new SortedSet<RenderRequest>(new RenderRequestComparer());
         private readonly ManualResetEventSlim _renderResourcesChangingManualResetEvent = new ManualResetEventSlim(true);
         private readonly ConcurrentMessagePublisherSubscriber<IGlobalMessage> _renderResourcesGlobalMessagePublisherSubscriber;
         private readonly object _renderResourcesLockObject = new object();
@@ -46,7 +45,6 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
 #endif
         private DXGISwapChain1? _dxgiSwapChain1;
         private TimeSpan? _refreshPeriod;
-        private IEnumerable<Action<DirectXResources, CancellationToken>> _renderDelegates = Enumerable.Empty<Action<DirectXResources, CancellationToken>>();
         private int _renderResourcesInitializationAttempts;
         private bool _renderResourcesInitialized;
         private bool _shouldPause;
@@ -148,18 +146,18 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         ///     Thrown when the thread executing this method is not the
         ///     <see cref="Threads.ProcessThread.Update" /> thread.
         /// </exception>
-        public void Update(CancellationToken cancellationToken = default)
+        public void Update(CancellationToken cancellationToken)
         {
             _interfaces.ThreadManager.VerifyProcessThread(ProcessThread.Update);
 
-            ImmutableArray<IEntity> entities;
+            ImmutableArray<IUpdatingEntity> entities;
 
             lock (_entitiesLockObject)
             {
                 entities = _entities.OrderedByUpdateOrder.ToImmutableArray();
             }
 
-            foreach (IEntity entity in entities)
+            foreach (IUpdatingEntity entity in entities)
             {
                 if (_shouldPause)
                 {
@@ -182,18 +180,8 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
                     _shouldResume = false;
                 }
 
-                RenderRequest? renderRequest = entity.UpdateGameState(cancellationToken);
-
-                if (renderRequest != null)
-                {
-                    // The entity is requesting a render
-                    _renderRequests.Add(renderRequest.Value);
-                }
+                entity.UpdateGameState(cancellationToken);
             }
-
-            Interlocked.Exchange(ref _renderDelegates, _renderRequests.Select(a => a.RenderDelegate).ToImmutableArray());
-
-            _renderRequests.Clear();
         }
 
         /// <inheritdoc />
@@ -201,7 +189,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         ///     Thrown when the thread executing this method is not the
         ///     <see cref="ProcessThread.RenderResources" /> thread.
         /// </exception>
-        public void ReleaseRenderResources(CancellationToken cancellationToken = default)
+        public void ReleaseRenderResources(CancellationToken cancellationToken)
         {
             _interfaces.ThreadManager.VerifyProcessThread(ProcessThread.RenderResources);
 
@@ -224,14 +212,14 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
 
             // Release all entities' render resources
 
-            ImmutableArray<IEntity> entities;
+            ImmutableArray<IRenderingEntity> entities;
 
             lock (_entitiesLockObject)
             {
                 entities = _entities.OrderedByRenderOrder.ToImmutableArray();
             }
 
-            foreach (IEntity entity in entities)
+            foreach (IRenderingEntity entity in entities)
             {
                 entity.ReleaseRenderResources();
             }
@@ -252,21 +240,9 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         ///     Thrown when the thread executing this method is not the
         ///     <see cref="ProcessThread.Render" /> thread.
         /// </exception>
-        public unsafe (RenderResult result, TimeSpan frametime) Render(CancellationToken cancellationToken = default)
+        public unsafe (RenderResult result, TimeSpan frametime) Render(CancellationToken cancellationToken)
         {
             _interfaces.ThreadManager.VerifyProcessThread(ProcessThread.Render);
-
-            ImmutableArray<Action<DirectXResources, CancellationToken>> renderDelegates =
-                Interlocked.Exchange(
-                    ref _renderDelegates,
-                    Enumerable.Empty<Action<DirectXResources, CancellationToken>>()).ToImmutableArray();
-
-            if (renderDelegates.Length == 0)
-            {
-                // No render delegates to invoke
-                // Unloading all scenes will cause the previously-presented frame to appear to "freeze"
-                return (RenderResult.FrameSkipped, TimeSpan.Zero);
-            }
 
             lock (_renderResourcesLockObject)
             {
@@ -298,9 +274,14 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
 
             try
             {
-                Debug.Assert(_clientSize != null);
+                ImmutableArray<IRenderingEntity> entities;
 
-                var resources = new DirectXResources(_dxgiAdapter!, _dxgiSwapChain1!, _d2d1Device!, _d2d1DeviceContext!, _dWriteFactory1!, _clientSize.Value);
+                lock (_entitiesLockObject)
+                {
+                    entities = _entities.OrderedByRenderOrder.ToImmutableArray();
+                }
+
+                Debug.Assert(_clientSize != null);
 
                 // Frametime measurements should start only after a render state is retrieved
                 long startTimestamp = Stopwatch.GetTimestamp();
@@ -310,14 +291,17 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
                 _d2d1DeviceContext!.BeginDraw();
                 _d2d1DeviceContext.Clear();
 
-                // Invoke render delegates
-                foreach (Action<DirectXResources, CancellationToken> renderDelegate in renderDelegates)
-                {
-                    renderDelegate(resources, cancellationToken);
-                }
+                // Render entities
+                bool atLeastOneEntityRendered = entities.Any(a => a.Render(cancellationToken) == EntityRenderResult.FrameRendered);
 
                 // End drawing
                 int endDrawResult = _d2d1DeviceContext.EndDraw();
+
+                // Skip presenting the frame if no entities were rendered
+                if (!atLeastOneEntityRendered)
+                {
+                    return (RenderResult.FrameSkipped, TimeSpan.Zero);
+                }
 
                 // Calculate frametime
                 TimeSpan frametime = TimeSpan.FromTicks(Stopwatch.GetTimestamp() - startTimestamp);
@@ -348,6 +332,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
                     d2d1Multithread.Leave();
                 }
 
+                // Consider the frame to be skipped if no entities actually rendered themselves
                 return (RenderResult.FrameRendered, frametime);
             }
             finally
@@ -403,7 +388,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         ///     Thrown when the thread executing this method is not the
         ///     <see cref="ProcessThread.RenderResources" /> thread.
         /// </exception>
-        private unsafe void InitializeRenderResources()
+        private unsafe void InitializeRenderResources(CancellationToken cancellationToken)
         {
             _interfaces.ThreadManager.VerifyProcessThread(ProcessThread.RenderResources);
 
@@ -510,14 +495,14 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
                 // Initialize all entities' render resources
 
                 var resources = new DirectXResources(_dxgiAdapter!, _dxgiSwapChain1!, _d2d1Device!, _d2d1DeviceContext!, _dWriteFactory1!, _clientSize.Value);
-                ImmutableArray<IEntity> entities;
+                ImmutableArray<IRenderingEntity> entities;
 
                 lock (_entitiesLockObject)
                 {
                     entities = _entities.OrderedByRenderOrder.ToImmutableArray();
                 }
 
-                foreach (IEntity entity in entities)
+                foreach (IRenderingEntity entity in entities)
                 {
                     entity.InitializeRenderResources(resources);
                 }
@@ -526,7 +511,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
             }
             catch (Exception exception)
             {
-                ReleaseRenderResources();
+                ReleaseRenderResources(cancellationToken);
 
                 bool initializationFailed = _renderResourcesInitializationAttempts == MaximumRenderResourcesInitializationAttempts;
 
@@ -661,7 +646,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         {
             _windowHandle = message.WindowHandle;
 
-            InitializeRenderResources();
+            InitializeRenderResources(CancellationToken.None);
         }
 
         /// <summary>Handles the <see cref="DisplayChangedMessage" /> global message.</summary>
@@ -725,14 +710,14 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
 
             // Resize all entities' render resources
 
-            ImmutableArray<IEntity> entities;
+            ImmutableArray<IRenderingEntity> entities;
 
             lock (_entitiesLockObject)
             {
                 entities = _entities.OrderedByRenderOrder.ToImmutableArray();
             }
 
-            foreach (IEntity entity in entities)
+            foreach (IRenderingEntity entity in entities)
             {
                 entity.ResizeRenderResources(_clientSize.Value);
             }
@@ -766,16 +751,6 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
             _refreshPeriod = refreshPeriod;
 
             _updateGlobalMessagePublisherSubscriber.Publish(new RefreshPeriodChangedMessage(refreshPeriod, hz));
-        }
-
-        /// <summary>A comparer that orders render requests by <see cref="RenderRequest.RenderOrder" />.</summary>
-        private class RenderRequestComparer : IComparer<RenderRequest>
-        {
-            /// <inheritdoc />
-            public int Compare(RenderRequest x, RenderRequest y)
-            {
-                return Comparer<uint?>.Default.Compare(x.RenderOrder, y.RenderOrder);
-            }
         }
     }
 }

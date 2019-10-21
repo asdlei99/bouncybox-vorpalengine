@@ -50,7 +50,7 @@ namespace BouncyBox.VorpalEngine.Engine.Threads
 
         /// <inheritdoc />
         /// <exception cref="InvalidOperationException">Thrown when the thread executing this method is not the correct thread.</exception>
-        public void DoWork(CancellationToken cancellationToken = default)
+        public void DoWork(CancellationToken cancellationToken)
         {
             Interfaces.ThreadManager.VerifyProcessThread(_thread);
 
@@ -83,7 +83,7 @@ namespace BouncyBox.VorpalEngine.Engine.Threads
         }
 
         /// <inheritdoc cref="IEngineThreadWorker.DoWork" />
-        protected virtual void OnDoWork(CancellationToken cancellationToken = default)
+        protected virtual void OnDoWork(CancellationToken cancellationToken)
         {
         }
 

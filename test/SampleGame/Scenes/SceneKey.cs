@@ -2,7 +2,7 @@
 {
     public enum SceneKey
     {
-        Root,
+        Loading,
         Title
     }
 }
