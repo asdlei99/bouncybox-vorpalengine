@@ -87,7 +87,7 @@ namespace BouncyBox.VorpalEngine.Engine.Windows
         {
             if (parserResult.Tag == ParserResultType.Parsed)
             {
-                throw new ArgumentException(nameof(parserResult));
+                throw new ArgumentException("Parser results must not be parsed.", nameof(parserResult));
             }
 
             ErrorForm? errorForm = null;
@@ -110,7 +110,7 @@ namespace BouncyBox.VorpalEngine.Engine.Windows
                     errorForm = new ErrorForm(windowCaption, "Invalid command line arguments. &Details:", stringBuilder.ToString());
                 });
 
-            Debug.Assert(errorForm != null);
+            Debug.Assert(!(errorForm is null));
 
             return errorForm;
         }

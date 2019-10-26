@@ -2,7 +2,8 @@
   "profiles": {
     "DebuggingGame": {
       "commandName": "Project",
-      "commandLineArgs": "--minimumloglevel Information"
+      "commandLineArgs": "--minimumloglevel Debug",
+      "nativeDebugging": false
     }
   }
 }

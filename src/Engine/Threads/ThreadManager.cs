@@ -123,7 +123,7 @@ namespace BouncyBox.VorpalEngine.Engine.Threads
             _serilogLogger.LogDebug("Engine threads terminated");
 
             ImmutableArray<(EngineThread thread, Exception exception)> unhandledExceptions =
-                _threadsByProcessThread.Values.Where(a => a.UnhandledException != null).Select(a => a.UnhandledException!.Value).ToImmutableArray();
+                _threadsByProcessThread.Values.Where(a => !(a.UnhandledException is null)).Select(a => a.UnhandledException!.Value).ToImmutableArray();
 
             // Remove all engine threads from the dictionary
             ImmutableArray<ProcessThread> threadsToRemove =

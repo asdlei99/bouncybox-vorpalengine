@@ -139,7 +139,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
                 return EntityRenderResult.FrameSkipped;
             }
 
-            Debug.Assert(renderState != null);
+            Debug.Assert(!(renderState is null));
 
             return OnRender(resources, renderState.Value, cancellationToken);
         }
@@ -290,7 +290,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
 
             lock (_renderStateLockObject)
             {
-                if (_renderState == null)
+                if (_renderState is null)
                 {
                     return false;
                 }

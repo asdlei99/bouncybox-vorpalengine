@@ -2,16 +2,18 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using BouncyBox.VorpalEngine.Engine;
 using BouncyBox.VorpalEngine.Engine.DirectX;
-using BouncyBox.VorpalEngine.Engine.DirectX.ComObjects;
 using BouncyBox.VorpalEngine.Engine.Entities;
 using BouncyBox.VorpalEngine.Engine.Game;
 using BouncyBox.VorpalEngine.Engine.Input.Keyboard;
 using BouncyBox.VorpalEngine.Engine.Input.XInput;
+using BouncyBox.VorpalEngine.Engine.Interop.D2D1;
+using BouncyBox.VorpalEngine.Engine.Interop.DWrite;
 using BouncyBox.VorpalEngine.Engine.Messaging.GlobalMessages;
 using TerraFX.Interop;
 using User32 = BouncyBox.VorpalEngine.Engine.Interop.User32;
@@ -206,8 +208,19 @@ namespace BouncyBox.VorpalEngine.DebuggingGame.Scenes.Root
         {
             DXGI_RGBA brushColor = DXGIFactory.CreateRgba(1, 1, 1, 1);
 
-            _brush = resources.D2D1DeviceContext.CreateSolidColorBrush(brushColor);
-            _textFormat = resources.DWriteFactory1.CreateTextFormat("Consolas", 16);
+            resources.D2D1DeviceContext.CreateSolidColorBrush(&brushColor, out _brush).ThrowIfFailed($"Failed to create {nameof(D2D1SolidColorBrush)}.");
+            resources
+                .DWriteFactory
+                .CreateTextFormat(
+                    "Consolas",
+                    null,
+                    DWRITE_FONT_WEIGHT.DWRITE_FONT_WEIGHT_NORMAL,
+                    DWRITE_FONT_STYLE.DWRITE_FONT_STYLE_NORMAL,
+                    DWRITE_FONT_STRETCH.DWRITE_FONT_STRETCH_NORMAL,
+                    16,
+                    CultureInfo.CurrentCulture.Name,
+                    out _textFormat)
+                .ThrowIfFailed($"Failed to create {nameof(DWriteTextFormat)}.");
         }
 
         protected override void OnReleaseRenderResources()
@@ -216,18 +229,14 @@ namespace BouncyBox.VorpalEngine.DebuggingGame.Scenes.Root
             _textFormat?.Dispose();
         }
 
-        protected override EntityRenderResult OnRender(
+        protected override unsafe EntityRenderResult OnRender(
             in DirectXResources resources,
             in RootEntityRenderState renderState,
             in CancellationToken cancellationToken)
         {
-            DXGI_ADAPTER_DESC dxgiAdapterDesc = resources.DXGIAdapter.GetDesc();
-            string adapter;
+            resources.DXGIAdapter.GetDesc(out DXGI_ADAPTER_DESC dxgiAdapterDesc).ThrowIfFailed($"Failed to get {nameof(DXGI_ADAPTER_DESC)}.");
 
-            unsafe
-            {
-                adapter = new string((char*)dxgiAdapterDesc.Description);
-            }
+            string adapter = new ReadOnlySpan<char>(dxgiAdapterDesc.Description, 128).ToString();
 
             _stringBuilder
                 .Clear()
@@ -277,7 +286,17 @@ namespace BouncyBox.VorpalEngine.DebuggingGame.Scenes.Root
                 .Append(renderState.GamePadLeftThumbPress)
                 .Append(renderState.GamePadRightThumbPress);
 
-            resources.D2D1DeviceContext.DrawText(_stringBuilder.ToString(), _textFormat!, resources.ClientRect.ToD2DRectF(), _brush!);
+            D2D_RECT_F rect = resources.ClientRectF;
+
+            resources
+                .D2D1DeviceContext
+                .DrawText(
+                    _stringBuilder.ToString(),
+                    _textFormat!,
+                    &rect,
+                    _brush!,
+                    D2D1_DRAW_TEXT_OPTIONS.D2D1_DRAW_TEXT_OPTIONS_NONE,
+                    DWRITE_MEASURING_MODE.DWRITE_MEASURING_MODE_NATURAL);
 
             if (renderState.RenderDelayInMilliseconds > 0)
             {

@@ -31,16 +31,16 @@ namespace BouncyBox.VorpalEngine.Engine.Input.XInput
         /// <summary>Gets the right trigger value.</summary>
         public byte RightTrigger { get; }
 
-        /// <summary>Gets the left thumb X-axis value.</summary>
+        /// <summary>Gets the left thumb x-axis value.</summary>
         public short LeftThumbX { get; }
 
-        /// <summary>Gets the left thumb Y-axis value.</summary>
+        /// <summary>Gets the left thumb y-axis value.</summary>
         public short LeftThumbY { get; }
 
-        /// <summary>Gets the right thumb X-axis value.</summary>
+        /// <summary>Gets the right thumb x-axis value.</summary>
         public short RightThumbX { get; }
 
-        /// <summary>Gets the right thumb Y-axis value.</summary>
+        /// <summary>Gets the right thumb y-axis value.</summary>
         public short RightThumbY { get; }
     }
 }

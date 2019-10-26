@@ -38,7 +38,7 @@ namespace BouncyBox.VorpalEngine.Engine.Calculators
 
                 foreach (TimeSpan accumulatedValue in accumulatedValues)
                 {
-                    if (value == null || accumulatedValue < value)
+                    if (value is null || accumulatedValue < value)
                     {
                         value = accumulatedValue;
                     }
@@ -58,7 +58,7 @@ namespace BouncyBox.VorpalEngine.Engine.Calculators
 
                 foreach (TimeSpan accumulatedValue in accumulatedValues)
                 {
-                    if (value == null || accumulatedValue > value)
+                    if (value is null || accumulatedValue > value)
                     {
                         value = accumulatedValue;
                     }

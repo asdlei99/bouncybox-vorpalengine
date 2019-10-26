@@ -3,33 +3,15 @@ using System.Diagnostics;
 
 namespace BouncyBox.VorpalEngine.Engine.Math
 {
-    /// <summary>A triangle wave that makes it easier to calculate a Y-axis value as a function of wave shape and time.</summary>
+    /// <summary>A triangle wave.</summary>
     public class TriangleWave : Wave
     {
         /// <summary>Initializes a new instance of the <see cref="SineWave" /> type.</summary>
-        /// <param name="trough">The Y-axis value for the trough of the wave.</param>
-        /// <param name="crest">The Y-axis value for the crest of the wave.</param>
+        /// <param name="trough">The y-axis value for the trough of the wave.</param>
+        /// <param name="crest">The y-axis value for the crest of the wave.</param>
         /// <param name="wavelength">The wavelength.</param>
-        /// <param name="waveOffset">The X-axis offset.</param>
-        /// <param name="stopwatch">A stopwatch that provides a dynamic X-axis value.</param>
-        /// <param name="timeSpanUnitDelegate">A delegate that determines what <see cref="TimeSpan" /> component to use for all calculations.</param>
-        public TriangleWave(
-            float trough,
-            float crest,
-            TimeSpan wavelength,
-            WaveOffset waveOffset,
-            Stopwatch stopwatch,
-            Func<TimeSpan, float>? timeSpanUnitDelegate = null)
-            : base(trough, crest, wavelength, waveOffset, stopwatch, timeSpanUnitDelegate)
-        {
-        }
-
-        /// <summary>Initializes a new instance of the <see cref="SineWave" /> type.</summary>
-        /// <param name="trough">The Y-axis value for the trough of the wave.</param>
-        /// <param name="crest">The Y-axis value for the crest of the wave.</param>
-        /// <param name="wavelength">The wavelength.</param>
-        /// <param name="waveOffset">The X-axis offset.</param>
-        /// <param name="valueDelegate">A delegate that determines the current X-axis value.</param>
+        /// <param name="waveOffset">The x-axis offset.</param>
+        /// <param name="valueDelegate">A delegate that determines the current x-axis value.</param>
         /// <param name="timeSpanUnitDelegate">A delegate that determines what <see cref="TimeSpan" /> component to use for all calculations.</param>
         public TriangleWave(
             float trough,
@@ -39,6 +21,24 @@ namespace BouncyBox.VorpalEngine.Engine.Math
             Func<TimeSpan> valueDelegate,
             Func<TimeSpan, float>? timeSpanUnitDelegate = null)
             : base(trough, crest, wavelength, waveOffset, valueDelegate, timeSpanUnitDelegate)
+        {
+        }
+
+        /// <summary>Initializes a new instance of the <see cref="SineWave" /> type.</summary>
+        /// <param name="trough">The y-axis value for the trough of the wave.</param>
+        /// <param name="crest">The y-axis value for the crest of the wave.</param>
+        /// <param name="wavelength">The wavelength.</param>
+        /// <param name="waveOffset">The x-axis offset.</param>
+        /// <param name="stopwatch">A stopwatch that provides a dynamic x-axis value.</param>
+        /// <param name="timeSpanUnitDelegate">A delegate that determines what <see cref="TimeSpan" /> component to use for all calculations.</param>
+        public TriangleWave(
+            float trough,
+            float crest,
+            TimeSpan wavelength,
+            WaveOffset waveOffset,
+            Stopwatch stopwatch,
+            Func<TimeSpan, float>? timeSpanUnitDelegate = null)
+            : base(trough, crest, wavelength, waveOffset, () => stopwatch.Elapsed, timeSpanUnitDelegate)
         {
         }
 

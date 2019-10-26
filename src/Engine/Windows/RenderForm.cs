@@ -259,7 +259,7 @@ namespace BouncyBox.VorpalEngine.Engine.Windows
         {
             _isUserMovingOrResizing = false;
 
-            if (_sizeMessage != null)
+            if (!(_sizeMessage is null))
             {
                 Message message = _sizeMessage.Value;
 
@@ -480,7 +480,7 @@ namespace BouncyBox.VorpalEngine.Engine.Windows
                 throw Win32ExceptionHelper.GetException();
             }
 
-            var deviceString = new string((char*)displayDeviceW.DeviceString);
+            string deviceString = new ReadOnlySpan<char>(displayDeviceW.DeviceString, 128).ToString();
 
             _serilogLogger.LogInformation("Display changed to {DeviceName} (0x{MonitorHandle})", deviceString, monitorHandle.ToString("X8"));
 

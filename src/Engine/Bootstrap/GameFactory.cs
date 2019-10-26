@@ -10,7 +10,6 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using Autofac;
 using BouncyBox.Common.NetStandard21.Logging;
-using BouncyBox.VorpalEngine.Engine.DirectX.ComObjects;
 using BouncyBox.VorpalEngine.Engine.Entities;
 using BouncyBox.VorpalEngine.Engine.Game;
 using BouncyBox.VorpalEngine.Engine.Input.Keyboard;
@@ -80,7 +79,7 @@ namespace BouncyBox.VorpalEngine.Engine.Bootstrap
             ParserResult<ProgramOptions> parserResult =
                 Parser.Default.ParseArguments<ProgramOptions>(args ?? Enumerable.Empty<string>()).WithParsed(a => programOptions = a);
 
-            if (programOptions == null)
+            if (programOptions is null)
             {
                 ErrorForm.CreateForInvalidCommandLineArguments(parserResult).ShowDialog();
 

@@ -4,14 +4,21 @@ using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Threading;
 using BouncyBox.VorpalEngine.Engine.DirectX;
-using BouncyBox.VorpalEngine.Engine.DirectX.ComObjects;
 using BouncyBox.VorpalEngine.Engine.Game;
 using BouncyBox.VorpalEngine.Engine.Interop;
+using BouncyBox.VorpalEngine.Engine.Interop.D2D1;
+using BouncyBox.VorpalEngine.Engine.Interop.D2D1_1;
+using BouncyBox.VorpalEngine.Engine.Interop.D3D11;
+using BouncyBox.VorpalEngine.Engine.Interop.DWrite;
+using BouncyBox.VorpalEngine.Engine.Interop.DWrite_1;
+using BouncyBox.VorpalEngine.Engine.Interop.DXGI;
+using BouncyBox.VorpalEngine.Engine.Interop.DXGI1_2;
 using BouncyBox.VorpalEngine.Engine.Logging;
 using BouncyBox.VorpalEngine.Engine.Messaging;
 using BouncyBox.VorpalEngine.Engine.Messaging.GlobalMessages;
 using Serilog.Events;
 using TerraFX.Interop;
+using DXGIDebug = BouncyBox.VorpalEngine.Engine.Interop.DXGIDebug.DXGIDebug;
 using ProcessThread = BouncyBox.VorpalEngine.Engine.Threads.ProcessThread;
 using User32 = TerraFX.Interop.User32;
 
@@ -35,10 +42,11 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         private D2D1Device? _d2d1Device;
         private D2D1DeviceContext? _d2d1DeviceContext;
         private D3D11Device? _d3d11Device;
-        private DWriteFactory1? _dWriteFactory1;
+        private D3D11DeviceContext? _d3d11DeviceContext;
+        private DWriteFactory? _dWriteFactory;
         private DXGIAdapter? _dxgiAdapter;
 #if DEBUG
-        private DXGIDebug1? _dxgiDebug1;
+        private DXGIDebug? _dxgiDebug;
 #endif
         private DXGISwapChain1? _dxgiSwapChain1;
         private TimeSpan? _refreshPeriod;
@@ -232,7 +240,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
                     entities = _entities.OrderedByRenderOrder.ToImmutableArray();
                 }
 
-                Debug.Assert(_clientSize != null);
+                Debug.Assert(!(_clientSize is null));
 
                 // Frametime measurements should start only after a render state is retrieved
                 long startTimestamp = Stopwatch.GetTimestamp();
@@ -247,7 +255,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
                     _dxgiSwapChain1!,
                     _d2d1Device!,
                     _d2d1DeviceContext,
-                    _dWriteFactory1!,
+                    _dWriteFactory!,
                     _clientSize.Value);
                 var atLeastOneEntityRendered = false;
 
@@ -262,7 +270,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
                 }
 
                 // End drawing
-                int endDrawResult = _d2d1DeviceContext.EndDraw();
+                HResult endDrawResult = _d2d1DeviceContext.EndDraw();
 
                 // Skip presenting the frame if no entities were rendered
                 if (!atLeastOneEntityRendered)
@@ -283,19 +291,19 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
                     return (RenderResult.FrameSkipped, TimeSpan.Zero);
                 }
 
-                ComObject.CheckResultHandle(endDrawResult, "Failed to end drawing.");
+                endDrawResult.ThrowIfFailed("Failed to end drawing.");
 
                 // Present
 
                 using D2D1Factory d2d1Factory = _d2d1Device!.GetFactory();
-                using D2D1Multithread d2d1Multithread = d2d1Factory.QueryD2D1Multithread()!;
+                using var d2d1Multithread = new D2D1Multithread(d2d1Factory.QueryInterface<ID2D1Multithread>());
 
                 // Lock underlying DXGI and Direct3D resources during presentation
                 d2d1Multithread.Enter();
 
                 try
                 {
-                    _dxgiSwapChain1!.Present(_interfaces.CommonGameSettings.EnableVSync ? 1u : 0u);
+                    _dxgiSwapChain1!.Present(_interfaces.CommonGameSettings.EnableVSync ? 1u : 0u, 0);
                 }
                 finally
                 {
@@ -377,70 +385,116 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
 #if DEBUG
                         const bool debug = true;
 
-                        _serilogLogger.LogDebug($"Creating {nameof(IDXGIDebug1)}");
+                        _serilogLogger.LogDebug($"Creating {nameof(TerraFX.Interop.DXGIDebug)}");
 
-                        _dxgiDebug1 = new DXGIDebug1();
+                        DXGIDebug.Create(out _dxgiDebug).ThrowIfFailed($"Failed to create {nameof(TerraFX.Interop.DXGIDebug)}.");
 #else
             const bool debug = false;
 #endif
 
                         // Initialize Direct3D
 
+                        var featureLevels = new[] { D3D_FEATURE_LEVEL.D3D_FEATURE_LEVEL_11_1, D3D_FEATURE_LEVEL.D3D_FEATURE_LEVEL_11_0 };
+
+                        _serilogLogger.LogDebug($"Creating hardware {nameof(D3D11Device)}");
+
                         try
                         {
-                            _serilogLogger.LogDebug($"Creating hardware {nameof(ID3D11Device)}");
-
-                            _d3d11Device = new D3D11Device(D3D_DRIVER_TYPE.D3D_DRIVER_TYPE_HARDWARE, new[] { D3D_FEATURE_LEVEL.D3D_FEATURE_LEVEL_11_0 }, debug);
+                            D3D11Device
+                                .Create(
+                                    driverType: D3D_DRIVER_TYPE.D3D_DRIVER_TYPE_HARDWARE,
+                                    featureLevels: featureLevels,
+                                    debug: debug,
+                                    device: out _d3d11Device,
+                                    immediateContext: out _d3d11DeviceContext)
+                                .ThrowIfFailed($"Failed to create hardware {nameof(D3D11Device)}.");
                         }
                         catch (Exception exception)
                         {
-                            _serilogLogger.LogWarning(exception, $"Failed to create hardware {nameof(ID3D11Device)}");
-                            _serilogLogger.LogDebug($"Creating WARP {nameof(ID3D11Device)}");
+                            _serilogLogger.LogWarning(exception, $"Failed to create hardware {nameof(D3D11Device)}");
+                            _serilogLogger.LogDebug($"Creating WARP {nameof(D3D11Device)}");
 
-                            _d3d11Device = new D3D11Device(D3D_DRIVER_TYPE.D3D_DRIVER_TYPE_WARP, new[] { D3D_FEATURE_LEVEL.D3D_FEATURE_LEVEL_11_0 }, debug);
+                            D3D11Device
+                                .Create(
+                                    driverType: D3D_DRIVER_TYPE.D3D_DRIVER_TYPE_WARP,
+                                    featureLevels: featureLevels,
+                                    debug: debug,
+                                    device: out _d3d11Device,
+                                    immediateContext: out _d3d11DeviceContext)
+                                .ThrowIfFailed($"Failed to create WARP {nameof(D3D11Device)}.");
                         }
 
                         // Initialize DXGI
 
-                        _serilogLogger.LogDebug($"Querying {nameof(IDXGIDevice)}");
+                        _serilogLogger.LogDebug($"Querying {nameof(DXGIDevice)}");
 
-                        using DXGIDevice dxgiDevice = _d3d11Device.QueryDXGIDevice()!;
+                        using var dxgiDevice = new DXGIDevice(_d3d11Device!.QueryInterface<IDXGIDevice>());
 
-                        _serilogLogger.LogDebug($"Retrieving {nameof(IDXGIAdapter)}");
+                        _serilogLogger.LogDebug($"Retrieving {nameof(DXGIAdapter)}");
 
-                        _dxgiAdapter = dxgiDevice.GetAdapter();
+                        dxgiDevice.GetAdapter(out _dxgiAdapter).ThrowIfFailed($"Failed to retrieve {nameof(DXGIAdapter)}.");
 
-                        _serilogLogger.LogDebug($"Retrieving {nameof(IDXGIFactory2)}");
+                        _serilogLogger.LogDebug($"Retrieving {nameof(DXGIFactory2)}");
 
-                        using DXGIFactory2 dxgiFactory2 = _dxgiAdapter.GetParentDXGIFactory2()!;
+                        _dxgiAdapter!.GetParent(out IDXGIFactory2* parent).ThrowIfFailed($"Failed to get parent {nameof(DXGIFactory2)}.");
+
+                        using var dxgiFactory2 = new DXGIFactory2(parent);
 
                         // Initialize swap chain
 
-                        _serilogLogger.LogDebug($"Creating {nameof(IDXGISwapChain1)}");
+                        _serilogLogger.LogDebug($"Creating {nameof(DXGISwapChain1)}");
 
-                        _dxgiSwapChain1 = dxgiFactory2.CreateSwapChainForHwnd(_d3d11Device, _windowHandle, DxgiFormat);
+                        var dxgiSwapChainDesc1 =
+                            new DXGI_SWAP_CHAIN_DESC1
+                            {
+                                Width = 0,
+                                Height = 0,
+                                Format = DxgiFormat,
+                                Stereo = TerraFX.Interop.Windows.FALSE,
+                                SampleDesc =
+                                    new DXGI_SAMPLE_DESC
+                                    {
+                                        Count = 1,
+                                        Quality = 0
+                                    },
+                                BufferUsage = DXGI.DXGI_USAGE_RENDER_TARGET_OUTPUT,
+                                // Jesse Natalie on DirectX Discord: "Using 3 buffers prevents quantizing to 30hz if you drop below 60"
+                                BufferCount = 2, // Triple-buffering
+                                Scaling = DXGI_SCALING.DXGI_SCALING_NONE,
+                                SwapEffect = DXGI_SWAP_EFFECT.DXGI_SWAP_EFFECT_FLIP_DISCARD,
+                                AlphaMode = DXGI_ALPHA_MODE.DXGI_ALPHA_MODE_IGNORE,
+                                Flags = 0
+                            };
+
+                        dxgiFactory2
+                            .CreateSwapChainForHwnd(_d3d11Device, _windowHandle, &dxgiSwapChainDesc1, swapChain: out _dxgiSwapChain1)
+                            .ThrowIfFailed($"Failed to create {nameof(DXGISwapChain1)}.");
 
                         // Initialize Direct2D
 
-                        _serilogLogger.LogDebug($"Creating {nameof(ID2D1Device)}");
+                        _serilogLogger.LogDebug($"Creating {nameof(D2D1Device)}");
 
-                        _d2d1Device = new D2D1Device(dxgiDevice, debug);
+                        D2D1Device.Create(dxgiDevice, debug, out _d2d1Device).ThrowIfFailed($"Failed to create {nameof(D2D1Device)}.");
 
-                        _serilogLogger.LogDebug($"Creating {nameof(ID2D1DeviceContext)}");
+                        _serilogLogger.LogDebug($"Creating {nameof(D2D1DeviceContext)}");
 
-                        _d2d1DeviceContext = _d2d1Device.CreateDeviceContext();
+                        _d2d1Device!
+                            .CreateDeviceContext(
+                                D2D1_DEVICE_CONTEXT_OPTIONS.D2D1_DEVICE_CONTEXT_OPTIONS_ENABLE_MULTITHREADED_OPTIMIZATIONS,
+                                out _d2d1DeviceContext)
+                            .ThrowIfFailed($"Failed to create {nameof(D2D1DeviceContext)}.");
 
                         InitializeRenderTarget();
 
                         _serilogLogger.LogDebug("Making window association");
 
-                        dxgiFactory2.MakeWindowAssociation(_windowHandle, DXGI.DXGI_MWA_NO_ALT_ENTER);
+                        dxgiFactory2.MakeWindowAssociation(_windowHandle, DXGI.DXGI_MWA_NO_ALT_ENTER).ThrowIfFailed("Failed to make window association.");
 
                         // Initialize DirectWrite
 
-                        _serilogLogger.LogDebug($"Creating {nameof(IDWriteFactory1)}");
+                        _serilogLogger.LogDebug($"Creating {nameof(DWriteFactory1)}");
 
-                        _dWriteFactory1 = new DWriteFactory1();
+                        DWriteFactory.Create(out _dWriteFactory).ThrowIfFailed($"Failed to create {nameof(DWriteFactory)}.");
 
                         // Initialization complete
 
@@ -460,7 +514,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
                             _dxgiSwapChain1!,
                             _d2d1Device!,
                             _d2d1DeviceContext!,
-                            _dWriteFactory1!,
+                            _dWriteFactory!,
                             _clientSize.Value);
                         ImmutableArray<IRenderingEntity> entities;
 
@@ -500,7 +554,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
             }
 
             // Initialization failed
-            throw new DirectXException(
+            throw new InvalidOperationException(
                 $"DirectX resource initialization failed after {_renderResourcesInitializationAttempts} attemp{(_renderResourcesInitializationAttempts == 1 ? "" : "s")}.");
         }
 
@@ -540,11 +594,13 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         }
 
         /// <summary>Initializes the render target. Render targets must be reinitialized when initializing or resizing render resources.</summary>
-        private void InitializeRenderTarget()
+        private unsafe void InitializeRenderTarget()
         {
             _serilogLogger.LogDebug("Retrieving back buffer IDXGISurface");
 
-            using DXGISurface dxgiSurface = _dxgiSwapChain1!.GetBuffer(0);
+            _dxgiSwapChain1!.GetBuffer(0, out IDXGISurface* surface).ThrowIfFailed($"Failed to get {nameof(IDXGISurface)}.");
+
+            using var dxgiSurface = new DXGISurface(surface);
 
             _serilogLogger.LogDebug($"Creating {nameof(ID2D1Bitmap1)} target");
 
@@ -562,12 +618,21 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
                     bitmapOptions = D2D1_BITMAP_OPTIONS.D2D1_BITMAP_OPTIONS_TARGET | D2D1_BITMAP_OPTIONS.D2D1_BITMAP_OPTIONS_CANNOT_DRAW,
                     colorContext = null
                 };
-            using D2D1Bitmap1 d2d1Bitmap1 = _d2d1DeviceContext!.CreateBitmapFromDxgiSurface(dxgiSurface, ref bitmapProperties);
+            _d2d1DeviceContext!
+                .CreateBitmapFromDxgiSurface(dxgiSurface, &bitmapProperties, out D2D1Bitmap1? d2d1Bitmap1)
+                .ThrowIfFailed("Failed to create {nameof(D2D1Bitmap)}.");
 
-            _serilogLogger.LogDebug("Setting target");
+            try
+            {
+                _serilogLogger.LogDebug("Setting target");
 
-            _d2d1DeviceContext.SetTarget(d2d1Bitmap1);
-            _d2d1DeviceContext.SetTextAntialiasMode(D2D1_TEXT_ANTIALIAS_MODE.D2D1_TEXT_ANTIALIAS_MODE_CLEARTYPE);
+                _d2d1DeviceContext.SetTarget(d2d1Bitmap1!);
+                _d2d1DeviceContext.SetTextAntialiasMode(D2D1_TEXT_ANTIALIAS_MODE.D2D1_TEXT_ANTIALIAS_MODE_CLEARTYPE);
+            }
+            finally
+            {
+                d2d1Bitmap1!.Dispose();
+            }
         }
 
         /// <summary>Prepares entities for adding by informing them of game execution state changes.</summary>
@@ -602,12 +667,12 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
             _d2d1Device = null;
             _d2d1DeviceContext?.Dispose();
             _d2d1DeviceContext = null;
-            _dWriteFactory1?.Dispose();
-            _dWriteFactory1 = null;
+            _dWriteFactory?.Dispose();
+            _dWriteFactory = null;
 #if DEBUG
-            _dxgiDebug1?.ReportLiveObjects(DXGIDebug.DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_FLAGS.DXGI_DEBUG_RLO_SUMMARY);
-            _dxgiDebug1?.Dispose();
-            _dxgiDebug1 = null;
+            _dxgiDebug?.ReportLiveObjects(TerraFX.Interop.DXGIDebug.DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_FLAGS.DXGI_DEBUG_RLO_SUMMARY);
+            _dxgiDebug?.Dispose();
+            _dxgiDebug = null;
 #endif
         }
 
@@ -666,7 +731,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
 
         /// <summary>Handles the <see cref="ResolutionChangedMessage" /> global message.</summary>
         /// <param name="message">The message being handled.</param>
-        private void HandleResolutionChangedMessage(ResolutionChangedMessage message)
+        private unsafe void HandleResolutionChangedMessage(ResolutionChangedMessage message)
         {
             // Wait for rendering to complete
             lock (_renderLockObject)
@@ -681,13 +746,13 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
                 // Required due to deferred destruction:
                 // https://docs.microsoft.com/en-us/windows/win32/api/d3d11/nf-d3d11-id3d11devicecontext-flush#Defer_Issues_with_Flip
 
-                _d3d11Device!.ImmediateContext.ClearState();
-                _d3d11Device.ImmediateContext.Flush();
+                _d3d11DeviceContext!.ClearState();
+                _d3d11DeviceContext.Flush();
 
                 // Required to avoid leaking memory
-                _d2d1DeviceContext!.SetTarget(null);
+                _d2d1DeviceContext!.SetTarget();
 
-                _dxgiSwapChain1!.ResizeBuffers();
+                _dxgiSwapChain1!.ResizeBuffers(0, 0, 0, DXGI_FORMAT.DXGI_FORMAT_UNKNOWN, 0).ThrowIfFailed("Failed to resize buffers.");
 
                 InitializeRenderTarget();
 
@@ -702,7 +767,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
                     entities = _entities.OrderedByRenderOrder.ToImmutableArray();
                 }
 
-                var resources = new DirectXResources(_dxgiAdapter!, _dxgiSwapChain1, _d2d1Device!, _d2d1DeviceContext, _dWriteFactory1!, _clientSize.Value);
+                var resources = new DirectXResources(_dxgiAdapter!, _dxgiSwapChain1, _d2d1Device!, _d2d1DeviceContext, _dWriteFactory!, _clientSize.Value);
 
                 foreach (IRenderingEntity entity in entities)
                 {
@@ -720,27 +785,45 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         }
 
         /// <summary>Publishes the <see cref="RefreshPeriodChangedMessage" /> global message.</summary>
-        private void PublishRefreshPeriodChangedMessage()
+        private unsafe void PublishRefreshPeriodChangedMessage()
         {
             // Retrieve the current refresh rate
 
-            using DXGIOutput dxgiOutput = _dxgiSwapChain1!.GetContainingOutput();
-            using DXGIOutput1 dxgiOutput1 = dxgiOutput.QueryDXGIOutput1()!;
-            DXGI_MODE_DESC1 closestMatch = dxgiOutput1.FindClosestMatchingMode1();
+            DXGIOutput? dxgiOutput = null;
+            DXGIOutput1? dxgiOutput1 = null;
 
-            // Convert the refresh rate to a refresh period
-
-            double hz = closestMatch.RefreshRate.Numerator / (closestMatch.RefreshRate.Denominator == 0 ? 1.0 : closestMatch.RefreshRate.Denominator);
-            TimeSpan refreshPeriod = TimeSpan.FromSeconds(1) / hz;
-
-            if (refreshPeriod == _refreshPeriod)
+            try
             {
-                return;
+                _dxgiSwapChain1!.GetContainingOutput(out dxgiOutput).ThrowIfFailed($"Failed to get {nameof(DXGIOutput)}.");
+                dxgiOutput1 = new DXGIOutput1(dxgiOutput!.QueryInterface<IDXGIOutput1>());
+
+                var modeToMatch =
+                    new DXGI_MODE_DESC1
+                    {
+                        Format = DxgiFormat
+                    };
+
+                dxgiOutput1.FindClosestMatchingMode1(&modeToMatch, out DXGI_MODE_DESC1 closestMatch).ThrowIfFailed("Failed to find closest matching mode.");
+
+                // Convert the refresh rate to a refresh period
+
+                double hz = closestMatch.RefreshRate.Numerator / (closestMatch.RefreshRate.Denominator == 0 ? 1.0 : closestMatch.RefreshRate.Denominator);
+                TimeSpan refreshPeriod = TimeSpan.FromSeconds(1) / hz;
+
+                if (refreshPeriod == _refreshPeriod)
+                {
+                    return;
+                }
+
+                _refreshPeriod = refreshPeriod;
+
+                _updateGlobalMessagePublisherSubscriber.Publish(new RefreshPeriodChangedMessage(refreshPeriod, hz));
             }
-
-            _refreshPeriod = refreshPeriod;
-
-            _updateGlobalMessagePublisherSubscriber.Publish(new RefreshPeriodChangedMessage(refreshPeriod, hz));
+            finally
+            {
+                dxgiOutput?.Dispose();
+                dxgiOutput1?.Dispose();
+            }
         }
     }
 }

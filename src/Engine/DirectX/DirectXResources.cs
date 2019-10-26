@@ -1,4 +1,7 @@
-﻿using BouncyBox.VorpalEngine.Engine.DirectX.ComObjects;
+﻿using BouncyBox.VorpalEngine.Engine.Interop.D2D1_1;
+using BouncyBox.VorpalEngine.Engine.Interop.DWrite;
+using BouncyBox.VorpalEngine.Engine.Interop.DXGI;
+using BouncyBox.VorpalEngine.Engine.Interop.DXGI1_2;
 using TerraFX.Interop;
 
 namespace BouncyBox.VorpalEngine.Engine.DirectX
@@ -11,23 +14,25 @@ namespace BouncyBox.VorpalEngine.Engine.DirectX
         /// <param name="dxgiSwapChain1">A <see cref="DXGISwapChain1" />.</param>
         /// <param name="d2d1Device">A <see cref="D2D1Device" />.</param>
         /// <param name="d2d1DeviceContext">A <see cref="D2D1DeviceContext" />.</param>
-        /// <param name="dWriteFactory1">A <see cref="DWriteFactory1" />.</param>
+        /// <param name="dWriteFactory">A <see cref="DWriteFactory" />.</param>
         /// <param name="clientSize">The size of the render window's client area.</param>
         public DirectXResources(
             DXGIAdapter dxgiAdapter,
             DXGISwapChain1 dxgiSwapChain1,
             D2D1Device d2d1Device,
             D2D1DeviceContext d2d1DeviceContext,
-            DWriteFactory1 dWriteFactory1,
+            DWriteFactory dWriteFactory,
             D2D_SIZE_U clientSize)
         {
             DXGIAdapter = dxgiAdapter;
             DXGISwapChain1 = dxgiSwapChain1;
             D2D1Device = d2d1Device;
             D2D1DeviceContext = d2d1DeviceContext;
-            DWriteFactory1 = dWriteFactory1;
+            DWriteFactory = dWriteFactory;
             ClientSize = clientSize;
+            ClientSizeF = clientSize.ToD2DSizeF();
             ClientRect = D2DFactory.CreateRectU(D2DFactory.ZeroPoint2U, clientSize);
+            ClientRectF = ClientRect.ToD2DRectF();
         }
 
         /// <summary>Gets the <see cref="DXGIAdapter" />.</summary>
@@ -44,13 +49,19 @@ namespace BouncyBox.VorpalEngine.Engine.DirectX
         /// <summary>Gets the <see cref="D2D1DeviceContext" />.</summary>
         public D2D1DeviceContext D2D1DeviceContext { get; }
 
-        /// <summary>Gets the <see cref="DWriteFactory1" />.</summary>
-        public DWriteFactory1 DWriteFactory1 { get; }
+        /// <summary>Gets the <see cref="DWriteFactory" />.</summary>
+        public DWriteFactory DWriteFactory { get; }
 
         /// <summary>Gets the size of the render window's client area.</summary>
         public D2D_SIZE_U ClientSize { get; }
 
+        /// <summary>Gets the size of the render window's client area.</summary>
+        public D2D_SIZE_F ClientSizeF { get; }
+
         /// <summary>Gets the render window's client rectangle.</summary>
         public D2D_RECT_U ClientRect { get; }
+
+        /// <summary>Gets the render window's client rectangle.</summary>
+        public D2D_RECT_F ClientRectF { get; }
     }
 }
