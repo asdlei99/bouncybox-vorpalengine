@@ -23,12 +23,11 @@ namespace BouncyBox.VorpalEngine.Engine.Interop.DWrite
 
         public HResult GetLocaleName(uint index, Span<char> localeName)
         {
-            var localeNameArray = new char[localeName.Length];
             int hr;
 
-            fixed (char* pLocaleNameArray = localeNameArray)
+            fixed (char* pLocaleName = localeName)
             {
-                hr = Pointer->GetLocaleName(index, (ushort*)pLocaleNameArray, (uint)localeName.Length);
+                hr = Pointer->GetLocaleName(index, (ushort*)pLocaleName, (uint)localeName.Length);
             }
 
             return hr;

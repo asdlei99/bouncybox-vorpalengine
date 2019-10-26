@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
-using BouncyBox.VorpalEngine.Engine.Interop.DWrite;
 using BouncyBox.VorpalEngine.Engine.Interop.DXGI;
 using TerraFX.Interop;
 
@@ -13,23 +12,20 @@ namespace BouncyBox.VorpalEngine.Engine.Interop.DXGI1_2
     {
         public HResult OfferResources(ReadOnlySpan<IDXGIResourcePointer> resources, DXGI_OFFER_RESOURCE_PRIORITY Priority)
         {
-            var pDxgiResources = new IDXGIResource*[resources.Length];
-
-            fixed (IDXGIResource** ppDxgiResources = pDxgiResources)
+            fixed (IDXGIResourcePointer* ppResources = resources)
             {
-                return Pointer->OfferResources((uint)pDxgiResources.Length, ppDxgiResources, Priority);
+                return Pointer->OfferResources((uint)resources.Length, (IDXGIResource**)ppResources, Priority);
             }
         }
 
         public HResult ReclaimResources(ReadOnlySpan<IDXGIResourcePointer> resources, out bool? discarded)
         {
-            var pDxgiResources = new IDXGIResource*[resources.Length];
             int iDiscarded;
             int hr;
 
-            fixed (IDXGIResource** ppDxgiResources = pDxgiResources)
+            fixed (IDXGIResourcePointer* ppResources = resources)
             {
-                hr = Pointer->ReclaimResources((uint)pDxgiResources.Length, ppDxgiResources, &iDiscarded);
+                hr = Pointer->ReclaimResources((uint)resources.Length, (IDXGIResource**)ppResources, &iDiscarded);
             }
 
             discarded = TerraFX.Interop.Windows.SUCCEEDED(hr) ? iDiscarded == TerraFX.Interop.Windows.TRUE : (bool?)null;

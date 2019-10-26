@@ -10,7 +10,6 @@ using BouncyBox.VorpalEngine.Engine.Interop.D2D1;
 using BouncyBox.VorpalEngine.Engine.Interop.D2D1_1;
 using BouncyBox.VorpalEngine.Engine.Interop.D3D11;
 using BouncyBox.VorpalEngine.Engine.Interop.DWrite;
-using BouncyBox.VorpalEngine.Engine.Interop.DWrite_1;
 using BouncyBox.VorpalEngine.Engine.Interop.DXGI;
 using BouncyBox.VorpalEngine.Engine.Interop.DXGI1_2;
 using BouncyBox.VorpalEngine.Engine.Logging;
@@ -256,7 +255,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
                     _d2d1Device!,
                     _d2d1DeviceContext,
                     _dWriteFactory!,
-                    _clientSize.Value);
+                    _clientSize!.Value);
                 var atLeastOneEntityRendered = false;
 
                 // Render entities
@@ -492,7 +491,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
 
                         // Initialize DirectWrite
 
-                        _serilogLogger.LogDebug($"Creating {nameof(DWriteFactory1)}");
+                        _serilogLogger.LogDebug($"Creating {nameof(DWriteFactory)}");
 
                         DWriteFactory.Create(out _dWriteFactory).ThrowIfFailed($"Failed to create {nameof(DWriteFactory)}.");
 

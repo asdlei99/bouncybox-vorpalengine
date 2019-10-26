@@ -12,7 +12,7 @@ namespace BouncyBox.VorpalEngine.SampleGame
         [STAThread]
         private static int Main(string[] args)
         {
-            return GameFactory.CreateAndRun<Game, GameState, SceneKey>(SceneKey.Loading, args, RegisterComponents);
+            return GameFactory.CreateAndRun<Game, GameState, SceneKey>(SceneKey.Title, args, RegisterComponents);
         }
 
         private static void RegisterComponents(ContainerBuilder containerBuilder)

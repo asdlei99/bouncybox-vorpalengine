@@ -17,30 +17,22 @@ namespace BouncyBox.VorpalEngine.Engine.Interop.DXGI
             }
         }
 
-        public HResult GetDisplayModeList(DXGI_FORMAT EnumFormat, uint Flags, out ReadOnlySpan<DXGI_MODE_DESC> desc)
+        public HResult GetDisplayModeList(DXGI_FORMAT EnumFormat, uint Flags, Span<DXGI_MODE_DESC> desc)
         {
-            uint numModes;
-            int hr = Pointer->GetDisplayModeList(EnumFormat, Flags, &numModes, null);
+            var numModes = (uint)desc.Length;
 
-            desc = default;
-
-            // ReSharper disable once InvertIf
-            if (TerraFX.Interop.Windows.SUCCEEDED(hr))
+            fixed (DXGI_MODE_DESC* pDesc = desc)
             {
-                var descArray = new DXGI_MODE_DESC[checked((int)numModes)];
-
-                fixed (DXGI_MODE_DESC* pDescs = descArray)
-                {
-                    hr = Pointer->GetDisplayModeList(EnumFormat, Flags, &numModes, pDescs);
-                }
-
-                if (TerraFX.Interop.Windows.SUCCEEDED(hr))
-                {
-                    desc = descArray;
-                }
+                return Pointer->GetDisplayModeList(EnumFormat, Flags, &numModes, pDesc);
             }
+        }
 
-            return hr;
+        public HResult GetDisplayModeListCount(DXGI_FORMAT EnumFormat, uint Flags, out uint count)
+        {
+            fixed (uint* pCount = &count)
+            {
+                return Pointer->GetDisplayModeList(EnumFormat, Flags, pCount, null);
+            }
         }
 
         public HResult GetFrameStatistics(out DXGI_FRAME_STATISTICS stats)

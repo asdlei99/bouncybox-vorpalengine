@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Buffers;
 using System.Runtime.InteropServices;
 using TerraFX.Interop;
 
@@ -8,43 +9,55 @@ namespace BouncyBox.VorpalEngine.Engine.Interop.DWrite
 {
     public unsafe partial class DWriteFontFace
     {
-        public HResult GetDesignGlyphMetrics(ReadOnlySpan<ushort> glyphIndices, out ReadOnlySpan<DWRITE_GLYPH_METRICS> glyphMetrics, bool isSideways)
+        public HResult GetDesignGlyphMetrics(ReadOnlySpan<ushort> glyphIndices, Span<DWRITE_GLYPH_METRICS> glyphMetrics, bool isSideways)
         {
-            var glyphMetricsArray = new DWRITE_GLYPH_METRICS[glyphIndices.Length];
-            int hr;
+            if (glyphMetrics.Length < glyphIndices.Length)
+            {
+                throw new ArgumentException($"Must have at least as many elements as {nameof(glyphIndices)}.", nameof(glyphMetrics));
+            }
 
             fixed (ushort* pGlyphIndices = glyphIndices)
-            fixed (DWRITE_GLYPH_METRICS* pGlyphMetrics = glyphMetricsArray)
+            fixed (DWRITE_GLYPH_METRICS* pGlyphMetrics = glyphMetrics)
             {
-                hr = Pointer->GetDesignGlyphMetrics(
+                return Pointer->GetDesignGlyphMetrics(
                     pGlyphIndices,
                     (uint)glyphIndices.Length,
                     pGlyphMetrics,
                     isSideways ? TerraFX.Interop.Windows.TRUE : TerraFX.Interop.Windows.FALSE);
             }
-
-            glyphMetrics = glyphMetricsArray;
-
-            return hr;
         }
 
         public HResult GetFiles(Span<DWriteFontFile> fontFiles)
         {
             var numberOfFiles = (uint)fontFiles.Length;
-            var pFontFilesArray = new IDWriteFontFile*[fontFiles.Length];
+            IDWriteFontFilePointer[]? pFontFilesArray = null;
+            Span<IDWriteFontFilePointer> fontFilesSpan =
+                AllocationHelper.CanStackAlloc<IDWriteFontFilePointer>((uint)fontFiles.Length)
+                    ? stackalloc IDWriteFontFilePointer[fontFiles.Length]
+                    : pFontFilesArray = ArrayPool<IDWriteFontFilePointer>.Shared.Rent(fontFiles.Length);
             int hr;
 
-            fixed (IDWriteFontFile** ppFontFilesArray = pFontFilesArray)
+            try
             {
-                hr = Pointer->GetFiles(&numberOfFiles, ppFontFilesArray);
-            }
-
-            // ReSharper disable once InvertIf
-            if (TerraFX.Interop.Windows.SUCCEEDED(hr))
-            {
-                for (var i = 0; i < fontFiles.Length; i++)
+                fixed (IDWriteFontFilePointer* ppFontFiles = fontFilesSpan)
                 {
-                    fontFiles[i] = new DWriteFontFile(pFontFilesArray[i]);
+                    hr = Pointer->GetFiles(&numberOfFiles, (IDWriteFontFile**)ppFontFiles);
+                }
+
+                // ReSharper disable once InvertIf
+                if (TerraFX.Interop.Windows.SUCCEEDED(hr))
+                {
+                    for (var i = 0; i < fontFiles.Length; i++)
+                    {
+                        fontFiles[i] = new DWriteFontFile(fontFilesSpan[i].Pointer);
+                    }
+                }
+            }
+            finally
+            {
+                if (pFontFilesArray is object)
+                {
+                    ArrayPool<IDWriteFontFilePointer>.Shared.Return(pFontFilesArray);
                 }
             }
 
@@ -65,34 +78,27 @@ namespace BouncyBox.VorpalEngine.Engine.Interop.DWrite
             [Optional] DWRITE_MATRIX* transform,
             bool useGdiNatural,
             ReadOnlySpan<ushort> glyphIndices,
-            out ReadOnlySpan<DWRITE_GLYPH_METRICS> glyphMetrics,
+            Span<DWRITE_GLYPH_METRICS> glyphMetrics,
             bool isSideways = false)
         {
-            var glyphMetricsArray = new DWRITE_GLYPH_METRICS[glyphIndices.Length];
-            int hr;
-
-            glyphMetrics = default;
+            if (glyphMetrics.Length < glyphIndices.Length)
+            {
+                throw new ArgumentException($"Must have at least as many elements as {nameof(glyphIndices)}.", nameof(glyphMetrics));
+            }
 
             fixed (ushort* pGlyphIndices = glyphIndices)
-            fixed (DWRITE_GLYPH_METRICS* pGlyphMetricsArray = glyphMetricsArray)
+            fixed (DWRITE_GLYPH_METRICS* pGlyphMetrics = glyphMetrics)
             {
-                hr = Pointer->GetGdiCompatibleGlyphMetrics(
+                return Pointer->GetGdiCompatibleGlyphMetrics(
                     emSize,
                     pixelsPerDip,
                     transform,
                     useGdiNatural ? TerraFX.Interop.Windows.TRUE : TerraFX.Interop.Windows.FALSE,
                     pGlyphIndices,
                     (uint)glyphIndices.Length,
-                    pGlyphMetricsArray,
+                    pGlyphMetrics,
                     isSideways ? TerraFX.Interop.Windows.TRUE : TerraFX.Interop.Windows.FALSE);
-
-                if (TerraFX.Interop.Windows.SUCCEEDED(hr))
-                {
-                    glyphMetrics = glyphMetricsArray;
-                }
             }
-
-            return hr;
         }
 
         public HResult GetGdiCompatibleMetrics(float emSize, float pixelsPerDip, [Optional] DWRITE_MATRIX* transform, out DWRITE_FONT_METRICS fontFaceMetrics)
@@ -103,17 +109,19 @@ namespace BouncyBox.VorpalEngine.Engine.Interop.DWrite
             }
         }
 
-        public HResult GetGlyphIndices(ReadOnlySpan<uint> codePoints, out ReadOnlySpan<ushort> glyphIndices)
+        public HResult GetGlyphIndices(ReadOnlySpan<uint> codePoints, Span<ushort> glyphIndices)
         {
-            var glyphIndicesArray = new ushort[codePoints.Length];
+            if (glyphIndices.Length < codePoints.Length)
+            {
+                throw new ArgumentException($"Must have at least as many elements as {nameof(codePoints)}.", nameof(glyphIndices));
+            }
+
             int hr;
 
             fixed (uint* pCodePoints = codePoints)
-            fixed (ushort* pGlyphIndicesArray = glyphIndicesArray)
+            fixed (ushort* pGlyphIndices = glyphIndices)
             {
-                hr = Pointer->GetGlyphIndices(pCodePoints, (uint)codePoints.Length, pGlyphIndicesArray);
-
-                glyphIndices = TerraFX.Interop.Windows.SUCCEEDED(hr) ? glyphIndicesArray : default;
+                hr = Pointer->GetGlyphIndices(pCodePoints, (uint)codePoints.Length, pGlyphIndices);
             }
 
             return hr;
@@ -131,7 +139,8 @@ namespace BouncyBox.VorpalEngine.Engine.Interop.DWrite
             if (glyphAdvances.Length > 0 && glyphAdvances.Length != glyphIndices.Length ||
                 glyphOffsets.Length > 0 && glyphOffsets.Length != glyphIndices.Length)
             {
-                throw new ArgumentException("Glyph indices, glyph advances, and glyph offsets must all have the same length, or be empty.");
+                throw new ArgumentException(
+                    $"{nameof(glyphIndices)}, {nameof(glyphAdvances)}, and {nameof(glyphOffsets)} must all have the same length, but they may be individually empty.");
             }
 
             fixed (ushort* pGlyphIndices = glyphIndices)

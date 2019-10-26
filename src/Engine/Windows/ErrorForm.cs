@@ -110,7 +110,7 @@ namespace BouncyBox.VorpalEngine.Engine.Windows
                     errorForm = new ErrorForm(windowCaption, "Invalid command line arguments. &Details:", stringBuilder.ToString());
                 });
 
-            Debug.Assert(!(errorForm is null));
+            Debug.Assert(errorForm is object);
 
             return errorForm;
         }
