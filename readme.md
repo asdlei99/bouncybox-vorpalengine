@@ -18,7 +18,7 @@ Bouncy Box is my not-yet-registered LLC. You'll see this name references in vari
 
 ## Engine requirements and recommendations
 
-- Platform Update for Windows 7 or newer
+- Windows 10
 - A GPU that supports DirectX 11
 - A gamepad that supports XInput or can be mapped with a mapping application like [DS4Windows](https://ryochan7.github.io/ds4windows-site/)
 
