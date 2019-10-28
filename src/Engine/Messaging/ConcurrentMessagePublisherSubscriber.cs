@@ -1,4 +1,5 @@
 ﻿using System;
+using BouncyBox.VorpalEngine.Common;
 
 namespace BouncyBox.VorpalEngine.Engine.Messaging
 {

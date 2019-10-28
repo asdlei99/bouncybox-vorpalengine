@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Drawing;
 using System.Threading;
+using BouncyBox.VorpalEngine.Common;
 using BouncyBox.VorpalEngine.Engine.DirectX;
 using BouncyBox.VorpalEngine.Engine.Input.Keyboard;
 using BouncyBox.VorpalEngine.Engine.Input.XInput;

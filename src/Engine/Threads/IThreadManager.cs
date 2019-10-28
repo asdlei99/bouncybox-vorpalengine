@@ -33,5 +33,11 @@ namespace BouncyBox.VorpalEngine.Engine.Threads
         /// <returns>Returns a collection of tuples containing unhandled exceptions and the engine threads they occurred on.</returns>
         IReadOnlyCollection<(EngineThread thread, Exception exception)> RequestEngineThreadTerminationAndWaitForTermination(
             CountdownEvent terminationCountdownEvent);
+
+        /// <summary>Disposes an object only if the provided flag is false. The flag is set to true after disposal.</summary>
+        /// <param name="delegate">A delegate that disposes the object.</param>
+        /// <param name="isDisposed">A flag indicating if the object was disposed.</param>
+        /// <param name="thread">The currently-executing thread must be the specified thread.</param>
+        void DisposeHelper(Action @delegate, ref bool isDisposed, ProcessThread thread);
     }
 }

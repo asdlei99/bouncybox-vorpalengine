@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using BouncyBox.VorpalEngine.Common;
 using BouncyBox.VorpalEngine.Engine.Entities;
 using BouncyBox.VorpalEngine.Engine.Messaging;
 using BouncyBox.VorpalEngine.Engine.Threads;
@@ -77,7 +78,7 @@ namespace BouncyBox.VorpalEngine.Engine.Scenes
         /// <inheritdoc />
         public void Dispose()
         {
-            DisposeHelper.Dispose(() => { _globalMessagePublisherSubscriber?.Dispose(); }, ref _isDisposed, _interfaces.ThreadManager, ProcessThread.Main);
+            _interfaces.ThreadManager.DisposeHelper(() => { _globalMessagePublisherSubscriber?.Dispose(); }, ref _isDisposed, ProcessThread.Main);
         }
 
         /// <inheritdoc cref="IScene{TSceneKey}.Load" />

@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using BouncyBox.Common.NetStandard21.Logging;
+using BouncyBox.VorpalEngine.Common;
 using BouncyBox.VorpalEngine.Engine.Logging;
 using EnumsNET;
 
@@ -138,16 +139,25 @@ namespace BouncyBox.VorpalEngine.Engine.Threads
         }
 
         /// <inheritdoc />
+        /// <exception cref="InvalidOperationException">Thrown when the specified thread has not been started.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when the current thread is not the specified thread.</exception>
+        public void DisposeHelper(Action @delegate, ref bool isDisposed, ProcessThread thread)
+        {
+            VerifyProcessThread(thread);
+
+            Common.DisposeHelper.Dispose(@delegate, ref isDisposed);
+        }
+
+        /// <inheritdoc />
         public void Dispose()
         {
-            DisposeHelper.Dispose(
+            DisposeHelper(
                 () =>
                 {
                     _threadsByProcessThread.Clear();
                     _cancellationTokenSource.Dispose();
                 },
                 ref _isDisposed,
-                this,
                 ProcessThread.Main);
         }
 

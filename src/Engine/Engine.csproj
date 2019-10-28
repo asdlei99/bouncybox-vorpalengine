@@ -18,15 +18,12 @@
     <PackageReference Include="Enums.NET" Version="2.3.2" />
     <PackageReference Include="Serilog.Sinks.Debug" Version="1.0.1" />
     <PackageReference Include="Serilog.Sinks.File" Version="4.1.0" />
-    <PackageReference Include="TerraFX.Interop.D2D1" Version="10.0.18362-alpha-20191020.1" />
-    <PackageReference Include="TerraFX.Interop.D3D11" Version="10.0.18362-alpha-20191020.1" />
-    <PackageReference Include="TerraFX.Interop.DWrite" Version="10.0.18362-alpha-20191020.1" />
-    <PackageReference Include="TerraFX.Interop.DXGI" Version="10.0.18362-alpha-20191020.1" />
-    <PackageReference Include="TerraFX.Interop.DXGIDebug" Version="10.0.18362-alpha-20191020.1" />
-    <PackageReference Include="TerraFX.Interop.User32" Version="10.0.18362-alpha-20191020.1" />
-    <PackageReference Include="TerraFX.Interop.Windows" Version="10.0.18362-alpha-20191020.1" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj" />
+    <ProjectReference Include="..\Interop\Interop.csproj" />
   </ItemGroup>
 </Project>

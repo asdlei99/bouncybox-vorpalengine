@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\build\msbuild\canonical.props" />
+  <Import Project="..\..\build\msbuild\standard-properties.props" />
+  <Import Project="..\..\build\msbuild\netstandard-version.props" />
+  <Import Project="..\..\build\msbuild\netstandard-assembly.props" />
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+</Project>

@@ -1,5 +1,6 @@
 ﻿using System;
 using BouncyBox.Common.NetStandard21.Logging;
+using BouncyBox.VorpalEngine.Common;
 using Serilog.Events;
 
 namespace BouncyBox.VorpalEngine.Engine.Logging

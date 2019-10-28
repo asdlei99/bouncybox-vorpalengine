@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using BouncyBox.Common.NetStandard21.Logging;
+using BouncyBox.VorpalEngine.Common;
 using BouncyBox.VorpalEngine.Engine.Logging;
 using Subscriptions = System.Collections.Generic.Dictionary<BouncyBox.VorpalEngine.Engine.Messaging.SubscriptionToken, (System.Delegate handlerDelegate,
-    BouncyBox.VorpalEngine.Engine.NestedContext context)>;
+    BouncyBox.VorpalEngine.Common.NestedContext context)>;
 
 namespace BouncyBox.VorpalEngine.Engine.Messaging
 {

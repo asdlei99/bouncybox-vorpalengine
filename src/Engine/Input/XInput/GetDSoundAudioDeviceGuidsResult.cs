@@ -1,4 +1,4 @@
-﻿using BouncyBox.VorpalEngine.Engine.Interop;
+﻿using BouncyBox.VorpalEngine.Interop;
 
 #pragma warning disable 1591
 

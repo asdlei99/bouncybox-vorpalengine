@@ -6,17 +6,18 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using BouncyBox.VorpalEngine.Common;
 using BouncyBox.VorpalEngine.Engine;
 using BouncyBox.VorpalEngine.Engine.DirectX;
 using BouncyBox.VorpalEngine.Engine.Entities;
 using BouncyBox.VorpalEngine.Engine.Game;
 using BouncyBox.VorpalEngine.Engine.Input.Keyboard;
 using BouncyBox.VorpalEngine.Engine.Input.XInput;
-using BouncyBox.VorpalEngine.Engine.Interop.D2D1;
-using BouncyBox.VorpalEngine.Engine.Interop.DWrite;
 using BouncyBox.VorpalEngine.Engine.Messaging.GlobalMessages;
+using BouncyBox.VorpalEngine.Interop.D2D1;
+using BouncyBox.VorpalEngine.Interop.DWrite;
 using TerraFX.Interop;
-using User32 = BouncyBox.VorpalEngine.Engine.Interop.User32;
+using User32 = BouncyBox.VorpalEngine.Interop.User32;
 
 namespace BouncyBox.VorpalEngine.DebuggingGame.Scenes.Root
 {

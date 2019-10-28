@@ -1,6 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
-using BouncyBox.VorpalEngine.Engine.Interop;
+using BouncyBox.VorpalEngine.Interop;
 
 namespace BouncyBox.VorpalEngine.Engine.Input.XInput
 {

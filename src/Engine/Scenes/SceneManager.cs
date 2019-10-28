@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using BouncyBox.VorpalEngine.Common;
 using BouncyBox.VorpalEngine.Engine.Logging;
 using BouncyBox.VorpalEngine.Engine.Messaging;
 using BouncyBox.VorpalEngine.Engine.Messaging.GlobalMessages;
@@ -76,7 +77,7 @@ namespace BouncyBox.VorpalEngine.Engine.Scenes
         /// </exception>
         public void Dispose()
         {
-            DisposeHelper.Dispose(() => { _globalMessagePublisherSubscriber?.Dispose(); }, ref _isDisposed, _interfaces.ThreadManager, ProcessThread.Main);
+            _interfaces.ThreadManager.DisposeHelper(() => { _globalMessagePublisherSubscriber?.Dispose(); }, ref _isDisposed, ProcessThread.Main);
         }
 
         /// <summary>Handles the <see cref="LoadSceneMessage{TSceneKey}" /> global message.</summary>

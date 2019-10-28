@@ -1,7 +1,7 @@
-﻿using BouncyBox.VorpalEngine.Engine.Interop.D2D1_1;
-using BouncyBox.VorpalEngine.Engine.Interop.DWrite;
-using BouncyBox.VorpalEngine.Engine.Interop.DXGI;
-using BouncyBox.VorpalEngine.Engine.Interop.DXGI1_2;
+﻿using BouncyBox.VorpalEngine.Interop.D2D1_1;
+using BouncyBox.VorpalEngine.Interop.DWrite;
+using BouncyBox.VorpalEngine.Interop.DXGI;
+using BouncyBox.VorpalEngine.Interop.DXGI1_2;
 using TerraFX.Interop;
 
 namespace BouncyBox.VorpalEngine.Engine.DirectX

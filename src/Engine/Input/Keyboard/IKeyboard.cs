@@ -1,4 +1,4 @@
-﻿using BouncyBox.VorpalEngine.Engine.Interop;
+﻿using BouncyBox.VorpalEngine.Interop;
 
 namespace BouncyBox.VorpalEngine.Engine.Input.Keyboard
 {

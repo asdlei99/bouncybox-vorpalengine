@@ -1,4 +1,5 @@
-﻿using BouncyBox.VorpalEngine.Engine.Logging;
+﻿using BouncyBox.VorpalEngine.Common;
+using BouncyBox.VorpalEngine.Engine.Logging;
 using BouncyBox.VorpalEngine.Engine.Messaging;
 using BouncyBox.VorpalEngine.Engine.Messaging.GlobalMessages;
 

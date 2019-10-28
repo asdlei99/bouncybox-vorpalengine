@@ -2,10 +2,10 @@
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
+using BouncyBox.VorpalEngine.Common;
 using BouncyBox.VorpalEngine.Engine.Bootstrap;
 using BouncyBox.VorpalEngine.Engine.Game;
 using BouncyBox.VorpalEngine.Engine.Input.Keyboard;
-using BouncyBox.VorpalEngine.Engine.Interop;
 using BouncyBox.VorpalEngine.Engine.Logging;
 using BouncyBox.VorpalEngine.Engine.Messaging;
 using BouncyBox.VorpalEngine.Engine.Messaging.GlobalMessages;

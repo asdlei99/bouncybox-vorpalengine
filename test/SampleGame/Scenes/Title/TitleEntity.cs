@@ -1,4 +1,5 @@
-﻿using BouncyBox.VorpalEngine.Engine;
+﻿using BouncyBox.VorpalEngine.Common;
+using BouncyBox.VorpalEngine.Engine;
 using BouncyBox.VorpalEngine.Engine.Entities;
 
 namespace BouncyBox.VorpalEngine.SampleGame.Scenes.Title

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
-using BouncyBox.VorpalEngine.Engine.Interop;
+using BouncyBox.VorpalEngine.Interop;
 using EnumsNET;
 
 namespace BouncyBox.VorpalEngine.Engine.Input.Keyboard

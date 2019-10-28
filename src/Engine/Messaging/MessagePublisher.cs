@@ -1,4 +1,6 @@
-﻿namespace BouncyBox.VorpalEngine.Engine.Messaging
+﻿using BouncyBox.VorpalEngine.Common;
+
+namespace BouncyBox.VorpalEngine.Engine.Messaging
 {
     /// <summary>Proxies publishing messages to a message queue to allow for method chaining.</summary>
     public class MessagePublisher<TMessageBase>
