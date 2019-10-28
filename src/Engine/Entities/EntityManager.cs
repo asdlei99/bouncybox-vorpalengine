@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
@@ -659,6 +659,8 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         {
             _d3d11Device?.Dispose();
             _d3d11Device = null;
+            _d3d11DeviceContext?.Dispose();
+            _d3d11DeviceContext = null;
             _dxgiAdapter?.Dispose();
             _dxgiAdapter = null;
             _dxgiSwapChain1?.Dispose();
