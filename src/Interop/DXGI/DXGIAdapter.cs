@@ -18,14 +18,14 @@ namespace BouncyBox.VorpalEngine.Interop.DXGI
 
         public new IDXGIAdapter* Pointer => (IDXGIAdapter*)base.Pointer;
 
-        public HResult CheckInterfaceSupport(Guid* InterfaceName, LARGE_INTEGER* pUMDVersion)
+        public HResult CheckInterfaceSupport(Guid* interfaceName, LARGE_INTEGER* pUMDVersion)
         {
-            return Pointer->CheckInterfaceSupport(InterfaceName, pUMDVersion);
+            return Pointer->CheckInterfaceSupport(interfaceName, pUMDVersion);
         }
 
-        public HResult EnumOutputs(uint Output, IDXGIOutput** ppOutput)
+        public HResult EnumOutputs(uint outputIndex, IDXGIOutput** ppOutput)
         {
-            return Pointer->EnumOutputs(Output, ppOutput);
+            return Pointer->EnumOutputs(outputIndex, ppOutput);
         }
 
         public HResult GetDesc(DXGI_ADAPTER_DESC* pDesc)

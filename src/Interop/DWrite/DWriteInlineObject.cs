@@ -23,7 +23,7 @@ namespace BouncyBox.VorpalEngine.Interop.DWrite
             float originY,
             bool isSideways,
             bool isRightToLeft,
-            [Optional] IUnknown* clientDrawingEffect)
+            IUnknown* clientDrawingEffect = null)
         {
             return Pointer->Draw(
                 clientDrawingContext,

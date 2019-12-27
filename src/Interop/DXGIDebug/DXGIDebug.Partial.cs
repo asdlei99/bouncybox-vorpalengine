@@ -12,10 +12,10 @@ namespace BouncyBox.VorpalEngine.Interop.DXGIDebug
         public static HResult Create(out DXGIDebug? dxgiDebug)
         {
             Guid iid = TerraFX.Interop.DXGIDebug.IID_IDXGIDebug;
-            IDXGIDebug* ppDebug;
-            int hr = TerraFX.Interop.DXGIDebug.DXGIGetDebugInterface(&iid, (void**)&ppDebug);
+            IDXGIDebug* pDebug;
+            int hr = TerraFX.Interop.DXGIDebug.DXGIGetDebugInterface(&iid, (void**)&pDebug);
 
-            dxgiDebug = TerraFX.Interop.Windows.SUCCEEDED(hr) ? new DXGIDebug(ppDebug) : null;
+            dxgiDebug = TerraFX.Interop.Windows.SUCCEEDED(hr) ? new DXGIDebug(pDebug) : null;
 
             return hr;
         }

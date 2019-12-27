@@ -17,21 +17,21 @@ namespace BouncyBox.VorpalEngine.Interop.DXGI
             }
         }
 
-        public HResult GetDisplayModeList(DXGI_FORMAT EnumFormat, uint Flags, Span<DXGI_MODE_DESC> desc)
+        public HResult GetDisplayModeList(DXGI_FORMAT enumFormat, uint flags, Span<DXGI_MODE_DESC> desc)
         {
             var numModes = (uint)desc.Length;
 
             fixed (DXGI_MODE_DESC* pDesc = desc)
             {
-                return Pointer->GetDisplayModeList(EnumFormat, Flags, &numModes, pDesc);
+                return Pointer->GetDisplayModeList(enumFormat, flags, &numModes, pDesc);
             }
         }
 
-        public HResult GetDisplayModeListCount(DXGI_FORMAT EnumFormat, uint Flags, out uint count)
+        public HResult GetDisplayModeListCount(DXGI_FORMAT enumFormat, uint flags, out uint count)
         {
             fixed (uint* pCount = &count)
             {
-                return Pointer->GetDisplayModeList(EnumFormat, Flags, pCount, null);
+                return Pointer->GetDisplayModeList(enumFormat, flags, pCount, null);
             }
         }
 

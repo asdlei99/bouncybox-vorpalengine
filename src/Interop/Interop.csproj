@@ -5,18 +5,18 @@
   <Import Project="..\..\build\msbuild\netstandard-assembly.props" />
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="TerraFX.Interop.D2D1" Version="10.0.18362-alpha-20191020.1" />
-    <PackageReference Include="TerraFX.Interop.D3D11" Version="10.0.18362-alpha-20191020.1" />
-    <PackageReference Include="TerraFX.Interop.DWrite" Version="10.0.18362-alpha-20191020.1" />
-    <PackageReference Include="TerraFX.Interop.DXGI" Version="10.0.18362-alpha-20191020.1" />
-    <PackageReference Include="TerraFX.Interop.DXGIDebug" Version="10.0.18362-alpha-20191020.1" />
-    <PackageReference Include="TerraFX.Interop.User32" Version="10.0.18362-alpha-20191020.1" />
-    <PackageReference Include="TerraFX.Interop.Windows" Version="10.0.18362-alpha-20191020.1" />
+    <PackageReference Include="TerraFX.Interop.D2D1" Version="10.0.18362-alpha-20191220.1" />
+    <PackageReference Include="TerraFX.Interop.D3D11" Version="10.0.18362-alpha-20191220.1" />
+    <PackageReference Include="TerraFX.Interop.DWrite" Version="10.0.18362-alpha-20191220.1" />
+    <PackageReference Include="TerraFX.Interop.DXGI" Version="10.0.18362-alpha-20191220.1" />
+    <PackageReference Include="TerraFX.Interop.DXGIDebug" Version="10.0.18362-alpha-20191220.1" />
+    <PackageReference Include="TerraFX.Interop.User32" Version="10.0.18362-alpha-20191220.1" />
+    <PackageReference Include="TerraFX.Interop.Windows" Version="10.0.18362-alpha-20191220.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj" />

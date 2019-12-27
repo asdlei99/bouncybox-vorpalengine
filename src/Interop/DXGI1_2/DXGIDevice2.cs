@@ -24,15 +24,15 @@ namespace BouncyBox.VorpalEngine.Interop.DXGI1_2
             return Pointer->EnqueueSetEvent(hEvent);
         }
 
-        public HResult OfferResources(uint NumResources, IDXGIResource** ppResources, DXGI_OFFER_RESOURCE_PRIORITY Priority)
+        public HResult OfferResources(uint numResources, IDXGIResource** resources, DXGI_OFFER_RESOURCE_PRIORITY priority)
         {
-            return Pointer->OfferResources(NumResources, ppResources, Priority);
+            return Pointer->OfferResources(numResources, resources, priority);
         }
 
-        public HResult ReclaimResources(uint NumResources, IDXGIResource** ppResources, out bool? discarded)
+        public HResult ReclaimResources(uint numResources, IDXGIResource** resources, out bool? discarded)
         {
             int iDiscarded;
-            int hr = Pointer->ReclaimResources(NumResources, ppResources, &iDiscarded);
+            int hr = Pointer->ReclaimResources(numResources, resources, &iDiscarded);
 
             discarded = iDiscarded == TerraFX.Interop.Windows.TRUE;
 

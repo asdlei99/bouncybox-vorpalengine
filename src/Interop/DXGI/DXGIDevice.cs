@@ -19,33 +19,33 @@ namespace BouncyBox.VorpalEngine.Interop.DXGI
         public new IDXGIDevice* Pointer => (IDXGIDevice*)base.Pointer;
 
         public HResult CreateSurface(
-            DXGI_SURFACE_DESC* pDesc,
-            uint NumSurfaces,
-            uint Usage,
-            [Optional] DXGI_SHARED_RESOURCE* pSharedResource,
-            IDXGISurface** ppSurface)
+            DXGI_SURFACE_DESC* desc,
+            uint numSurfaces,
+            uint usage,
+            [Optional] DXGI_SHARED_RESOURCE* sharedResource,
+            IDXGISurface** surface)
         {
-            return Pointer->CreateSurface(pDesc, NumSurfaces, Usage, pSharedResource, ppSurface);
+            return Pointer->CreateSurface(desc, numSurfaces, usage, sharedResource, surface);
         }
 
-        public HResult GetAdapter(IDXGIAdapter** pAdapter)
+        public HResult GetAdapter(IDXGIAdapter** adapter)
         {
-            return Pointer->GetAdapter(pAdapter);
+            return Pointer->GetAdapter(adapter);
         }
 
-        public HResult GetGPUThreadPriority(int* pPriority)
+        public HResult GetGPUThreadPriority(int* priority)
         {
-            return Pointer->GetGPUThreadPriority(pPriority);
+            return Pointer->GetGPUThreadPriority(priority);
         }
 
-        public HResult QueryResourceResidency(IUnknown** ppResources, DXGI_RESIDENCY* pResidencyStatus, uint NumResources)
+        public HResult QueryResourceResidency(IUnknown** resources, DXGI_RESIDENCY* residencyStatus, uint numResources)
         {
-            return Pointer->QueryResourceResidency(ppResources, pResidencyStatus, NumResources);
+            return Pointer->QueryResourceResidency(resources, residencyStatus, numResources);
         }
 
-        public HResult SetGPUThreadPriority(int Priority)
+        public HResult SetGPUThreadPriority(int priority)
         {
-            return Pointer->SetGPUThreadPriority(Priority);
+            return Pointer->SetGPUThreadPriority(priority);
         }
 
         public static implicit operator IDXGIDevice*(DXGIDevice value)

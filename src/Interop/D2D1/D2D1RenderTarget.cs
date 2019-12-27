@@ -22,7 +22,7 @@ namespace BouncyBox.VorpalEngine.Interop.D2D1
             Pointer->BeginDraw();
         }
 
-        public void Clear([Optional] DXGI_RGBA* clearColor)
+        public void Clear(DXGI_RGBA* clearColor = null)
         {
             Pointer->Clear(clearColor);
         }
@@ -197,17 +197,17 @@ namespace BouncyBox.VorpalEngine.Interop.D2D1
             [Optional] D2D_RECT_F* destinationRectangle,
             float opacity = 1f,
             D2D1_BITMAP_INTERPOLATION_MODE interpolationMode = D2D1_BITMAP_INTERPOLATION_MODE.D2D1_BITMAP_INTERPOLATION_MODE_LINEAR,
-            D2D_RECT_F* sourceRectangle = default)
+            D2D_RECT_F* sourceRectangle = null)
         {
             Pointer->DrawBitmap(bitmap, destinationRectangle, opacity, interpolationMode, sourceRectangle);
         }
 
-        public void DrawEllipse(D2D1_ELLIPSE* ellipse, ID2D1Brush* brush, float strokeWidth = 1f, ID2D1StrokeStyle* strokeStyle = default)
+        public void DrawEllipse(D2D1_ELLIPSE* ellipse, ID2D1Brush* brush, float strokeWidth = 1f, ID2D1StrokeStyle* strokeStyle = null)
         {
             Pointer->DrawEllipse(ellipse, brush, strokeWidth, strokeStyle);
         }
 
-        public void DrawGeometry(ID2D1Geometry* geometry, ID2D1Brush* brush, float strokeWidth = 1f, ID2D1StrokeStyle* strokeStyle = default)
+        public void DrawGeometry(ID2D1Geometry* geometry, ID2D1Brush* brush, float strokeWidth = 1f, ID2D1StrokeStyle* strokeStyle = null)
         {
             Pointer->DrawGeometry(geometry, brush, strokeWidth, strokeStyle);
         }
@@ -217,17 +217,17 @@ namespace BouncyBox.VorpalEngine.Interop.D2D1
             Pointer->DrawGlyphRun(baselineOrigin, glyphRun, foregroundBrush, measuringMode);
         }
 
-        public void DrawLine(D2D_POINT_2F point0, D2D_POINT_2F point1, ID2D1Brush* brush, float strokeWidth = 1f, ID2D1StrokeStyle* strokeStyle = default)
+        public void DrawLine(D2D_POINT_2F point0, D2D_POINT_2F point1, ID2D1Brush* brush, float strokeWidth = 1f, ID2D1StrokeStyle* strokeStyle = null)
         {
             Pointer->DrawLine(point0, point1, brush, strokeWidth, strokeStyle);
         }
 
-        public void DrawRectangle(D2D_RECT_F* rect, ID2D1Brush* brush, float strokeWidth = 1f, ID2D1StrokeStyle* strokeStyle = default)
+        public void DrawRectangle(D2D_RECT_F* rect, ID2D1Brush* brush, float strokeWidth = 1f, ID2D1StrokeStyle* strokeStyle = null)
         {
             Pointer->DrawRectangle(rect, brush, strokeWidth, strokeStyle);
         }
 
-        public void DrawRoundedRectangle(D2D1_ROUNDED_RECT* roundedRect, ID2D1Brush* brush, float strokeWidth = 1f, ID2D1StrokeStyle* strokeStyle = default)
+        public void DrawRoundedRectangle(D2D1_ROUNDED_RECT* roundedRect, ID2D1Brush* brush, float strokeWidth = 1f, ID2D1StrokeStyle* strokeStyle = null)
         {
             Pointer->DrawRoundedRectangle(roundedRect, brush, strokeWidth, strokeStyle);
         }
@@ -249,7 +249,7 @@ namespace BouncyBox.VorpalEngine.Interop.D2D1
             Pointer->DrawTextLayout(origin, textLayout, defaultFillBrush, options);
         }
 
-        public HResult EndDraw([Optional] ulong* tag1, [Optional] ulong* tag2)
+        public HResult EndDraw(ulong* tag1 = null, ulong* tag2 = null)
         {
             return Pointer->EndDraw(tag1, tag2);
         }
@@ -259,7 +259,7 @@ namespace BouncyBox.VorpalEngine.Interop.D2D1
             Pointer->FillEllipse(ellipse, brush);
         }
 
-        public void FillGeometry(ID2D1Geometry* geometry, ID2D1Brush* brush, [Optional] ID2D1Brush* opacityBrush)
+        public void FillGeometry(ID2D1Geometry* geometry, ID2D1Brush* brush, ID2D1Brush* opacityBrush = null)
         {
             Pointer->FillGeometry(geometry, brush, opacityBrush);
         }
@@ -273,8 +273,8 @@ namespace BouncyBox.VorpalEngine.Interop.D2D1
             ID2D1Bitmap* opacityMask,
             ID2D1Brush* brush,
             D2D1_OPACITY_MASK_CONTENT content,
-            [Optional] D2D_RECT_F* destinationRectangle,
-            [Optional] D2D_RECT_F* sourceRectangle)
+            D2D_RECT_F* destinationRectangle = null,
+            D2D_RECT_F* sourceRectangle = null)
         {
             Pointer->FillOpacityMask(opacityMask, brush, content, destinationRectangle, sourceRectangle);
         }
@@ -289,7 +289,7 @@ namespace BouncyBox.VorpalEngine.Interop.D2D1
             Pointer->FillRoundedRectangle(roundedRect, brush);
         }
 
-        public HResult Flush([Optional] ulong* tag1, [Optional] ulong* tag2)
+        public HResult Flush(ulong* tag1 = null, ulong* tag2 = null)
         {
             return Pointer->Flush(tag1, tag2);
         }
@@ -324,7 +324,7 @@ namespace BouncyBox.VorpalEngine.Interop.D2D1
             return Pointer->GetSize();
         }
 
-        public void GetTags([Optional] ulong* tag1, [Optional] ulong* tag2)
+        public void GetTags(ulong* tag1 = null, ulong* tag2 = null)
         {
             Pointer->GetTags(tag1, tag2);
         }
@@ -364,7 +364,7 @@ namespace BouncyBox.VorpalEngine.Interop.D2D1
             Pointer->PushAxisAlignedClip(clipRect, antialiasMode);
         }
 
-        public void PushLayer(D2D1_LAYER_PARAMETERS* layerParameters, [Optional] ID2D1Layer* layer)
+        public void PushLayer(D2D1_LAYER_PARAMETERS* layerParameters, ID2D1Layer* layer = null)
         {
             Pointer->PushLayer(layerParameters, layer);
         }
@@ -399,7 +399,7 @@ namespace BouncyBox.VorpalEngine.Interop.D2D1
             Pointer->SetTextAntialiasMode(textAntialiasMode);
         }
 
-        public void SetTextRenderingParams([Optional] IDWriteRenderingParams* textRenderingParams)
+        public void SetTextRenderingParams(IDWriteRenderingParams* textRenderingParams = null)
         {
             Pointer->SetTextRenderingParams(textRenderingParams);
         }

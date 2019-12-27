@@ -8,25 +8,25 @@ namespace BouncyBox.VorpalEngine.Interop.DXGI
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     public unsafe partial class DXGIObject
     {
-        public HResult GetParent<T>(out T* pParent)
+        public HResult GetParent<T>(out T* parent)
             where T : unmanaged
         {
             Guid riid = typeof(T).GUID;
 
-            fixed (T** ppParent = &pParent)
+            fixed (T** ppParent = &parent)
             {
                 return Pointer->GetParent(&riid, (void**)ppParent);
             }
         }
 
-        public HResult GetPrivateData(Guid* Name, ref Span<byte> data)
+        public HResult GetPrivateData(Guid* name, ref Span<byte> data)
         {
             var uiDataSize = (uint)data.Length;
             int hr;
 
             fixed (byte* pData = data)
             {
-                hr = Pointer->GetPrivateData(Name, &uiDataSize, pData);
+                hr = Pointer->GetPrivateData(name, &uiDataSize, pData);
             }
 
             data = data.Slice(0, (int)uiDataSize);
@@ -34,11 +34,11 @@ namespace BouncyBox.VorpalEngine.Interop.DXGI
             return hr;
         }
 
-        public HResult SetPrivateData(Guid* Name, Span<byte> data)
+        public HResult SetPrivateData(Guid* name, Span<byte> data)
         {
             fixed (byte* pData = data)
             {
-                return Pointer->SetPrivateData(Name, (uint)data.Length, pData);
+                return Pointer->SetPrivateData(name, (uint)data.Length, pData);
             }
         }
     }

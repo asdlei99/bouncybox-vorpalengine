@@ -6,13 +6,13 @@ namespace BouncyBox.VorpalEngine.Interop.D2D1
 {
     public unsafe partial class D2D1RadialGradientBrush
     {
-        public void GetGradientStopCollection(out D2D1GradientStopCollection gradientStopCollection)
+        public D2D1GradientStopCollection GetGradientStopCollection()
         {
             ID2D1GradientStopCollection* pGradientStopCollection;
 
             Pointer->GetGradientStopCollection(&pGradientStopCollection);
 
-            gradientStopCollection = new D2D1GradientStopCollection(pGradientStopCollection);
+            return new D2D1GradientStopCollection(pGradientStopCollection);
         }
     }
 }

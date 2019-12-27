@@ -18,7 +18,7 @@ namespace BouncyBox.VorpalEngine.Engine.Input.Keyboard
             DownKeys = downKeys;
         }
 
-        private string DebuggerDisplay => $"DownKeys = {string.Join(", ", DownKeys.Select(a => a.GetName()))}";
+        private string DebuggerDisplay => $"DownKeys = {string.Join(", ", DownKeys.Select(a => a.AsString()))}";
 
         /// <summary>Gets the keys that were down at the time of the snapshot.</summary>
         public IReadOnlyCollection<User32.VirtualKey> DownKeys { get; }

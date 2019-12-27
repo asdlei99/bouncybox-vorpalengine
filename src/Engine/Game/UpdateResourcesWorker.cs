@@ -1,4 +1,5 @@
-﻿using BouncyBox.VorpalEngine.Common;
+﻿using System.Threading;
+using BouncyBox.VorpalEngine.Common;
 using BouncyBox.VorpalEngine.Engine.Threads;
 
 namespace BouncyBox.VorpalEngine.Engine.Game
@@ -16,6 +17,11 @@ namespace BouncyBox.VorpalEngine.Engine.Game
         /// <summary>Initializes a new instance of the <see cref="UpdateResourcesWorker" /> type.</summary>
         /// <param name="interfaces">An <see cref="IInterfaces" /> implementation.</param>
         public UpdateResourcesWorker(IInterfaces interfaces) : this(interfaces, NestedContext.None())
+        {
+        }
+
+        /// <inheritdoc />
+        protected override void OnDoWork(in CancellationToken cancellationToken)
         {
         }
     }

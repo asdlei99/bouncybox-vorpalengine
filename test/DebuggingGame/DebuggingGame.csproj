@@ -5,7 +5,7 @@
   <Import Project="..\..\build\msbuild\netstandard-assembly.props" />
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <ApplicationIcon>app.ico</ApplicationIcon>
     <AssemblyTitle>Vorpal Engine Debugging Game</AssemblyTitle>
     <ApplicationManifest>app.manifest</ApplicationManifest>

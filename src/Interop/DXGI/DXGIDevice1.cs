@@ -17,14 +17,14 @@ namespace BouncyBox.VorpalEngine.Interop.DXGI
 
         public new IDXGIDevice1* Pointer => (IDXGIDevice1*)base.Pointer;
 
-        public HResult GetMaximumFrameLatency(uint* pMaxLatency)
+        public HResult GetMaximumFrameLatency(uint* maxLatency)
         {
-            return Pointer->GetMaximumFrameLatency(pMaxLatency);
+            return Pointer->GetMaximumFrameLatency(maxLatency);
         }
 
-        public HResult SetMaximumFrameLatency(uint MaxLatency)
+        public HResult SetMaximumFrameLatency(uint maxLatency)
         {
-            return Pointer->SetMaximumFrameLatency(MaxLatency);
+            return Pointer->SetMaximumFrameLatency(maxLatency);
         }
 
         public static implicit operator IDXGIDevice1*(DXGIDevice1 value)

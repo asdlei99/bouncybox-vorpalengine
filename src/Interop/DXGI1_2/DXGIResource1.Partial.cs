@@ -10,12 +10,12 @@ namespace BouncyBox.VorpalEngine.Interop.DXGI1_2
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     public unsafe partial class DXGIResource1
     {
-        public HResult CreateSharedHandle([Optional] SECURITY_ATTRIBUTES* pAttributes, uint dwAccess, [Optional] ReadOnlySpan<char> name, out IntPtr handle)
+        public HResult CreateSharedHandle([Optional] SECURITY_ATTRIBUTES* attributes, uint access, [Optional] ReadOnlySpan<char> name, out IntPtr handle)
         {
             fixed (char* pName = name)
             fixed (IntPtr* pHandle = &handle)
             {
-                return Pointer->CreateSharedHandle(pAttributes, dwAccess, (ushort*)pName, pHandle);
+                return Pointer->CreateSharedHandle(attributes, access, (ushort*)pName, pHandle);
             }
         }
 

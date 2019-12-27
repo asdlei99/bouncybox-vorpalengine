@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Runtime.InteropServices;
 using TerraFX.Interop;
 
 #pragma warning disable 1591
@@ -26,7 +25,7 @@ namespace BouncyBox.VorpalEngine.Interop.DWrite
             DWRITE_GLYPH_RUN* glyphRun,
             IDWriteRenderingParams* renderingParams,
             uint textColor,
-            [Optional] RECT* blackBoxRect)
+            RECT* blackBoxRect = null)
         {
             return Pointer->DrawGlyphRun(baselineOriginX, baselineOriginY, measuringMode, glyphRun, renderingParams, textColor, blackBoxRect);
         }
@@ -56,7 +55,7 @@ namespace BouncyBox.VorpalEngine.Interop.DWrite
             return Pointer->Resize(width, height);
         }
 
-        public HResult SetCurrentTransform([Optional] DWRITE_MATRIX* transform)
+        public HResult SetCurrentTransform(DWRITE_MATRIX* transform = null)
         {
             return Pointer->SetCurrentTransform(transform);
         }

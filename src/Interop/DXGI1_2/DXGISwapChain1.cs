@@ -19,39 +19,39 @@ namespace BouncyBox.VorpalEngine.Interop.DXGI1_2
 
         public new IDXGISwapChain1* Pointer => (IDXGISwapChain1*)base.Pointer;
 
-        public HResult GetBackgroundColor(DXGI_RGBA* pColor)
+        public HResult GetBackgroundColor(DXGI_RGBA* color)
         {
-            return Pointer->GetBackgroundColor(pColor);
+            return Pointer->GetBackgroundColor(color);
         }
 
-        public HResult GetCoreWindow(Guid* refiid, void** ppUnk)
+        public HResult GetCoreWindow(Guid* iid, void** unk)
         {
-            return Pointer->GetCoreWindow(refiid, ppUnk);
+            return Pointer->GetCoreWindow(iid, unk);
         }
 
-        public HResult GetDesc1(DXGI_SWAP_CHAIN_DESC1* pDesc)
+        public HResult GetDesc1(DXGI_SWAP_CHAIN_DESC1* desc)
         {
-            return Pointer->GetDesc1(pDesc);
+            return Pointer->GetDesc1(desc);
         }
 
-        public HResult GetFullscreenDesc(DXGI_SWAP_CHAIN_FULLSCREEN_DESC* pDesc)
+        public HResult GetFullscreenDesc(DXGI_SWAP_CHAIN_FULLSCREEN_DESC* desc)
         {
-            return Pointer->GetFullscreenDesc(pDesc);
+            return Pointer->GetFullscreenDesc(desc);
         }
 
-        public HResult GetHwnd(IntPtr* pHwnd)
+        public HResult GetHwnd(IntPtr* hwnd)
         {
-            return Pointer->GetHwnd(pHwnd);
+            return Pointer->GetHwnd(hwnd);
         }
 
-        public HResult GetRestrictToOutput(IDXGIOutput** ppRestrictToOutput)
+        public HResult GetRestrictToOutput(IDXGIOutput** restrictToOutput)
         {
-            return Pointer->GetRestrictToOutput(ppRestrictToOutput);
+            return Pointer->GetRestrictToOutput(restrictToOutput);
         }
 
-        public HResult GetRotation(DXGI_MODE_ROTATION* pRotation)
+        public HResult GetRotation(DXGI_MODE_ROTATION* rotation)
         {
-            return Pointer->GetRotation(pRotation);
+            return Pointer->GetRotation(rotation);
         }
 
         public bool IsTemporaryMonoSupported()
@@ -59,19 +59,19 @@ namespace BouncyBox.VorpalEngine.Interop.DXGI1_2
             return Pointer->IsTemporaryMonoSupported() == TerraFX.Interop.Windows.TRUE;
         }
 
-        public HResult Present1(uint SyncInterval, uint PresentFlags, DXGI_PRESENT_PARAMETERS* pPresentParameters)
+        public HResult Present1(uint syncInterval, uint presentFlags, DXGI_PRESENT_PARAMETERS* presentParameters)
         {
-            return Pointer->Present1(SyncInterval, PresentFlags, pPresentParameters);
+            return Pointer->Present1(syncInterval, presentFlags, presentParameters);
         }
 
-        public HResult SetBackgroundColor(DXGI_RGBA* pColor)
+        public HResult SetBackgroundColor(DXGI_RGBA* color)
         {
-            return Pointer->SetBackgroundColor(pColor);
+            return Pointer->SetBackgroundColor(color);
         }
 
-        public HResult SetRotation(DXGI_MODE_ROTATION Rotation)
+        public HResult SetRotation(DXGI_MODE_ROTATION rotation)
         {
-            return Pointer->SetRotation(Rotation);
+            return Pointer->SetRotation(rotation);
         }
 
         public static implicit operator IDXGISwapChain1*(DXGISwapChain1 value)

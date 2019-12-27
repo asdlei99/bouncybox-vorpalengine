@@ -31,47 +31,47 @@ namespace BouncyBox.VorpalEngine.Interop.DWrite
             return Pointer->GetClusterMetrics(clusterMetrics, maxClusterCount, actualClusterCount);
         }
 
-        public HResult GetDrawingEffect(uint currentPosition, IUnknown** drawingEffect, [Optional] DWRITE_TEXT_RANGE* textRange)
+        public HResult GetDrawingEffect(uint currentPosition, IUnknown** drawingEffect, DWRITE_TEXT_RANGE* textRange = null)
         {
             return Pointer->GetDrawingEffect(currentPosition, drawingEffect, textRange);
         }
 
-        public HResult GetFontCollection(uint currentPosition, IDWriteFontCollection** fontCollection, [Optional] DWRITE_TEXT_RANGE* textRange)
+        public HResult GetFontCollection(uint currentPosition, IDWriteFontCollection** fontCollection, DWRITE_TEXT_RANGE* textRange = null)
         {
             return Pointer->GetFontCollection(currentPosition, fontCollection, textRange);
         }
 
-        public HResult GetFontFamilyName(uint currentPosition, ushort* fontFamilyName, uint nameSize, [Optional] DWRITE_TEXT_RANGE* textRange)
+        public HResult GetFontFamilyName(uint currentPosition, ushort* fontFamilyName, uint nameSize, DWRITE_TEXT_RANGE* textRange = null)
         {
             return Pointer->GetFontFamilyName(currentPosition, fontFamilyName, nameSize, textRange);
         }
 
-        public HResult GetFontFamilyNameLength(uint currentPosition, uint* nameLength, [Optional] DWRITE_TEXT_RANGE* textRange)
+        public HResult GetFontFamilyNameLength(uint currentPosition, uint* nameLength, DWRITE_TEXT_RANGE* textRange = null)
         {
             return Pointer->GetFontFamilyNameLength(currentPosition, nameLength, textRange);
         }
 
-        public HResult GetFontSize(uint currentPosition, float* fontSize, [Optional] DWRITE_TEXT_RANGE* textRange)
+        public HResult GetFontSize(uint currentPosition, float* fontSize, DWRITE_TEXT_RANGE* textRange = null)
         {
             return Pointer->GetFontSize(currentPosition, fontSize, textRange);
         }
 
-        public HResult GetFontStretch(uint currentPosition, DWRITE_FONT_STRETCH* fontStretch, [Optional] DWRITE_TEXT_RANGE* textRange)
+        public HResult GetFontStretch(uint currentPosition, DWRITE_FONT_STRETCH* fontStretch, DWRITE_TEXT_RANGE* textRange = null)
         {
             return Pointer->GetFontStretch(currentPosition, fontStretch, textRange);
         }
 
-        public HResult GetFontStyle(uint currentPosition, DWRITE_FONT_STYLE* fontStyle, [Optional] DWRITE_TEXT_RANGE* textRange)
+        public HResult GetFontStyle(uint currentPosition, DWRITE_FONT_STYLE* fontStyle, DWRITE_TEXT_RANGE* textRange = null)
         {
             return Pointer->GetFontStyle(currentPosition, fontStyle, textRange);
         }
 
-        public HResult GetFontWeight(uint currentPosition, DWRITE_FONT_WEIGHT* fontWeight, [Optional] DWRITE_TEXT_RANGE* textRange)
+        public HResult GetFontWeight(uint currentPosition, DWRITE_FONT_WEIGHT* fontWeight, DWRITE_TEXT_RANGE* textRange = null)
         {
             return Pointer->GetFontWeight(currentPosition, fontWeight, textRange);
         }
 
-        public HResult GetInlineObject(uint currentPosition, IDWriteInlineObject** inlineObject, [Optional] DWRITE_TEXT_RANGE* textRange)
+        public HResult GetInlineObject(uint currentPosition, IDWriteInlineObject** inlineObject, DWRITE_TEXT_RANGE* textRange = null)
         {
             return Pointer->GetInlineObject(currentPosition, inlineObject, textRange);
         }
@@ -81,12 +81,12 @@ namespace BouncyBox.VorpalEngine.Interop.DWrite
             return Pointer->GetLineMetrics(lineMetrics, maxLineCount, actualLineCount);
         }
 
-        public HResult GetLocaleName(uint currentPosition, ushort* localeName, uint nameSize, [Optional] DWRITE_TEXT_RANGE* textRange)
+        public HResult GetLocaleName(uint currentPosition, ushort* localeName, uint nameSize, DWRITE_TEXT_RANGE* textRange = null)
         {
             return Pointer->GetLocaleName(currentPosition, localeName, nameSize, textRange);
         }
 
-        public HResult GetLocaleNameLength(uint currentPosition, uint* nameLength, [Optional] DWRITE_TEXT_RANGE* textRange)
+        public HResult GetLocaleNameLength(uint currentPosition, uint* nameLength, DWRITE_TEXT_RANGE* textRange = null)
         {
             return Pointer->GetLocaleNameLength(currentPosition, nameLength, textRange);
         }
@@ -111,7 +111,7 @@ namespace BouncyBox.VorpalEngine.Interop.DWrite
             return Pointer->GetOverhangMetrics(overhangs);
         }
 
-        public HResult GetStrikethrough(uint currentPosition, out bool hasStrikethrough, [Optional] DWRITE_TEXT_RANGE* textRange)
+        public HResult GetStrikethrough(uint currentPosition, out bool hasStrikethrough, DWRITE_TEXT_RANGE* textRange = null)
         {
             int iHasStrikethrough;
             int hr = Pointer->GetStrikethrough(currentPosition, &iHasStrikethrough, textRange);
@@ -121,12 +121,12 @@ namespace BouncyBox.VorpalEngine.Interop.DWrite
             return hr;
         }
 
-        public HResult GetTypography(uint currentPosition, IDWriteTypography** typography, [Optional] DWRITE_TEXT_RANGE* textRange)
+        public HResult GetTypography(uint currentPosition, IDWriteTypography** typography, DWRITE_TEXT_RANGE* textRange = null)
         {
             return Pointer->GetTypography(currentPosition, typography, textRange);
         }
 
-        public HResult GetUnderline(uint currentPosition, out bool hasUnderline, [Optional] DWRITE_TEXT_RANGE* textRange)
+        public HResult GetUnderline(uint currentPosition, out bool hasUnderline, DWRITE_TEXT_RANGE* textRange = null)
         {
             int iHasUnderline;
             int hr = Pointer->GetUnderline(currentPosition, &iHasUnderline, textRange);

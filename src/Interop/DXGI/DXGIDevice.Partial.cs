@@ -11,14 +11,14 @@ namespace BouncyBox.VorpalEngine.Interop.DXGI
     public unsafe partial class DXGIDevice
     {
         public HResult CreateSurface(
-            DXGI_SURFACE_DESC* pDesc,
-            uint NumSurfaces,
-            uint Usage,
-            [Optional] DXGI_SHARED_RESOURCE* pSharedResource,
+            DXGI_SURFACE_DESC* desc,
+            uint numSurfaces,
+            uint usage,
+            [Optional] DXGI_SHARED_RESOURCE* sharedResource,
             out DXGISurface? surface)
         {
             IDXGISurface* pSurface;
-            int hr = Pointer->CreateSurface(pDesc, NumSurfaces, Usage, pSharedResource, &pSurface);
+            int hr = Pointer->CreateSurface(desc, numSurfaces, usage, sharedResource, &pSurface);
 
             surface = TerraFX.Interop.Windows.SUCCEEDED(hr) ? new DXGISurface(pSurface) : null;
 
@@ -43,9 +43,9 @@ namespace BouncyBox.VorpalEngine.Interop.DXGI
             }
         }
 
-        public HResult QueryResourceResidency(ReadOnlySpan<IUnknownPointer> resources, out DXGI_RESIDENCY residencyStatus)
+        public HResult QueryResourceResidency(ReadOnlySpan<Pointer<IUnknown>> resources, out DXGI_RESIDENCY residencyStatus)
         {
-            fixed (IUnknownPointer* pResources = resources)
+            fixed (Pointer<IUnknown>* pResources = resources)
             fixed (DXGI_RESIDENCY* pResidencyStatus = &residencyStatus)
             {
                 return Pointer->QueryResourceResidency((IUnknown**)pResources, pResidencyStatus, (uint)resources.Length);

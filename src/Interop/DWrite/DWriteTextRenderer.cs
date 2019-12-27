@@ -23,7 +23,7 @@ namespace BouncyBox.VorpalEngine.Interop.DWrite
             DWRITE_MEASURING_MODE measuringMode,
             DWRITE_GLYPH_RUN* glyphRun,
             DWRITE_GLYPH_RUN_DESCRIPTION* glyphRunDescription,
-            [Optional] IUnknown* clientDrawingEffect)
+            IUnknown* clientDrawingEffect = null)
         {
             return Pointer->DrawGlyphRun(
                 clientDrawingContext,
@@ -42,7 +42,7 @@ namespace BouncyBox.VorpalEngine.Interop.DWrite
             IDWriteInlineObject* inlineObject,
             bool isSideways,
             bool isRightToLeft,
-            [Optional] IUnknown* clientDrawingEffect)
+            IUnknown* clientDrawingEffect = null)
         {
             return Pointer->DrawInlineObject(
                 clientDrawingContext,
@@ -59,7 +59,7 @@ namespace BouncyBox.VorpalEngine.Interop.DWrite
             float baselineOriginX,
             float baselineOriginY,
             DWRITE_STRIKETHROUGH* strikethrough,
-            [Optional] IUnknown* clientDrawingEffect)
+            IUnknown* clientDrawingEffect = null)
         {
             return Pointer->DrawStrikethrough(clientDrawingContext, baselineOriginX, baselineOriginY, strikethrough, clientDrawingEffect);
         }
@@ -69,7 +69,7 @@ namespace BouncyBox.VorpalEngine.Interop.DWrite
             float baselineOriginX,
             float baselineOriginY,
             DWRITE_UNDERLINE* underline,
-            [Optional] IUnknown* clientDrawingEffect)
+            IUnknown* clientDrawingEffect = null)
         {
             return Pointer->DrawUnderline(clientDrawingContext, baselineOriginX, baselineOriginY, underline, clientDrawingEffect);
         }

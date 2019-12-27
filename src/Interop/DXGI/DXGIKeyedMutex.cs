@@ -17,14 +17,14 @@ namespace BouncyBox.VorpalEngine.Interop.DXGI
 
         public new IDXGIKeyedMutex* Pointer => (IDXGIKeyedMutex*)base.Pointer;
 
-        public HResult AcquireSync(ulong Key, uint dwMilliseconds)
+        public HResult AcquireSync(ulong key, uint milliseconds)
         {
-            return Pointer->AcquireSync(Key, dwMilliseconds);
+            return Pointer->AcquireSync(key, milliseconds);
         }
 
-        public HResult ReleaseSync(ulong Key)
+        public HResult ReleaseSync(ulong key)
         {
-            return Pointer->ReleaseSync(Key);
+            return Pointer->ReleaseSync(key);
         }
 
         public static implicit operator IDXGIKeyedMutex*(DXGIKeyedMutex value)

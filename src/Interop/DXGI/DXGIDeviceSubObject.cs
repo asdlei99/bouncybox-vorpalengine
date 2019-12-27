@@ -18,9 +18,9 @@ namespace BouncyBox.VorpalEngine.Interop.DXGI
 
         public new IDXGIDeviceSubObject* Pointer => (IDXGIDeviceSubObject*)base.Pointer;
 
-        public HResult GetDevice(Guid* riid, void** ppDevice)
+        public HResult GetDevice(Guid* iid, void** device)
         {
-            return Pointer->GetDevice(riid, ppDevice);
+            return Pointer->GetDevice(iid, device);
         }
 
         public static implicit operator IDXGIDeviceSubObject*(DXGIDeviceSubObject value)

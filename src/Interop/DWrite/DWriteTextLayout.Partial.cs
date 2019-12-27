@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.InteropServices;
 using TerraFX.Interop;
 
 #pragma warning disable 1591
@@ -25,7 +24,7 @@ namespace BouncyBox.VorpalEngine.Interop.DWrite
             }
         }
 
-        public HResult GetDrawingEffect(uint currentPosition, out IUnknown* drawingEffect, [Optional] DWRITE_TEXT_RANGE* textRange)
+        public HResult GetDrawingEffect(uint currentPosition, out IUnknown* drawingEffect, DWRITE_TEXT_RANGE* textRange = null)
         {
             fixed (IUnknown** pDrawingEffect = &drawingEffect)
             {
@@ -33,7 +32,7 @@ namespace BouncyBox.VorpalEngine.Interop.DWrite
             }
         }
 
-        public HResult GetFontCollection(uint currentPosition, out DWriteFontCollection? fontCollection, [Optional] DWRITE_TEXT_RANGE* textRange)
+        public HResult GetFontCollection(uint currentPosition, out DWriteFontCollection? fontCollection, DWRITE_TEXT_RANGE* textRange = null)
         {
             IDWriteFontCollection* pFontCollection;
             int hr = Pointer->GetFontCollection(currentPosition, &pFontCollection, textRange);
@@ -43,7 +42,7 @@ namespace BouncyBox.VorpalEngine.Interop.DWrite
             return hr;
         }
 
-        public HResult GetFontFamilyName(uint currentPosition, Span<char> fontFamilyName, [Optional] DWRITE_TEXT_RANGE* textRange)
+        public HResult GetFontFamilyName(uint currentPosition, Span<char> fontFamilyName, DWRITE_TEXT_RANGE* textRange = null)
         {
             fixed (char* pFontFamilyName = fontFamilyName)
             {
@@ -51,7 +50,7 @@ namespace BouncyBox.VorpalEngine.Interop.DWrite
             }
         }
 
-        public HResult GetFontFamilyNameLength(uint currentPosition, out uint nameLength, [Optional] DWRITE_TEXT_RANGE* textRange)
+        public HResult GetFontFamilyNameLength(uint currentPosition, out uint nameLength, DWRITE_TEXT_RANGE* textRange = null)
         {
             fixed (uint* pNameLength = &nameLength)
             {
@@ -59,7 +58,7 @@ namespace BouncyBox.VorpalEngine.Interop.DWrite
             }
         }
 
-        public HResult GetFontSize(uint currentPosition, out float fontSize, [Optional] DWRITE_TEXT_RANGE* textRange)
+        public HResult GetFontSize(uint currentPosition, out float fontSize, DWRITE_TEXT_RANGE* textRange = null)
         {
             fixed (float* pFontSize = &fontSize)
             {
@@ -67,7 +66,7 @@ namespace BouncyBox.VorpalEngine.Interop.DWrite
             }
         }
 
-        public HResult GetFontStretch(uint currentPosition, out DWRITE_FONT_STRETCH fontStretch, [Optional] DWRITE_TEXT_RANGE* textRange)
+        public HResult GetFontStretch(uint currentPosition, out DWRITE_FONT_STRETCH fontStretch, DWRITE_TEXT_RANGE* textRange = null)
         {
             fixed (DWRITE_FONT_STRETCH* pFontStretch = &fontStretch)
             {
@@ -75,7 +74,7 @@ namespace BouncyBox.VorpalEngine.Interop.DWrite
             }
         }
 
-        public HResult GetFontStyle(uint currentPosition, out DWRITE_FONT_STYLE fontStyle, [Optional] DWRITE_TEXT_RANGE* textRange)
+        public HResult GetFontStyle(uint currentPosition, out DWRITE_FONT_STYLE fontStyle, DWRITE_TEXT_RANGE* textRange = null)
         {
             fixed (DWRITE_FONT_STYLE* pFontStyle = &fontStyle)
             {
@@ -83,7 +82,7 @@ namespace BouncyBox.VorpalEngine.Interop.DWrite
             }
         }
 
-        public HResult GetFontWeight(uint currentPosition, out DWRITE_FONT_WEIGHT fontWeight, [Optional] DWRITE_TEXT_RANGE* textRange)
+        public HResult GetFontWeight(uint currentPosition, out DWRITE_FONT_WEIGHT fontWeight, DWRITE_TEXT_RANGE* textRange = null)
         {
             fixed (DWRITE_FONT_WEIGHT* pFontWeight = &fontWeight)
             {
@@ -91,7 +90,7 @@ namespace BouncyBox.VorpalEngine.Interop.DWrite
             }
         }
 
-        public HResult GetInlineObject(uint currentPosition, out DWriteInlineObject? inlineObject, [Optional] DWRITE_TEXT_RANGE* textRange)
+        public HResult GetInlineObject(uint currentPosition, out DWriteInlineObject? inlineObject, DWRITE_TEXT_RANGE* textRange = null)
         {
             IDWriteInlineObject* pInlineObject;
             int hr = Pointer->GetInlineObject(currentPosition, &pInlineObject, textRange);
@@ -110,7 +109,7 @@ namespace BouncyBox.VorpalEngine.Interop.DWrite
             }
         }
 
-        public HResult GetLocaleName(uint currentPosition, Span<char> localeName, [Optional] DWRITE_TEXT_RANGE* textRange)
+        public HResult GetLocaleName(uint currentPosition, Span<char> localeName, DWRITE_TEXT_RANGE* textRange = null)
         {
             fixed (char* pLocaleName = localeName)
             {
@@ -118,7 +117,7 @@ namespace BouncyBox.VorpalEngine.Interop.DWrite
             }
         }
 
-        public HResult GetLocaleNameLength(uint currentPosition, out uint nameLength, [Optional] DWRITE_TEXT_RANGE* textRange)
+        public HResult GetLocaleNameLength(uint currentPosition, out uint nameLength, DWRITE_TEXT_RANGE* textRange = null)
         {
             fixed (uint* pNameLength = &nameLength)
             {
@@ -142,7 +141,7 @@ namespace BouncyBox.VorpalEngine.Interop.DWrite
             }
         }
 
-        public HResult GetTypography(uint currentPosition, out DWriteTypography? typography, [Optional] DWRITE_TEXT_RANGE* textRange)
+        public HResult GetTypography(uint currentPosition, out DWriteTypography? typography, DWRITE_TEXT_RANGE* textRange = null)
         {
             IDWriteTypography* pTypography;
             int hr = Pointer->GetTypography(currentPosition, &pTypography, textRange);

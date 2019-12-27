@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Runtime.InteropServices;
 using TerraFX.Interop;
 
 #pragma warning disable 1591
@@ -24,7 +23,7 @@ namespace BouncyBox.VorpalEngine.Interop.D2D1
             return Pointer->GetDC(mode, hdc);
         }
 
-        public HResult ReleaseDC([Optional] RECT* update)
+        public HResult ReleaseDC(RECT* update = null)
         {
             return Pointer->ReleaseDC(update);
         }

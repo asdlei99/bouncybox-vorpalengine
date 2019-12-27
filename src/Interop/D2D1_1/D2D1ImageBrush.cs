@@ -1,5 +1,4 @@
-﻿using System.Runtime.InteropServices;
-using BouncyBox.VorpalEngine.Interop.D2D1;
+﻿using BouncyBox.VorpalEngine.Interop.D2D1;
 using TerraFX.Interop;
 
 #pragma warning disable 1591
@@ -52,7 +51,7 @@ namespace BouncyBox.VorpalEngine.Interop.D2D1_1
             Pointer->SetExtendModeY(extendModeY);
         }
 
-        public void SetImage([Optional] ID2D1Image* image)
+        public void SetImage(ID2D1Image* image = null)
         {
             Pointer->SetImage(image);
         }

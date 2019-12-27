@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using System.Runtime.InteropServices;
 using BouncyBox.VorpalEngine.Interop.DXGI;
 using TerraFX.Interop;
 
@@ -19,24 +18,24 @@ namespace BouncyBox.VorpalEngine.Interop.DXGI1_2
 
         public new IDXGIOutput1* Pointer => (IDXGIOutput1*)base.Pointer;
 
-        public HResult DuplicateOutput(IUnknown* pDevice, IDXGIOutputDuplication** ppOutputDuplication)
+        public HResult DuplicateOutput(IUnknown* device, IDXGIOutputDuplication** outputDuplication)
         {
-            return Pointer->DuplicateOutput(pDevice, ppOutputDuplication);
+            return Pointer->DuplicateOutput(device, outputDuplication);
         }
 
-        public HResult FindClosestMatchingMode1(DXGI_MODE_DESC1* pModeToMatch, DXGI_MODE_DESC1* pClosestMatch, [Optional] IUnknown* pConcernedDevice)
+        public HResult FindClosestMatchingMode1(DXGI_MODE_DESC1* modeToMatch, DXGI_MODE_DESC1* closestMatch, IUnknown* concernedDevice = null)
         {
-            return Pointer->FindClosestMatchingMode1(pModeToMatch, pClosestMatch, pConcernedDevice);
+            return Pointer->FindClosestMatchingMode1(modeToMatch, closestMatch, concernedDevice);
         }
 
-        public HResult GetDisplayModeList1(DXGI_FORMAT EnumFormat, uint Flags, uint* pNumModes, DXGI_MODE_DESC1* pDesc)
+        public HResult GetDisplayModeList1(DXGI_FORMAT enumFormat, uint flags, uint* numModes, DXGI_MODE_DESC1* desc)
         {
-            return Pointer->GetDisplayModeList1(EnumFormat, Flags, pNumModes, pDesc);
+            return Pointer->GetDisplayModeList1(enumFormat, flags, numModes, desc);
         }
 
-        public HResult GetDisplaySurfaceData1(IDXGIResource* pDestination)
+        public HResult GetDisplaySurfaceData1(IDXGIResource* destination)
         {
-            return Pointer->GetDisplaySurfaceData1(pDestination);
+            return Pointer->GetDisplaySurfaceData1(destination);
         }
 
         public static implicit operator IDXGIOutput1*(DXGIOutput1 value)

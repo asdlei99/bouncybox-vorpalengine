@@ -63,12 +63,12 @@ namespace BouncyBox.VorpalEngine.Interop.D2D1
             return hr;
         }
 
-        public HResult CreateGeometryGroup(D2D1_FILL_MODE fillMode, ReadOnlySpan<ID2D1GeometryPointer> geometries, out D2D1GeometryGroup? geometryGroup)
+        public HResult CreateGeometryGroup(D2D1_FILL_MODE fillMode, ReadOnlySpan<Pointer<ID2D1Geometry>> geometries, out D2D1GeometryGroup? geometryGroup)
         {
             ID2D1GeometryGroup* pGeometryGroup;
             int hr;
 
-            fixed (ID2D1GeometryPointer* pGeometries = geometries)
+            fixed (Pointer<ID2D1Geometry>* pGeometries = geometries)
             {
                 hr = Pointer->CreateGeometryGroup(fillMode, (ID2D1Geometry**)pGeometries, (uint)geometries.Length, &pGeometryGroup);
             }

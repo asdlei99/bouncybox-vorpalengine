@@ -16,7 +16,7 @@ namespace BouncyBox.VorpalEngine.Interop.D2D1
 
         public new ID2D1Bitmap* Pointer => (ID2D1Bitmap*)base.Pointer;
 
-        public HResult CopyFromBitmap([Optional] D2D_POINT_2U* destPoint, ID2D1Bitmap* bitmap, [Optional] D2D_RECT_U* srcRect)
+        public HResult CopyFromBitmap([Optional] D2D_POINT_2U* destPoint, ID2D1Bitmap* bitmap, D2D_RECT_U* srcRect = null)
         {
             return Pointer->CopyFromBitmap(destPoint, bitmap, srcRect);
         }
@@ -26,7 +26,7 @@ namespace BouncyBox.VorpalEngine.Interop.D2D1
             return Pointer->CopyFromMemory(dstRect, srcData, pitch);
         }
 
-        public HResult CopyFromRenderTarget([Optional] D2D_POINT_2U* destPoint, ID2D1RenderTarget* renderTarget, [Optional] D2D_RECT_U* srcRect)
+        public HResult CopyFromRenderTarget([Optional] D2D_POINT_2U* destPoint, ID2D1RenderTarget* renderTarget, D2D_RECT_U* srcRect = null)
         {
             return Pointer->CopyFromRenderTarget(destPoint, renderTarget, srcRect);
         }

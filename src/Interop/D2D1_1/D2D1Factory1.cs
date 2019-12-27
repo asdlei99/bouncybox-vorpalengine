@@ -65,7 +65,7 @@ namespace BouncyBox.VorpalEngine.Interop.D2D1_1
             return Pointer->GetEffectProperties(effectId, properties);
         }
 
-        public HResult GetRegisteredEffects(Guid* effects, uint effectsCount, [Optional] uint* effectsReturned, [Optional] uint* effectsRegistered)
+        public HResult GetRegisteredEffects(Guid* effects, uint effectsCount, uint* effectsReturned = null, uint* effectsRegistered = null)
         {
             return Pointer->GetRegisteredEffects(effects, effectsCount, effectsReturned, effectsRegistered);
         }

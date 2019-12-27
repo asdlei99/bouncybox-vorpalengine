@@ -73,8 +73,8 @@ namespace BouncyBox.VorpalEngine.Interop.D2D1
             float length,
             [Optional] D2D_MATRIX_3X2_F* worldTransform,
             float flatteningTolerance,
-            [Optional] D2D_POINT_2F* point,
-            [Optional] D2D_POINT_2F* unitTangentVector)
+            D2D_POINT_2F* point = null,
+            D2D_POINT_2F* unitTangentVector = null)
         {
             return Pointer->ComputePointAtLength(length, worldTransform, flatteningTolerance, point, unitTangentVector);
         }
@@ -82,8 +82,8 @@ namespace BouncyBox.VorpalEngine.Interop.D2D1
         public HResult ComputePointAtLength(
             float length,
             D2D_MATRIX_3X2_F* worldTransform,
-            [Optional] D2D_POINT_2F* point,
-            [Optional] D2D_POINT_2F* unitTangentVector)
+            D2D_POINT_2F* point = null,
+            D2D_POINT_2F* unitTangentVector = null)
         {
             return Pointer->ComputePointAtLength(length, worldTransform, point, unitTangentVector);
         }

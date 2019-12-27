@@ -18,29 +18,29 @@ namespace BouncyBox.VorpalEngine.Interop.DXGI
 
         public new IDXGIFactory* Pointer => (IDXGIFactory*)base.Pointer;
 
-        public HResult CreateSoftwareAdapter(IntPtr Module, IDXGIAdapter** ppAdapter)
+        public HResult CreateSoftwareAdapter(IntPtr module, IDXGIAdapter** adapter)
         {
-            return Pointer->CreateSoftwareAdapter(Module, ppAdapter);
+            return Pointer->CreateSoftwareAdapter(module, adapter);
         }
 
-        public HResult CreateSwapChain(IUnknown* pDevice, DXGI_SWAP_CHAIN_DESC* pDesc, IDXGISwapChain** ppSwapChain)
+        public HResult CreateSwapChain(IUnknown* device, DXGI_SWAP_CHAIN_DESC* desc, IDXGISwapChain** swapChain)
         {
-            return Pointer->CreateSwapChain(pDevice, pDesc, ppSwapChain);
+            return Pointer->CreateSwapChain(device, desc, swapChain);
         }
 
-        public HResult EnumAdapters(uint Adapter, IDXGIAdapter** ppAdapter)
+        public HResult EnumAdapters(uint adapterIndex, IDXGIAdapter** adapter)
         {
-            return Pointer->EnumAdapters(Adapter, ppAdapter);
+            return Pointer->EnumAdapters(adapterIndex, adapter);
         }
 
-        public HResult GetWindowAssociation(IntPtr* pWindowHandle)
+        public HResult GetWindowAssociation(IntPtr* windowHandle)
         {
-            return Pointer->GetWindowAssociation(pWindowHandle);
+            return Pointer->GetWindowAssociation(windowHandle);
         }
 
-        public HResult MakeWindowAssociation(IntPtr WindowHandle, uint Flags)
+        public HResult MakeWindowAssociation(IntPtr windowHandle, uint flags)
         {
-            return Pointer->MakeWindowAssociation(WindowHandle, Flags);
+            return Pointer->MakeWindowAssociation(windowHandle, flags);
         }
 
         public static implicit operator IDXGIFactory*(DXGIFactory value)

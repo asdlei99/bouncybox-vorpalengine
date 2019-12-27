@@ -8,12 +8,12 @@ namespace BouncyBox.VorpalEngine.Interop.DXGI
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     public unsafe partial class DXGIDeviceSubObject
     {
-        public HResult GetDevice<T>(out T* pDevice)
+        public HResult GetDevice<T>(out T* device)
             where T : unmanaged
         {
             Guid iid = typeof(T).GUID;
 
-            fixed (T** ppDevice = &pDevice)
+            fixed (T** ppDevice = &device)
             {
                 return Pointer->GetDevice(&iid, (void**)ppDevice);
             }

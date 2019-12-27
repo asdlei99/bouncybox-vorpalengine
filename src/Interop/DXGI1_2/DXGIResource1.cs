@@ -20,17 +20,17 @@ namespace BouncyBox.VorpalEngine.Interop.DXGI1_2
 
         public new IDXGIResource1* Pointer => (IDXGIResource1*)base.Pointer;
 
-        public HResult CreateSharedHandle([Optional] SECURITY_ATTRIBUTES* pAttributes, uint dwAccess, [Optional] ReadOnlySpan<char> name, IntPtr* pHandle)
+        public HResult CreateSharedHandle([Optional] SECURITY_ATTRIBUTES* attributes, uint access, [Optional] ReadOnlySpan<char> name, IntPtr* handle)
         {
             fixed (char* pName = name)
             {
-                return Pointer->CreateSharedHandle(pAttributes, dwAccess, (ushort*)pName, pHandle);
+                return Pointer->CreateSharedHandle(attributes, access, (ushort*)pName, handle);
             }
         }
 
-        public HResult CreateSubresourceSurface(uint index, IDXGISurface2** ppSurface)
+        public HResult CreateSubresourceSurface(uint index, IDXGISurface2** surface)
         {
-            return Pointer->CreateSubresourceSurface(index, ppSurface);
+            return Pointer->CreateSubresourceSurface(index, surface);
         }
 
         public static implicit operator IDXGIResource1*(DXGIResource1 value)

@@ -17,14 +17,14 @@ namespace BouncyBox.VorpalEngine.Interop.DXGI
 
         public new IDXGISurface* Pointer => (IDXGISurface*)base.Pointer;
 
-        public HResult GetDesc(DXGI_SURFACE_DESC* pDesc)
+        public HResult GetDesc(DXGI_SURFACE_DESC* desc)
         {
-            return Pointer->GetDesc(pDesc);
+            return Pointer->GetDesc(desc);
         }
 
-        public HResult Map(DXGI_MAPPED_RECT* pLockedRect, uint MapFlags)
+        public HResult Map(DXGI_MAPPED_RECT* lockedRect, uint mapFlags)
         {
-            return Pointer->Map(pLockedRect, MapFlags);
+            return Pointer->Map(lockedRect, mapFlags);
         }
 
         public HResult Unmap()

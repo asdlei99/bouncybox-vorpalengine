@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Runtime.InteropServices;
 using TerraFX.Interop;
 
 #pragma warning disable 1591
@@ -19,14 +18,14 @@ namespace BouncyBox.VorpalEngine.Interop.DXGI
 
         public new IDXGISurface1* Pointer => (IDXGISurface1*)base.Pointer;
 
-        public HResult GetDC(bool Discard, IntPtr* phdc)
+        public HResult GetDC(bool discard, IntPtr* hdc)
         {
-            return Pointer->GetDC(Discard ? TerraFX.Interop.Windows.TRUE : TerraFX.Interop.Windows.FALSE, phdc);
+            return Pointer->GetDC(discard ? TerraFX.Interop.Windows.TRUE : TerraFX.Interop.Windows.FALSE, hdc);
         }
 
-        public HResult ReleaseDC([Optional] RECT* pDirtyRect)
+        public HResult ReleaseDC(RECT* dirtyRect = null)
         {
-            return Pointer->ReleaseDC(pDirtyRect);
+            return Pointer->ReleaseDC(dirtyRect);
         }
 
         public static implicit operator IDXGISurface1*(DXGISurface1 value)

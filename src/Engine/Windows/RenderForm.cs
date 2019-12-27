@@ -462,9 +462,9 @@ namespace BouncyBox.VorpalEngine.Engine.Windows
 
             MONITORINFOEXW monitorInfoExW;
 
-            monitorInfoExW._base.cbSize = (uint)sizeof(MONITORINFOEXW);
+            monitorInfoExW.Base.cbSize = (uint)sizeof(MONITORINFOEXW);
 
-            if (User32.GetMonitorInfoW(monitorHandle, &monitorInfoExW._base) == TerraFX.Interop.Windows.FALSE)
+            if (User32.GetMonitorInfoW(monitorHandle, &monitorInfoExW.Base) == TerraFX.Interop.Windows.FALSE)
             {
                 throw Win32ExceptionHelper.GetException();
             }

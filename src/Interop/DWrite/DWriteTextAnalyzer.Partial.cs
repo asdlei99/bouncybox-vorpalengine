@@ -23,7 +23,7 @@ namespace BouncyBox.VorpalEngine.Interop.DWrite
             bool isRightToLeft,
             DWRITE_SCRIPT_ANALYSIS* scriptAnalysis,
             [Optional] ReadOnlySpan<char> localeName,
-            [Optional] ReadOnlySpan<IDWriteTypographicFeaturesPointer> features,
+            [Optional] ReadOnlySpan<Pointer<DWRITE_TYPOGRAPHIC_FEATURES>> features,
             [Optional] ReadOnlySpan<uint> featureRangeLengths,
             Span<float> glyphAdvances,
             Span<DWRITE_GLYPH_OFFSET> glyphOffsets)
@@ -47,7 +47,7 @@ namespace BouncyBox.VorpalEngine.Interop.DWrite
             fixed (ushort* pGlyphIndices = glyphIndices)
             fixed (DWRITE_SHAPING_GLYPH_PROPERTIES* pGlyphProps = glyphProps)
             fixed (char* pLocaleName = localeName)
-            fixed (IDWriteTypographicFeaturesPointer* pFeatures = features)
+            fixed (Pointer<DWRITE_TYPOGRAPHIC_FEATURES>* pFeatures = features)
             fixed (uint* pFeatureRangeLengths = featureRangeLengths)
             fixed (float* pGlyphAdvances = glyphAdvances)
             fixed (DWRITE_GLYPH_OFFSET* pGlyphOffsets = glyphOffsets)
@@ -89,7 +89,7 @@ namespace BouncyBox.VorpalEngine.Interop.DWrite
             bool isRightToLeft,
             DWRITE_SCRIPT_ANALYSIS* scriptAnalysis,
             [Optional] ReadOnlySpan<char> localeName,
-            [Optional] ReadOnlySpan<IDWriteTypographicFeaturesPointer> features,
+            [Optional] ReadOnlySpan<Pointer<DWRITE_TYPOGRAPHIC_FEATURES>> features,
             [Optional] ReadOnlySpan<uint> featureRangeLengths,
             Span<float> glyphAdvances,
             Span<DWRITE_GLYPH_OFFSET> glyphOffsets)
@@ -113,7 +113,7 @@ namespace BouncyBox.VorpalEngine.Interop.DWrite
             fixed (ushort* pGlyphIndices = glyphIndices)
             fixed (DWRITE_SHAPING_GLYPH_PROPERTIES* pGlyphProps = glyphProps)
             fixed (char* pLocaleName = localeName)
-            fixed (IDWriteTypographicFeaturesPointer* pFeatures = features)
+            fixed (Pointer<DWRITE_TYPOGRAPHIC_FEATURES>* pFeatures = features)
             fixed (uint* pFeatureRangeLengths = featureRangeLengths)
             fixed (float* pGlyphAdvances = glyphAdvances)
             fixed (DWRITE_GLYPH_OFFSET* pGlyphOffsets = glyphOffsets)
@@ -148,7 +148,7 @@ namespace BouncyBox.VorpalEngine.Interop.DWrite
             DWRITE_SCRIPT_ANALYSIS* scriptAnalysis,
             [Optional] ReadOnlySpan<char> localeName,
             [Optional] IDWriteNumberSubstitution* numberSubstitution,
-            [Optional] ReadOnlySpan<IDWriteTypographicFeaturesPointer> features,
+            [Optional] ReadOnlySpan<Pointer<DWRITE_TYPOGRAPHIC_FEATURES>> features,
             [Optional] ReadOnlySpan<uint> featureRangeLengths,
             Span<ushort> clusterMap,
             Span<DWRITE_SHAPING_TEXT_PROPERTIES> textProps,
@@ -173,7 +173,7 @@ namespace BouncyBox.VorpalEngine.Interop.DWrite
 
             fixed (ushort* pTextString = textString)
             fixed (char* pLocaleName = localeName)
-            fixed (IDWriteTypographicFeaturesPointer* pFeatures = features)
+            fixed (Pointer<DWRITE_TYPOGRAPHIC_FEATURES>* pFeatures = features)
             fixed (uint* pFeatureRangeLengths = featureRangeLengths)
             fixed (ushort* pClusterMap = clusterMap)
             fixed (DWRITE_SHAPING_TEXT_PROPERTIES* pTextProps = textProps)

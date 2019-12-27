@@ -72,7 +72,7 @@ namespace BouncyBox.VorpalEngine.Interop.DWrite
 
         public HResult CreateFontFace(
             DWRITE_FONT_FACE_TYPE fontFaceType,
-            ReadOnlySpan<IDWriteFontFilePointer> fontFiles,
+            ReadOnlySpan<Pointer<IDWriteFontFile>> fontFiles,
             uint faceIndex,
             DWRITE_FONT_SIMULATIONS fontFaceSimulationFlags,
             out DWriteFontFace? fontFace)
@@ -80,7 +80,7 @@ namespace BouncyBox.VorpalEngine.Interop.DWrite
             IDWriteFontFace* pFontFace;
             int hr;
 
-            fixed (IDWriteFontFilePointer* pFontFiles = fontFiles)
+            fixed (Pointer<IDWriteFontFile>* pFontFiles = fontFiles)
             {
                 hr = Pointer->CreateFontFace(
                     fontFaceType,

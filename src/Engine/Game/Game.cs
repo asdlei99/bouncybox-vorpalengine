@@ -32,7 +32,10 @@ namespace BouncyBox.VorpalEngine.Engine.Game
         private RenderForm? _renderForm;
 
         /// <summary>Initializes a new instance of the <see cref="Game{TGameState,TSceneKey}" /> type.</summary>
-        /// <remarks>Subscribes to the <see cref="RenderWindowClosingMessage" /> global message.</remarks>
+        /// <remarks>
+        ///     <para>Subscribes to the <see cref="RenderWindowClosingMessage" /> global message.</para>
+        ///     <para>Subscribes to the <see cref="DisposeObjectMessage" /> global message.</para>
+        /// </remarks>
         /// <param name="interfaces">An <see cref="IInterfaces" /> implementation.</param>
         /// <param name="gameExecutionStateManager">An <see cref="IGameExecutionStateManager" /> implementation.</param>
         /// <param name="entityManager">An <see cref="IEntityManager{TGameState}" /> implementation.</param>
@@ -58,7 +61,8 @@ namespace BouncyBox.VorpalEngine.Engine.Game
             _globalMessagePublisherSubscriber =
                 ConcurrentMessagePublisherSubscriber<IGlobalMessage>
                     .Create(interfaces, context)
-                    .Subscribe<RenderWindowClosingMessage>(HandleRenderWindowClosingMessage);
+                    .Subscribe<RenderWindowClosingMessage>(HandleRenderWindowClosingMessage)
+                    .Subscribe<DisposeObjectMessage>(HandleDisposeObjectMessage);
         }
 
         /// <summary>Initializes a new instance of the <see cref="Game{TGameState,TSceneKey}" /> type.</summary>
@@ -173,7 +177,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
 
             (EngineThread thread, Exception exception) = unhandledExceptions.First();
 
-            throw new Exception($"An unhandled exception occurred on the {thread.GetName()} thread.", exception);
+            throw new Exception($"An unhandled exception occurred on the {thread.AsString()} thread.", exception);
         }
 
         /// <summary>Handle dispatched messages.</summary>
@@ -198,6 +202,13 @@ namespace BouncyBox.VorpalEngine.Engine.Game
         private void HandleRenderWindowClosingMessage(RenderWindowClosingMessage message)
         {
             _exitManualResetEvent.Set();
+        }
+
+        /// <summary>Handles the <see cref="DisposeObjectMessage" /> global message.</summary>
+        /// <param name="message">The message being handled.</param>
+        private static void HandleDisposeObjectMessage(DisposeObjectMessage message)
+        {
+            message.Disposable.Dispose();
         }
     }
 }

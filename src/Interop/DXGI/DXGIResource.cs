@@ -18,24 +18,24 @@ namespace BouncyBox.VorpalEngine.Interop.DXGI
 
         public new IDXGIResource* Pointer => (IDXGIResource*)base.Pointer;
 
-        public HResult GetEvictionPriority(uint* pEvictionPriority)
+        public HResult GetEvictionPriority(uint* evictionPriority)
         {
-            return Pointer->GetEvictionPriority(pEvictionPriority);
+            return Pointer->GetEvictionPriority(evictionPriority);
         }
 
-        public HResult GetSharedHandle(IntPtr* pSharedHandle)
+        public HResult GetSharedHandle(IntPtr* sharedHandle)
         {
-            return Pointer->GetSharedHandle(pSharedHandle);
+            return Pointer->GetSharedHandle(sharedHandle);
         }
 
-        public HResult GetUsage(uint* pUsage)
+        public HResult GetUsage(uint* usage)
         {
-            return Pointer->GetUsage(pUsage);
+            return Pointer->GetUsage(usage);
         }
 
-        public HResult SetEvictionPriority(uint EvictionPriority)
+        public HResult SetEvictionPriority(uint evictionPriority)
         {
-            return Pointer->SetEvictionPriority(EvictionPriority);
+            return Pointer->SetEvictionPriority(evictionPriority);
         }
 
         public static implicit operator IDXGIResource*(DXGIResource value)

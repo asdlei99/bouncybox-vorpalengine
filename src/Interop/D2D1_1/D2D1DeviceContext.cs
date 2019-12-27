@@ -122,8 +122,8 @@ namespace BouncyBox.VorpalEngine.Interop.D2D1_1
             [Optional] D2D_RECT_F* destinationRectangle,
             float opacity,
             D2D1_INTERPOLATION_MODE interpolationMode,
-            [Optional] D2D_RECT_F* sourceRectangle,
-            [Optional] D2D_MATRIX_4X4_F* perspectiveTransform)
+            D2D_RECT_F* sourceRectangle = null,
+            D2D_MATRIX_4X4_F* perspectiveTransform = null)
         {
             Pointer->DrawBitmap(bitmap, destinationRectangle, opacity, interpolationMode, sourceRectangle, perspectiveTransform);
         }
@@ -133,7 +133,7 @@ namespace BouncyBox.VorpalEngine.Interop.D2D1_1
             Pointer->DrawGdiMetafile(gdiMetafile, targetOffset);
         }
 
-        public void DrawGdiMetafile(ID2D1GdiMetafile* gdiMetafile, [Optional] D2D_POINT_2F* targetOffset)
+        public void DrawGdiMetafile(ID2D1GdiMetafile* gdiMetafile, D2D_POINT_2F* targetOffset = null)
         {
             Pointer->DrawGdiMetafile(gdiMetafile, targetOffset);
         }
@@ -143,7 +143,7 @@ namespace BouncyBox.VorpalEngine.Interop.D2D1_1
             DWRITE_GLYPH_RUN* glyphRun,
             [Optional] DWRITE_GLYPH_RUN_DESCRIPTION* glyphRunDescription,
             ID2D1Brush* foregroundBrush,
-            DWRITE_MEASURING_MODE measuringMode = DWRITE_MEASURING_MODE.DWRITE_MEASURING_MODE_GDI_NATURAL)
+            DWRITE_MEASURING_MODE measuringMode = DWRITE_MEASURING_MODE.DWRITE_MEASURING_MODE_NATURAL)
         {
             Pointer->DrawGlyphRun(baselineOrigin, glyphRun, glyphRunDescription, foregroundBrush, measuringMode);
         }
@@ -205,8 +205,8 @@ namespace BouncyBox.VorpalEngine.Interop.D2D1_1
         public void FillOpacityMask(
             ID2D1Bitmap* opacityMask,
             ID2D1Brush* brush,
-            [Optional] D2D_RECT_F* destinationRectangle,
-            [Optional] D2D_RECT_F* sourceRectangle)
+            D2D_RECT_F* destinationRectangle = null,
+            D2D_RECT_F* sourceRectangle = null)
         {
             Pointer->FillOpacityMask(opacityMask, brush, destinationRectangle, sourceRectangle);
         }
@@ -286,7 +286,7 @@ namespace BouncyBox.VorpalEngine.Interop.D2D1_1
             return Pointer->IsDxgiFormatSupported(format) == TerraFX.Interop.Windows.TRUE;
         }
 
-        public void PushLayer(D2D1_LAYER_PARAMETERS1* layerParameters, [Optional] ID2D1Layer* layer)
+        public void PushLayer(D2D1_LAYER_PARAMETERS1* layerParameters, ID2D1Layer* layer = null)
         {
             Pointer->PushLayer(layerParameters, layer);
         }
@@ -301,7 +301,7 @@ namespace BouncyBox.VorpalEngine.Interop.D2D1_1
             Pointer->SetRenderingControls(renderingControls);
         }
 
-        public void SetTarget([Optional] ID2D1Image* image)
+        public void SetTarget(ID2D1Image* image = null)
         {
             Pointer->SetTarget(image);
         }

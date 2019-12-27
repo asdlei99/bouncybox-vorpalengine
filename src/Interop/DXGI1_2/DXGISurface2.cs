@@ -19,9 +19,9 @@ namespace BouncyBox.VorpalEngine.Interop.DXGI1_2
 
         public new IDXGISurface2* Pointer => (IDXGISurface2*)base.Pointer;
 
-        public HResult GetResource(Guid* riid, void** ppParentResource, uint* pSubresourceIndex)
+        public HResult GetResource(Guid* iid, void** parentResource, uint* subresourceIndex)
         {
-            return Pointer->GetResource(riid, ppParentResource, pSubresourceIndex);
+            return Pointer->GetResource(iid, parentResource, subresourceIndex);
         }
 
         public static implicit operator IDXGISurface2*(DXGISurface2 value)

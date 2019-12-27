@@ -9,21 +9,21 @@ namespace BouncyBox.VorpalEngine.Interop.DXGI
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     public unsafe partial class DXGIAdapter
     {
-        public HResult CheckInterfaceSupport<T>(out LARGE_INTEGER pUMDVersion)
+        public HResult CheckInterfaceSupport<T>(out LARGE_INTEGER umdVersion)
             where T : unmanaged
         {
             Guid interfaceName = typeof(T).GUID;
 
-            fixed (LARGE_INTEGER* pPUMDVersion = &pUMDVersion)
+            fixed (LARGE_INTEGER* pUmdVersion = &umdVersion)
             {
-                return Pointer->CheckInterfaceSupport(&interfaceName, pPUMDVersion);
+                return Pointer->CheckInterfaceSupport(&interfaceName, pUmdVersion);
             }
         }
 
-        public HResult EnumOutputs(uint Output, out DXGIOutput? output)
+        public HResult EnumOutputs(uint outputIndex, out DXGIOutput? output)
         {
             IDXGIOutput* pOutput;
-            int hr = Pointer->EnumOutputs(Output, &pOutput);
+            int hr = Pointer->EnumOutputs(outputIndex, &pOutput);
 
             output = TerraFX.Interop.Windows.SUCCEEDED(hr) ? new DXGIOutput(pOutput) : null;
 

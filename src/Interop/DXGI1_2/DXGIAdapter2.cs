@@ -18,9 +18,9 @@ namespace BouncyBox.VorpalEngine.Interop.DXGI1_2
 
         public new IDXGIAdapter2* Pointer => (IDXGIAdapter2*)base.Pointer;
 
-        public HResult GetDesc2(DXGI_ADAPTER_DESC2* pDesc)
+        public HResult GetDesc2(DXGI_ADAPTER_DESC2* desc)
         {
-            return Pointer->GetDesc2(pDesc);
+            return Pointer->GetDesc2(desc);
         }
 
         public static implicit operator IDXGIAdapter2*(DXGIAdapter2 value)

@@ -16,11 +16,11 @@ namespace BouncyBox.VorpalEngine.Interop.DXGI
             }
         }
 
-        public HResult Map(out DXGI_MAPPED_RECT lockedRect, uint MapFlags)
+        public HResult Map(out DXGI_MAPPED_RECT lockedRect, uint mapFlags)
         {
             fixed (DXGI_MAPPED_RECT* pLockedRect = &lockedRect)
             {
-                return Pointer->Map(pLockedRect, MapFlags);
+                return Pointer->Map(pLockedRect, mapFlags);
             }
         }
     }

@@ -13,16 +13,16 @@ namespace BouncyBox.VorpalEngine.Interop.D2D1_1
 
             Pointer->GetInput(index, &pInput);
 
-            input = pInput is null ? null : new D2D1Image(pInput);
+            input = pInput != null ? new D2D1Image(pInput) : null;
         }
 
-        public void GetOutput(out D2D1Image outputImage)
+        public D2D1Image GetOutput()
         {
             ID2D1Image* pOutputImage;
 
             Pointer->GetOutput(&pOutputImage);
 
-            outputImage = new D2D1Image(pOutputImage);
+            return new D2D1Image(pOutputImage);
         }
     }
 }

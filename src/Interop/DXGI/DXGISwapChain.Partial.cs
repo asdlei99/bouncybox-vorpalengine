@@ -9,14 +9,14 @@ namespace BouncyBox.VorpalEngine.Interop.DXGI
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     public unsafe partial class DXGISwapChain
     {
-        public HResult GetBuffer<T>(uint Buffer, out T* pSurface)
+        public HResult GetBuffer<T>(uint buffer, out T* surface)
             where T : unmanaged
         {
             Guid iid = typeof(T).GUID;
 
-            fixed (T** ppSurface = &pSurface)
+            fixed (T** ppSurface = &surface)
             {
-                return Pointer->GetBuffer(Buffer, &iid, (void**)ppSurface);
+                return Pointer->GetBuffer(buffer, &iid, (void**)ppSurface);
             }
         }
 

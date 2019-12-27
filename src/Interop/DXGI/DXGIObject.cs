@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Runtime.InteropServices;
 using TerraFX.Interop;
 
 #pragma warning disable 1591
@@ -19,24 +18,24 @@ namespace BouncyBox.VorpalEngine.Interop.DXGI
 
         public new IDXGIObject* Pointer => (IDXGIObject*)base.Pointer;
 
-        public HResult GetParent(Guid* riid, void** ppParent)
+        public HResult GetParent(Guid* iid, void** parent)
         {
-            return Pointer->GetParent(riid, ppParent);
+            return Pointer->GetParent(iid, parent);
         }
 
-        public HResult GetPrivateData(Guid* Name, uint* pDataSize, void* pData)
+        public HResult GetPrivateData(Guid* name, uint* dataSize, void* data)
         {
-            return Pointer->GetPrivateData(Name, pDataSize, pData);
+            return Pointer->GetPrivateData(name, dataSize, data);
         }
 
-        public HResult SetPrivateData(Guid* Name, uint DataSize, void* pData)
+        public HResult SetPrivateData(Guid* name, uint dataSize, void* data)
         {
-            return Pointer->SetPrivateData(Name, DataSize, pData);
+            return Pointer->SetPrivateData(name, dataSize, data);
         }
 
-        public HResult SetPrivateDataInterface(Guid* Name, [Optional] IUnknown* pUnknown)
+        public HResult SetPrivateDataInterface(Guid* name, IUnknown* unknown = null)
         {
-            return Pointer->SetPrivateDataInterface(Name, pUnknown);
+            return Pointer->SetPrivateDataInterface(name, unknown);
         }
 
         public static implicit operator IDXGIObject*(DXGIObject value)

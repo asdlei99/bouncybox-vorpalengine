@@ -17,34 +17,34 @@ namespace BouncyBox.VorpalEngine.Interop.DXGI
 
         public new IDXGIOutput* Pointer => (IDXGIOutput*)base.Pointer;
 
-        public HResult GetDesc(DXGI_OUTPUT_DESC* pDesc)
+        public HResult GetDesc(DXGI_OUTPUT_DESC* desc)
         {
-            return Pointer->GetDesc(pDesc);
+            return Pointer->GetDesc(desc);
         }
 
-        public HResult GetDisplayModeList(DXGI_FORMAT EnumFormat, uint Flags, uint* pNumModes, DXGI_MODE_DESC* pDesc)
+        public HResult GetDisplayModeList(DXGI_FORMAT enumFormat, uint flags, uint* numModes, DXGI_MODE_DESC* desc)
         {
-            return Pointer->GetDisplayModeList(EnumFormat, Flags, pNumModes, pDesc);
+            return Pointer->GetDisplayModeList(enumFormat, flags, numModes, desc);
         }
 
-        public HResult GetDisplaySurfaceData(IDXGISurface* pDestination)
+        public HResult GetDisplaySurfaceData(IDXGISurface* destination)
         {
-            return Pointer->GetDisplaySurfaceData(pDestination);
+            return Pointer->GetDisplaySurfaceData(destination);
         }
 
-        public HResult GetFrameStatistics(DXGI_FRAME_STATISTICS* pStats)
+        public HResult GetFrameStatistics(DXGI_FRAME_STATISTICS* stats)
         {
-            return Pointer->GetFrameStatistics(pStats);
+            return Pointer->GetFrameStatistics(stats);
         }
 
-        public HResult GetGammaControl(DXGI_GAMMA_CONTROL* pArray)
+        public HResult GetGammaControl(DXGI_GAMMA_CONTROL* array)
         {
-            return Pointer->GetGammaControl(pArray);
+            return Pointer->GetGammaControl(array);
         }
 
-        public HResult GetGammaControlCapabilities(DXGI_GAMMA_CONTROL_CAPABILITIES* pGammaCaps)
+        public HResult GetGammaControlCapabilities(DXGI_GAMMA_CONTROL_CAPABILITIES* gammaCaps)
         {
-            return Pointer->GetGammaControlCapabilities(pGammaCaps);
+            return Pointer->GetGammaControlCapabilities(gammaCaps);
         }
 
         public void ReleaseOwnership()
@@ -52,19 +52,19 @@ namespace BouncyBox.VorpalEngine.Interop.DXGI
             Pointer->ReleaseOwnership();
         }
 
-        public HResult SetDisplaySurface(IDXGISurface* pScanoutSurface)
+        public HResult SetDisplaySurface(IDXGISurface* scanoutSurface)
         {
-            return Pointer->SetDisplaySurface(pScanoutSurface);
+            return Pointer->SetDisplaySurface(scanoutSurface);
         }
 
-        public HResult SetGammaControl(DXGI_GAMMA_CONTROL* pArray)
+        public HResult SetGammaControl(DXGI_GAMMA_CONTROL* array)
         {
-            return Pointer->SetGammaControl(pArray);
+            return Pointer->SetGammaControl(array);
         }
 
-        public HResult TakeOwnership(IUnknown* pDevice, bool Exclusive)
+        public HResult TakeOwnership(IUnknown* device, bool exclusive)
         {
-            return Pointer->TakeOwnership(pDevice, Exclusive ? TerraFX.Interop.Windows.TRUE : TerraFX.Interop.Windows.FALSE);
+            return Pointer->TakeOwnership(device, exclusive ? TerraFX.Interop.Windows.TRUE : TerraFX.Interop.Windows.FALSE);
         }
 
         public HResult WaitForVBlank()

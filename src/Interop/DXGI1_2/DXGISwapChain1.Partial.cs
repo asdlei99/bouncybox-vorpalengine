@@ -18,12 +18,12 @@ namespace BouncyBox.VorpalEngine.Interop.DXGI1_2
             }
         }
 
-        public HResult GetCoreWindow<T>(out T* pUnk)
+        public HResult GetCoreWindow<T>(out T* unk)
             where T : unmanaged
         {
             Guid iid = typeof(T).GUID;
 
-            fixed (T** ppUnk = &pUnk)
+            fixed (T** ppUnk = &unk)
             {
                 return Pointer->GetCoreWindow(&iid, (void**)ppUnk);
             }

@@ -11,15 +11,15 @@ namespace BouncyBox.VorpalEngine.Interop.D2D1
     {
         public void GetSourceGeometries(ref Span<D2D1Geometry> geometries)
         {
-            ID2D1GeometryPointer[]? pGeometriesArray = null;
-            Span<ID2D1GeometryPointer> geometriesSpan =
-                AllocationHelper.CanStackAlloc<ID2D1GeometryPointer>((uint)geometries.Length)
-                    ? stackalloc ID2D1GeometryPointer[geometries.Length]
-                    : pGeometriesArray = ArrayPool<ID2D1GeometryPointer>.Shared.Rent(geometries.Length);
+            Pointer<ID2D1Geometry>[]? pGeometriesArray = null;
+            Span<Pointer<ID2D1Geometry>> geometriesSpan =
+                AllocationHelper.CanStackAlloc<Pointer<ID2D1Geometry>>((uint)geometries.Length)
+                    ? stackalloc Pointer<ID2D1Geometry>[geometries.Length]
+                    : pGeometriesArray = ArrayPool<Pointer<ID2D1Geometry>>.Shared.Rent(geometries.Length);
 
             try
             {
-                fixed (ID2D1GeometryPointer* ppGeometries = geometriesSpan)
+                fixed (Pointer<ID2D1Geometry>* ppGeometries = geometriesSpan)
                 {
                     Pointer->GetSourceGeometries((ID2D1Geometry**)ppGeometries, (uint)geometries.Length);
                 }
@@ -32,14 +32,14 @@ namespace BouncyBox.VorpalEngine.Interop.D2D1
                         break;
                     }
 
-                    geometries[i] = new D2D1Geometry(geometriesSpan[i].Pointer);
+                    geometries[i] = new D2D1Geometry(geometriesSpan[i].Ptr);
                 }
             }
             finally
             {
                 if (pGeometriesArray is object)
                 {
-                    ArrayPool<ID2D1GeometryPointer>.Shared.Return(pGeometriesArray);
+                    ArrayPool<Pointer<ID2D1Geometry>>.Shared.Return(pGeometriesArray);
                 }
             }
         }

@@ -84,11 +84,11 @@ namespace BouncyBox.VorpalEngine.Engine.Threads
         {
             VerifyProcessThread(ProcessThread.Main);
 
-            var processThread = Enums.Parse<ProcessThread>(thread.GetName());
+            var processThread = Enums.Parse<ProcessThread>(thread.AsString());
 
             if (_threadsByProcessThread.ContainsKey(processThread))
             {
-                throw new InvalidOperationException($"{thread.GetName()} thread is already started.");
+                throw new InvalidOperationException($"{thread.AsString()} thread is already started.");
             }
 
             var threadWrapper = new ThreadWrapper(
@@ -194,7 +194,7 @@ namespace BouncyBox.VorpalEngine.Engine.Threads
                 ManualResetEventSlim unhandledExceptionManualResetEvent,
                 CancellationToken cancellationToken)
             {
-                ProcessThread = Enums.Parse<ProcessThread>(thread.GetName());
+                ProcessThread = Enums.Parse<ProcessThread>(thread.AsString());
 
                 _thread = new Thread(
                     () =>
@@ -205,7 +205,7 @@ namespace BouncyBox.VorpalEngine.Engine.Threads
                         try
                         {
                             // Set the thread's name for easier debugging
-                            Thread.CurrentThread.Name = $"{thread.GetName()} Thread";
+                            Thread.CurrentThread.Name = $"{thread.AsString()} Thread";
 
                             // Prepare the worker for work
                             threadWorker.Prepare();

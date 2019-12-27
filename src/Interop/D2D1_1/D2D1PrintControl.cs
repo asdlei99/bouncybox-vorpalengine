@@ -1,5 +1,4 @@
-﻿using System.Runtime.InteropServices;
-using TerraFX.Interop;
+﻿using TerraFX.Interop;
 
 #pragma warning disable 1591
 
@@ -19,9 +18,9 @@ namespace BouncyBox.VorpalEngine.Interop.D2D1_1
         public HResult AddPage(
             ID2D1CommandList* commandList,
             D2D_SIZE_F pageSize,
-            [Optional] IStream* pagePrintTicketStream,
-            [Optional] ulong* tag1,
-            [Optional] ulong* tag2)
+            IStream* pagePrintTicketStream = null,
+            ulong* tag1 = null,
+            ulong* tag2 = null)
         {
             return Pointer->AddPage(commandList, pageSize, pagePrintTicketStream, tag1, tag2);
         }

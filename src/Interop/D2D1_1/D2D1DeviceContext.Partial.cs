@@ -304,6 +304,5 @@ namespace BouncyBox.VorpalEngine.Interop.D2D1_1
 
             return pImage is null ? null : new D2D1Image(pImage);
         }
-
     }
 }

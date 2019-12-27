@@ -17,9 +17,9 @@ namespace BouncyBox.VorpalEngine.Interop.DXGI
 
         public new IDXGIFactory1* Pointer => (IDXGIFactory1*)base.Pointer;
 
-        public HResult EnumAdapters1(uint Adapter, IDXGIAdapter1** ppAdapter)
+        public HResult EnumAdapters1(uint adapterIndex, IDXGIAdapter1** adapter)
         {
-            return Pointer->EnumAdapters1(Adapter, ppAdapter);
+            return Pointer->EnumAdapters1(adapterIndex, adapter);
         }
 
         public bool IsCurrent()

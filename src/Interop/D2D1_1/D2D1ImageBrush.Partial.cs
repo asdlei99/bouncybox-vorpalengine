@@ -7,13 +7,13 @@ namespace BouncyBox.VorpalEngine.Interop.D2D1_1
 {
     public unsafe partial class D2D1ImageBrush
     {
-        public void GetImage(out D2D1Image? image)
+        public D2D1Image? GetImage()
         {
             ID2D1Image* pImage;
 
             Pointer->GetImage(&pImage);
 
-            image = pImage is null ? null : new D2D1Image(pImage);
+            return pImage != null ? new D2D1Image(pImage) : null;
         }
 
         public D2D_RECT_F GetSourceRectangle()

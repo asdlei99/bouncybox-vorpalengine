@@ -86,7 +86,7 @@ namespace BouncyBox.VorpalEngine.Engine.Scenes
         /// <exception cref="InvalidOperationException">Thrown when a scene with the same render order was already loaded.</exception>
         private void HandleLoadSceneMessage(LoadSceneMessage<TSceneKey> message)
         {
-            string sceneKeyName = message.SceneKey.GetName();
+            string sceneKeyName = message.SceneKey.AsString();
 
             if (_scenesBySceneKey.ContainsKey(message.SceneKey))
             {
@@ -106,10 +106,11 @@ namespace BouncyBox.VorpalEngine.Engine.Scenes
         }
 
         /// <summary>Handles the <see cref="LoadSceneMessage{TSceneKey}" /> global message.</summary>
+        /// <remarks>Publishes the <see cref="DisposeObjectMessage" /> global message.</remarks>
         /// <param name="message">The message being handled.</param>
         private void HandleUnloadSceneMessage(UnloadSceneMessage<TSceneKey> message)
         {
-            string sceneKeyName = message.SceneKey.GetName();
+            string sceneKeyName = message.SceneKey.AsString();
 
             if (!_scenesBySceneKey.Remove(message.SceneKey, out IScene<TSceneKey>? scene))
             {
@@ -122,6 +123,8 @@ namespace BouncyBox.VorpalEngine.Engine.Scenes
             scene.Unload();
 
             _serilogLogger.LogDebug("Unloaded scene {Scene}", sceneKeyName);
+
+            _globalMessagePublisherSubscriber.Publish(new DisposeObjectMessage(scene));
         }
     }
 }

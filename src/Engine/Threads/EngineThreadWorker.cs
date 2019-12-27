@@ -19,7 +19,7 @@ namespace BouncyBox.VorpalEngine.Engine.Threads
         {
             Context = context;
             Interfaces = interfaces;
-            _thread = Enums.Parse<ProcessThread>(thread.GetName());
+            _thread = Enums.Parse<ProcessThread>(thread.AsString());
 
             GlobalMessagePublisherSubscriber = ConcurrentMessagePublisherSubscriber<IGlobalMessage>.Create(interfaces, context);
         }
@@ -78,13 +78,11 @@ namespace BouncyBox.VorpalEngine.Engine.Threads
             GlobalMessagePublisherSubscriber.HandleDispatched();
         }
 
+        /// <inheritdoc cref="IEngineThreadWorker.DoWork" />
+        protected abstract void OnDoWork(in CancellationToken cancellationToken);
+
         /// <inheritdoc cref="IEngineThreadWorker.Prepare" />
         protected virtual void OnPrepare()
-        {
-        }
-
-        /// <inheritdoc cref="IEngineThreadWorker.DoWork" />
-        protected virtual void OnDoWork(in CancellationToken cancellationToken)
         {
         }
 

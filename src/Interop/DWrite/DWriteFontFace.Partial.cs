@@ -31,16 +31,16 @@ namespace BouncyBox.VorpalEngine.Interop.DWrite
         public HResult GetFiles(Span<DWriteFontFile> fontFiles)
         {
             var numberOfFiles = (uint)fontFiles.Length;
-            IDWriteFontFilePointer[]? pFontFilesArray = null;
-            Span<IDWriteFontFilePointer> fontFilesSpan =
-                AllocationHelper.CanStackAlloc<IDWriteFontFilePointer>((uint)fontFiles.Length)
-                    ? stackalloc IDWriteFontFilePointer[fontFiles.Length]
-                    : pFontFilesArray = ArrayPool<IDWriteFontFilePointer>.Shared.Rent(fontFiles.Length);
+            Pointer<IDWriteFontFile>[]? pFontFilesArray = null;
+            Span<Pointer<IDWriteFontFile>> fontFilesSpan =
+                AllocationHelper.CanStackAlloc<Pointer<IDWriteFontFile>>((uint)fontFiles.Length)
+                    ? stackalloc Pointer<IDWriteFontFile>[fontFiles.Length]
+                    : pFontFilesArray = ArrayPool<Pointer<IDWriteFontFile>>.Shared.Rent(fontFiles.Length);
             int hr;
 
             try
             {
-                fixed (IDWriteFontFilePointer* ppFontFiles = fontFilesSpan)
+                fixed (Pointer<IDWriteFontFile>* ppFontFiles = fontFilesSpan)
                 {
                     hr = Pointer->GetFiles(&numberOfFiles, (IDWriteFontFile**)ppFontFiles);
                 }
@@ -50,7 +50,7 @@ namespace BouncyBox.VorpalEngine.Interop.DWrite
                 {
                     for (var i = 0; i < fontFiles.Length; i++)
                     {
-                        fontFiles[i] = new DWriteFontFile(fontFilesSpan[i].Pointer);
+                        fontFiles[i] = new DWriteFontFile(fontFilesSpan[i].Ptr);
                     }
                 }
             }
@@ -58,7 +58,7 @@ namespace BouncyBox.VorpalEngine.Interop.DWrite
             {
                 if (pFontFilesArray is object)
                 {
-                    ArrayPool<IDWriteFontFilePointer>.Shared.Return(pFontFilesArray);
+                    ArrayPool<Pointer<IDWriteFontFile>>.Shared.Return(pFontFilesArray);
                 }
             }
 
@@ -160,12 +160,13 @@ namespace BouncyBox.VorpalEngine.Interop.DWrite
             }
         }
 
-        public void GetMetrics(out DWRITE_FONT_METRICS fontFaceMetrics)
+        public DWRITE_FONT_METRICS GetMetrics()
         {
-            fixed (DWRITE_FONT_METRICS* pFontFaceMetrics = &fontFaceMetrics)
-            {
-                Pointer->GetMetrics(pFontFaceMetrics);
-            }
+            DWRITE_FONT_METRICS fontFaceMetrics;
+
+            Pointer->GetMetrics(&fontFaceMetrics);
+
+            return fontFaceMetrics;
         }
 
         public HResult GetRecommendedRenderingMode(

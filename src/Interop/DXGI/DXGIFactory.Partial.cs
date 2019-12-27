@@ -9,30 +9,30 @@ namespace BouncyBox.VorpalEngine.Interop.DXGI
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     public unsafe partial class DXGIFactory
     {
-        public HResult CreateSoftwareAdapter(IntPtr Module, out DXGIAdapter? adapter)
+        public HResult CreateSoftwareAdapter(IntPtr module, out DXGIAdapter? adapter)
         {
             IDXGIAdapter* pAdapter;
-            int hr = Pointer->CreateSoftwareAdapter(Module, &pAdapter);
+            int hr = Pointer->CreateSoftwareAdapter(module, &pAdapter);
 
             adapter = TerraFX.Interop.Windows.SUCCEEDED(hr) ? new DXGIAdapter(pAdapter) : null;
 
             return hr;
         }
 
-        public HResult CreateSwapChain(IUnknown* pDevice, DXGI_SWAP_CHAIN_DESC* pDesc, out DXGISwapChain? swapChain)
+        public HResult CreateSwapChain(IUnknown* device, DXGI_SWAP_CHAIN_DESC* desc, out DXGISwapChain? swapChain)
         {
             IDXGISwapChain* pSwapChain;
-            int hr = Pointer->CreateSwapChain(pDevice, pDesc, &pSwapChain);
+            int hr = Pointer->CreateSwapChain(device, desc, &pSwapChain);
 
             swapChain = TerraFX.Interop.Windows.SUCCEEDED(hr) ? new DXGISwapChain(pSwapChain) : null;
 
             return hr;
         }
 
-        public HResult EnumAdapters(uint Adapter, out DXGIAdapter? adapter)
+        public HResult EnumAdapters(uint adapterIndex, out DXGIAdapter? adapter)
         {
             IDXGIAdapter* pAdapter;
-            int hr = Pointer->EnumAdapters(Adapter, &pAdapter);
+            int hr = Pointer->EnumAdapters(adapterIndex, &pAdapter);
 
             adapter = TerraFX.Interop.Windows.SUCCEEDED(hr) ? new DXGIAdapter(pAdapter) : null;
 

@@ -21,7 +21,7 @@ namespace BouncyBox.VorpalEngine.Interop.D2D1_1
             return Pointer->BeginDraw();
         }
 
-        public HResult Clear([Optional] DXGI_RGBA* color)
+        public HResult Clear(DXGI_RGBA* color = null)
         {
             return Pointer->Clear(color);
         }
@@ -31,18 +31,18 @@ namespace BouncyBox.VorpalEngine.Interop.D2D1_1
             [Optional] D2D_RECT_F* destinationRectangle,
             float opacity,
             D2D1_INTERPOLATION_MODE interpolationMode,
-            [Optional] D2D_RECT_F* sourceRectangle,
-            [Optional] D2D_MATRIX_4X4_F* perspectiveTransform)
+            D2D_RECT_F* sourceRectangle = null,
+            D2D_MATRIX_4X4_F* perspectiveTransform = null)
         {
             return Pointer->DrawBitmap(bitmap, destinationRectangle, opacity, interpolationMode, sourceRectangle, perspectiveTransform);
         }
 
-        public HResult DrawGdiMetafile(ID2D1GdiMetafile* gdiMetafile, [Optional] D2D_POINT_2F* targetOffset)
+        public HResult DrawGdiMetafile(ID2D1GdiMetafile* gdiMetafile, D2D_POINT_2F* targetOffset = null)
         {
             return Pointer->DrawGdiMetafile(gdiMetafile, targetOffset);
         }
 
-        public HResult DrawGeometry(ID2D1Geometry* geometry, ID2D1Brush* brush, float strokeWidth, [Optional] ID2D1StrokeStyle* strokeStyle)
+        public HResult DrawGeometry(ID2D1Geometry* geometry, ID2D1Brush* brush, float strokeWidth, ID2D1StrokeStyle* strokeStyle = null)
         {
             return Pointer->DrawGeometry(geometry, brush, strokeWidth, strokeStyle);
         }
@@ -67,12 +67,12 @@ namespace BouncyBox.VorpalEngine.Interop.D2D1_1
             return Pointer->DrawImage(image, targetOffset, imageRectangle, interpolationMode, compositeMode);
         }
 
-        public HResult DrawLine(D2D_POINT_2F point0, D2D_POINT_2F point1, ID2D1Brush* brush, float strokeWidth, [Optional] ID2D1StrokeStyle* strokeStyle)
+        public HResult DrawLine(D2D_POINT_2F point0, D2D_POINT_2F point1, ID2D1Brush* brush, float strokeWidth, ID2D1StrokeStyle* strokeStyle = null)
         {
             return Pointer->DrawLine(point0, point1, brush, strokeWidth, strokeStyle);
         }
 
-        public HResult DrawRectangle(D2D_RECT_F* rect, ID2D1Brush* brush, float strokeWidth, [Optional] ID2D1StrokeStyle* strokeStyle)
+        public HResult DrawRectangle(D2D_RECT_F* rect, ID2D1Brush* brush, float strokeWidth, ID2D1StrokeStyle* strokeStyle = null)
         {
             return Pointer->DrawRectangle(rect, brush, strokeWidth, strokeStyle);
         }
@@ -82,7 +82,7 @@ namespace BouncyBox.VorpalEngine.Interop.D2D1_1
             return Pointer->EndDraw();
         }
 
-        public HResult FillGeometry(ID2D1Geometry* geometry, ID2D1Brush* brush, [Optional] ID2D1Brush* opacityBrush)
+        public HResult FillGeometry(ID2D1Geometry* geometry, ID2D1Brush* brush, ID2D1Brush* opacityBrush = null)
         {
             return Pointer->FillGeometry(geometry, brush, opacityBrush);
         }
@@ -95,8 +95,8 @@ namespace BouncyBox.VorpalEngine.Interop.D2D1_1
         public HResult FillOpacityMask(
             ID2D1Bitmap* opacityMask,
             ID2D1Brush* brush,
-            [Optional] D2D_RECT_F* destinationRectangle,
-            [Optional] D2D_RECT_F* sourceRectangle)
+            D2D_RECT_F* destinationRectangle = null,
+            D2D_RECT_F* sourceRectangle = null)
         {
             return Pointer->FillOpacityMask(opacityMask, brush, destinationRectangle, sourceRectangle);
         }
@@ -121,7 +121,7 @@ namespace BouncyBox.VorpalEngine.Interop.D2D1_1
             return Pointer->PushAxisAlignedClip(clipRect, antialiasMode);
         }
 
-        public HResult PushLayer(D2D1_LAYER_PARAMETERS1* layerParameters1, [Optional] ID2D1Layer* layer)
+        public HResult PushLayer(D2D1_LAYER_PARAMETERS1* layerParameters1, ID2D1Layer* layer = null)
         {
             return Pointer->PushLayer(layerParameters1, layer);
         }
@@ -146,7 +146,7 @@ namespace BouncyBox.VorpalEngine.Interop.D2D1_1
             return Pointer->SetTextAntialiasMode(textAntialiasMode);
         }
 
-        public HResult SetTextRenderingParams([Optional] IDWriteRenderingParams* textRenderingParams)
+        public HResult SetTextRenderingParams(IDWriteRenderingParams* textRenderingParams = null)
         {
             return Pointer->SetTextRenderingParams(textRenderingParams);
         }

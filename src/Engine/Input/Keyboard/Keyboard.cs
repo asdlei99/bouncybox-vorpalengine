@@ -25,7 +25,7 @@ namespace BouncyBox.VorpalEngine.Engine.Input.Keyboard
             {
                 lock (_lockObject)
                 {
-                    return $"DownKeys = {string.Join(", ", _downKeys.Select(a => a.GetName()))}";
+                    return $"DownKeys = {string.Join(", ", _downKeys.Select(a => a.AsString()))}";
                 }
             }
         }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Runtime.InteropServices;
 using TerraFX.Interop;
 
 #pragma warning disable 1591
@@ -19,59 +18,59 @@ namespace BouncyBox.VorpalEngine.Interop.DXGI
 
         public new IDXGISwapChain* Pointer => (IDXGISwapChain*)base.Pointer;
 
-        public HResult GetBuffer(uint Buffer, Guid* riid, void** ppSurface)
+        public HResult GetBuffer(uint buffer, Guid* iid, void** surface)
         {
-            return Pointer->GetBuffer(Buffer, riid, ppSurface);
+            return Pointer->GetBuffer(buffer, iid, surface);
         }
 
-        public HResult GetContainingOutput(IDXGIOutput** ppOutput)
+        public HResult GetContainingOutput(IDXGIOutput** output)
         {
-            return Pointer->GetContainingOutput(ppOutput);
+            return Pointer->GetContainingOutput(output);
         }
 
-        public HResult GetDesc(DXGI_SWAP_CHAIN_DESC* pDesc)
+        public HResult GetDesc(DXGI_SWAP_CHAIN_DESC* desc)
         {
-            return Pointer->GetDesc(pDesc);
+            return Pointer->GetDesc(desc);
         }
 
-        public HResult GetFrameStatistics(DXGI_FRAME_STATISTICS* pStats)
+        public HResult GetFrameStatistics(DXGI_FRAME_STATISTICS* stats)
         {
-            return Pointer->GetFrameStatistics(pStats);
+            return Pointer->GetFrameStatistics(stats);
         }
 
-        public HResult GetFullscreenState(out bool? fullscreen, IDXGIOutput** ppTarget)
+        public HResult GetFullscreenState(out bool? fullscreen, IDXGIOutput** target)
         {
             int iFullscreen;
-            int hr = Pointer->GetFullscreenState(&iFullscreen, ppTarget);
+            int hr = Pointer->GetFullscreenState(&iFullscreen, target);
 
             fullscreen = TerraFX.Interop.Windows.SUCCEEDED(hr) ? iFullscreen == TerraFX.Interop.Windows.TRUE : (bool?)null;
 
             return hr;
         }
 
-        public HResult GetLastPresentCount(uint* pLastPresentCount)
+        public HResult GetLastPresentCount(uint* lastPresentCount)
         {
-            return Pointer->GetLastPresentCount(pLastPresentCount);
+            return Pointer->GetLastPresentCount(lastPresentCount);
         }
 
-        public HResult Present(uint SyncInterval, uint Flags)
+        public HResult Present(uint syncInterval, uint flags)
         {
-            return Pointer->Present(SyncInterval, Flags);
+            return Pointer->Present(syncInterval, flags);
         }
 
-        public HResult ResizeBuffers(uint BufferCount, uint Width, uint Height, DXGI_FORMAT NewFormat, uint SwapChainFlags)
+        public HResult ResizeBuffers(uint bufferCount, uint width, uint height, DXGI_FORMAT newFormat, uint swapChainFlags)
         {
-            return Pointer->ResizeBuffers(BufferCount, Width, Height, NewFormat, SwapChainFlags);
+            return Pointer->ResizeBuffers(bufferCount, width, height, newFormat, swapChainFlags);
         }
 
-        public HResult ResizeTarget(DXGI_MODE_DESC* pNewTargetParameters)
+        public HResult ResizeTarget(DXGI_MODE_DESC* newTargetParameters)
         {
-            return Pointer->ResizeTarget(pNewTargetParameters);
+            return Pointer->ResizeTarget(newTargetParameters);
         }
 
-        public HResult SetFullscreenState(bool Fullscreen, [Optional] IDXGIOutput* pTarget)
+        public HResult SetFullscreenState(bool fullscreen, IDXGIOutput* target = null)
         {
-            return Pointer->SetFullscreenState(Fullscreen ? TerraFX.Interop.Windows.TRUE : TerraFX.Interop.Windows.FALSE, pTarget);
+            return Pointer->SetFullscreenState(fullscreen ? TerraFX.Interop.Windows.TRUE : TerraFX.Interop.Windows.FALSE, target);
         }
 
         public static implicit operator IDXGISwapChain*(DXGISwapChain value)

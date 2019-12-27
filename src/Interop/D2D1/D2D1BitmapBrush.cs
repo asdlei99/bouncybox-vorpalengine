@@ -1,5 +1,4 @@
-﻿using System.Runtime.InteropServices;
-using TerraFX.Interop;
+﻿using TerraFX.Interop;
 
 #pragma warning disable 1591
 
@@ -36,7 +35,7 @@ namespace BouncyBox.VorpalEngine.Interop.D2D1
             return Pointer->GetInterpolationMode();
         }
 
-        public void SetBitmap([Optional] ID2D1Bitmap* bitmap)
+        public void SetBitmap(ID2D1Bitmap* bitmap = null)
         {
             Pointer->SetBitmap(bitmap);
         }

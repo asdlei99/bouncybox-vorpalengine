@@ -99,7 +99,7 @@ namespace BouncyBox.VorpalEngine.Interop.D2D1_1
             return hr;
         }
 
-        public HResult GetRegisteredEffects(Span<Guid> effects, [Optional] uint* effectsReturned, [Optional] uint* effectsRegistered)
+        public HResult GetRegisteredEffects(Span<Guid> effects, uint* effectsReturned = null, uint* effectsRegistered = null)
         {
             fixed (Guid* pEffects = effects)
             {
@@ -119,7 +119,11 @@ namespace BouncyBox.VorpalEngine.Interop.D2D1_1
             }
         }
 
-        public HResult RegisterEffectFromString(Guid* classId, ReadOnlySpan<char> propertyXml, ReadOnlySpan<D2D1_PROPERTY_BINDING> bindings, IntPtr effectFactory)
+        public HResult RegisterEffectFromString(
+            Guid* classId,
+            ReadOnlySpan<char> propertyXml,
+            ReadOnlySpan<D2D1_PROPERTY_BINDING> bindings,
+            IntPtr effectFactory)
         {
             fixed (char* pPropertyXml = propertyXml)
             fixed (D2D1_PROPERTY_BINDING* pBindings = bindings)

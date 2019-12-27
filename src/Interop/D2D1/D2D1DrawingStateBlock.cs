@@ -1,5 +1,4 @@
-﻿using System.Runtime.InteropServices;
-using TerraFX.Interop;
+﻿using TerraFX.Interop;
 
 #pragma warning disable 1591
 
@@ -31,7 +30,7 @@ namespace BouncyBox.VorpalEngine.Interop.D2D1
             Pointer->SetDescription(stateDescription);
         }
 
-        public void SetTextRenderingParams([Optional] IDWriteRenderingParams* textRenderingParams)
+        public void SetTextRenderingParams(IDWriteRenderingParams* textRenderingParams = null)
         {
             Pointer->SetTextRenderingParams(textRenderingParams);
         }

@@ -11,13 +11,13 @@ namespace BouncyBox.VorpalEngine.Interop.DXGI1_2
     public unsafe partial class DXGIFactory2
     {
         public HResult CreateSwapChainForComposition(
-            IUnknown* pDevice,
-            DXGI_SWAP_CHAIN_DESC1* pDesc,
-            [Optional] IDXGIOutput* pRestrictToOutput,
+            IUnknown* device,
+            DXGI_SWAP_CHAIN_DESC1* desc,
+            [Optional] IDXGIOutput* restrictToOutput,
             out DXGISwapChain1? swapChain)
         {
             IDXGISwapChain1* pSwapChain;
-            int hr = Pointer->CreateSwapChainForComposition(pDevice, pDesc, pRestrictToOutput, &pSwapChain);
+            int hr = Pointer->CreateSwapChainForComposition(device, desc, restrictToOutput, &pSwapChain);
 
             swapChain = TerraFX.Interop.Windows.SUCCEEDED(hr) ? new DXGISwapChain1(pSwapChain) : null;
 
@@ -25,14 +25,14 @@ namespace BouncyBox.VorpalEngine.Interop.DXGI1_2
         }
 
         public HResult CreateSwapChainForCoreWindow(
-            IUnknown* pDevice,
-            IUnknown* pWindow,
-            DXGI_SWAP_CHAIN_DESC1* pDesc,
-            [Optional] IDXGIOutput* pRestrictToOutput,
+            IUnknown* device,
+            IUnknown* window,
+            DXGI_SWAP_CHAIN_DESC1* desc,
+            [Optional] IDXGIOutput* restrictToOutput,
             out DXGISwapChain1? swapChain)
         {
             IDXGISwapChain1* pSwapChain;
-            int hr = Pointer->CreateSwapChainForCoreWindow(pDevice, pWindow, pDesc, pRestrictToOutput, &pSwapChain);
+            int hr = Pointer->CreateSwapChainForCoreWindow(device, window, desc, restrictToOutput, &pSwapChain);
 
             swapChain = TerraFX.Interop.Windows.SUCCEEDED(hr) ? new DXGISwapChain1(pSwapChain) : null;
 
@@ -40,15 +40,15 @@ namespace BouncyBox.VorpalEngine.Interop.DXGI1_2
         }
 
         public HResult CreateSwapChainForHwnd(
-            IUnknown* pDevice,
+            IUnknown* device,
             IntPtr hWnd,
-            DXGI_SWAP_CHAIN_DESC1* pDesc,
-            [Optional] DXGI_SWAP_CHAIN_FULLSCREEN_DESC* pFullscreenDesc,
-            [Optional] IDXGIOutput* pRestrictToOutput,
+            DXGI_SWAP_CHAIN_DESC1* desc,
+            [Optional] DXGI_SWAP_CHAIN_FULLSCREEN_DESC* fullscreenDesc,
+            [Optional] IDXGIOutput* restrictToOutput,
             out DXGISwapChain1? swapChain)
         {
             IDXGISwapChain1* pSwapChain;
-            int hr = Pointer->CreateSwapChainForHwnd(pDevice, hWnd, pDesc, pFullscreenDesc, pRestrictToOutput, &pSwapChain);
+            int hr = Pointer->CreateSwapChainForHwnd(device, hWnd, desc, fullscreenDesc, restrictToOutput, &pSwapChain);
 
             swapChain = TerraFX.Interop.Windows.SUCCEEDED(hr) ? new DXGISwapChain1(pSwapChain) : null;
 
@@ -63,35 +63,35 @@ namespace BouncyBox.VorpalEngine.Interop.DXGI1_2
             }
         }
 
-        public HResult RegisterOcclusionStatusEvent(IntPtr hEvent, out uint dwCookie)
+        public HResult RegisterOcclusionStatusEvent(IntPtr hEvent, out uint cookie)
         {
-            fixed (uint* pDwCookie = &dwCookie)
+            fixed (uint* pDwCookie = &cookie)
             {
                 return Pointer->RegisterOcclusionStatusEvent(hEvent, pDwCookie);
             }
         }
 
-        public HResult RegisterOcclusionStatusWindow(IntPtr WindowHandle, uint wMsg, out uint dwCookie)
+        public HResult RegisterOcclusionStatusWindow(IntPtr windowHandle, uint msg, out uint cookie)
         {
-            fixed (uint* pDwCookie = &dwCookie)
+            fixed (uint* pDwCookie = &cookie)
             {
-                return Pointer->RegisterOcclusionStatusWindow(WindowHandle, wMsg, pDwCookie);
+                return Pointer->RegisterOcclusionStatusWindow(windowHandle, msg, pDwCookie);
             }
         }
 
-        public HResult RegisterStereoStatusEvent(IntPtr hEvent, out uint dwCookie)
+        public HResult RegisterStereoStatusEvent(IntPtr hEvent, out uint cookie)
         {
-            fixed (uint* pDwCookie = &dwCookie)
+            fixed (uint* pDwCookie = &cookie)
             {
                 return Pointer->RegisterStereoStatusEvent(hEvent, pDwCookie);
             }
         }
 
-        public HResult RegisterStereoStatusWindow(IntPtr WindowHandle, uint wMsg, out uint dwCookie)
+        public HResult RegisterStereoStatusWindow(IntPtr windowHandle, uint msg, out uint dwCookie)
         {
             fixed (uint* pDwCookie = &dwCookie)
             {
-                return Pointer->RegisterStereoStatusWindow(WindowHandle, wMsg, pDwCookie);
+                return Pointer->RegisterStereoStatusWindow(windowHandle, msg, pDwCookie);
             }
         }
     }

@@ -53,12 +53,13 @@ namespace BouncyBox.VorpalEngine.Interop.DWrite
             return hr;
         }
 
-        public void GetMetrics(out DWRITE_FONT_METRICS fontMetrics)
+        public DWRITE_FONT_METRICS GetMetrics()
         {
-            fixed (DWRITE_FONT_METRICS* pFontMetrics = &fontMetrics)
-            {
-                Pointer->GetMetrics(pFontMetrics);
-            }
+            DWRITE_FONT_METRICS fontMetrics;
+
+            Pointer->GetMetrics(&fontMetrics);
+
+            return fontMetrics;
         }
     }
 }
