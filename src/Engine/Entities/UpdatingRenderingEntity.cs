@@ -17,7 +17,8 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         where TRenderState : struct
     {
         private readonly object _renderStateLockObject = new object();
-        private TRenderState? _renderState;
+        private TRenderState _renderState;
+        private RenderStateResult _renderStateResult = RenderStateResult.Skip;
 
         /// <summary>Initializes a new instance of the <see cref="UpdatingRenderingEntity{TRenderState}" /> type.</summary>
         /// <param name="interfaces">An <see cref="IInterfaces" /> implementation.</param>
@@ -135,14 +136,9 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         {
             Interfaces.ThreadManager.VerifyProcessThread(ProcessThread.Render);
 
-            if (!ShouldRender(out TRenderState? renderState))
-            {
-                return EntityRenderResult.FrameSkipped;
-            }
+            TRenderState? renderState = GetRenderState();
 
-            Debug.Assert(renderState is object);
-
-            return OnRender(resources, renderState.Value, cancellationToken);
+            return renderState != null ? OnRender(resources, renderState.Value, cancellationToken) : EntityRenderResult.FrameSkipped;
         }
 
         /// <inheritdoc />
@@ -204,7 +200,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
             OnUpdateGameState(cancellationToken);
             lock (_renderStateLockObject)
             {
-                _renderState = OnGetRenderState();
+                _renderStateResult = OnPrepareRenderState(ref _renderState);
             }
         }
 
@@ -228,13 +224,12 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         {
         }
 
-        /// <summary>
-        ///     Gets a render state for the current game state.
-        /// </summary>
-        /// <returns>Returns a render state.</returns>
-        protected virtual TRenderState? OnGetRenderState()
+        /// <summary>Prepares the render state and determines whether to use it when rendering the next frame.</summary>
+        /// <param name="renderState">The render state.</param>
+        /// <returns>Returns the result of the render state preparation.</returns>
+        protected virtual RenderStateResult OnPrepareRenderState(ref TRenderState renderState)
         {
-            return null;
+            return RenderStateResult.Skip;
         }
 
         /// <inheritdoc cref="InitializeRenderResources" />
@@ -277,32 +272,25 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
             return (!IsPaused || UpdateWhenPaused) && (!IsSuspended || UpdateWhenSuspended);
         }
 
-        /// <summary>Determines if the entity should render.</summary>
-        /// <param name="renderState">The render state to render.</param>
+        /// <summary>Gets a copy of the render state to render.</summary>
         /// <returns>Returns a value indicating whether the entity should render.</returns>
-        private bool ShouldRender(out TRenderState? renderState)
+        private TRenderState? GetRenderState()
         {
-            renderState = null;
-
             if (IsPaused && !RenderWhenPaused || IsSuspended && !RenderWhenSuspended)
             {
-                return false;
+                return null;
             }
 
             lock (_renderStateLockObject)
             {
-                if (_renderState is null)
+                if (_renderStateResult == RenderStateResult.Skip)
                 {
-                    return false;
+                    return null;
                 }
 
-                // Consume the render state
-
-                renderState = _renderState.Value;
-                _renderState = null;
+                // Copy the render state to avoid concurrency problems
+                return _renderState;
             }
-
-            return true;
         }
     }
 }

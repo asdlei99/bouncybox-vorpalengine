@@ -170,39 +170,37 @@ namespace BouncyBox.VorpalEngine.DebuggingGame.Scenes.Root
             }
         }
 
-        protected override RootEntityRenderState? OnGetRenderState()
+        protected override RenderStateResult OnPrepareRenderState(ref RootEntityRenderState renderState)
         {
             RootSceneGameState sceneGameState = _gameStateManager.GameState.SceneStates.Root!;
 
-            return
-                new RootEntityRenderState
-                {
-                    Counter = sceneGameState.Counter,
-                    UpdatesPerSecond = _latestEngineUpdateStatsMessage?.UpdatesPerSecond,
-                    FramesPerSecond = _latestEngineRenderStatsMessage?.FramesPerSecond,
-                    MeanFrametime = _latestEngineRenderStatsMessage?.MeanFrametime,
-                    MinimumFrametime = _latestEngineRenderStatsMessage?.MinimumFrametime,
-                    MaximumFrametime = _latestEngineRenderStatsMessage?.MaximumFrametime,
-                    FrameCount = _latestEngineRenderStatsMessage?.FrameCount,
-                    RenderDelayInMilliseconds = (uint)sceneGameState.RenderDelay.TotalMilliseconds,
-                    UpdateDelayInMilliseconds = (uint)sceneGameState.UpdateDelay.TotalMilliseconds,
-                    GamePadDPadLeft = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.DPadLeft) ? "\u2190" : " ",
-                    GamePadDPadUp = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.DPadUp) ? "\u2191" : " ",
-                    GamePadDPadRight = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.DPadRight) ? "\u2192" : " ",
-                    GamePadDPadDown = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.DPadDown) ? "\u2193" : " ",
-                    GamePadA = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.A) ? "A" : " ",
-                    GamePadB = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.B) ? "B" : " ",
-                    GamePadX = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.X) ? "X" : " ",
-                    GamePadY = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.Y) ? "Y" : " ",
-                    GamePadBack = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.Back) ? "Back " : "     ",
-                    GamePadStart = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.Start) ? "Start " : "      ",
-                    GamePadLeftShoulder = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.LeftShoulder) ? "LS " : "   ",
-                    GamePadRightShoulder = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.RightShoulder) ? "RS " : "   ",
-                    GamePadLeftTrigger = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.LeftTrigger) ? "LTr " : "    ",
-                    GamePadRightTrigger = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.RightTrigger) ? "RTr " : "    ",
-                    GamePadLeftThumbPress = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.LeftThumbPress) ? "LTh " : "    ",
-                    GamePadRightThumbPress = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.RightThumbPress) ? "RTh" : ""
-                };
+            renderState.Counter = sceneGameState.Counter;
+            renderState.UpdatesPerSecond = _latestEngineUpdateStatsMessage?.UpdatesPerSecond;
+            renderState.FramesPerSecond = _latestEngineRenderStatsMessage?.FramesPerSecond;
+            renderState.MeanFrametime = _latestEngineRenderStatsMessage?.MeanFrametime;
+            renderState.MinimumFrametime = _latestEngineRenderStatsMessage?.MinimumFrametime;
+            renderState.MaximumFrametime = _latestEngineRenderStatsMessage?.MaximumFrametime;
+            renderState.FrameCount = _latestEngineRenderStatsMessage?.FrameCount;
+            renderState.RenderDelayInMilliseconds = (uint)sceneGameState.RenderDelay.TotalMilliseconds;
+            renderState.UpdateDelayInMilliseconds = (uint)sceneGameState.UpdateDelay.TotalMilliseconds;
+            renderState.GamePadDPadLeft = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.DPadLeft) ? "\u2190" : " ";
+            renderState.GamePadDPadUp = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.DPadUp) ? "\u2191" : " ";
+            renderState.GamePadDPadRight = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.DPadRight) ? "\u2192" : " ";
+            renderState.GamePadDPadDown = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.DPadDown) ? "\u2193" : " ";
+            renderState.GamePadA = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.A) ? "A" : " ";
+            renderState.GamePadB = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.B) ? "B" : " ";
+            renderState.GamePadX = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.X) ? "X" : " ";
+            renderState.GamePadY = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.Y) ? "Y" : " ";
+            renderState.GamePadBack = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.Back) ? "Back " : "     ";
+            renderState.GamePadStart = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.Start) ? "Start " : "      ";
+            renderState.GamePadLeftShoulder = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.LeftShoulder) ? "LS " : "   ";
+            renderState.GamePadRightShoulder = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.RightShoulder) ? "RS " : "   ";
+            renderState.GamePadLeftTrigger = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.LeftTrigger) ? "LTr " : "    ";
+            renderState.GamePadRightTrigger = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.RightTrigger) ? "RTr " : "    ";
+            renderState.GamePadLeftThumbPress = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.LeftThumbPress) ? "LTh " : "    ";
+            renderState.GamePadRightThumbPress = sceneGameState.XInputDownKeys.Contains(XInputVirtualKey.RightThumbPress) ? "RTh" : "";
+
+            return RenderStateResult.Use;
         }
 
         protected override unsafe void OnInitializeRenderResources(in DirectXResources resources)
