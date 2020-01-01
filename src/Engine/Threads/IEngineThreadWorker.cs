@@ -10,7 +10,7 @@ namespace BouncyBox.VorpalEngine.Engine.Threads
 
         /// <summary>Performs the work.</summary>
         /// <param name="cancellationToken">A cancellation token whose cancellation signals the thread is attempting to shut down.</param>
-        void DoWork(in CancellationToken cancellationToken);
+        void DoWork(CancellationToken cancellationToken);
 
         /// <summary>Performs post-work clean-up.</summary>
         void CleanUp();

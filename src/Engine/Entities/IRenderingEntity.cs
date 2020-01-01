@@ -29,6 +29,6 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         /// <param name="resources">DirectX resources.</param>
         /// <param name="cancellationToken">A cancellation token.</param>
         /// <returns>Returns the result of the render attempt.</returns>
-        EntityRenderResult Render(in DirectXResources resources, in CancellationToken cancellationToken);
+        EntityRenderResult Render(in DirectXResources resources, CancellationToken cancellationToken);
     }
 }

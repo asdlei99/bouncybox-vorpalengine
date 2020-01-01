@@ -32,7 +32,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
         }
 
         /// <inheritdoc />
-        protected override void OnDoWork(in CancellationToken cancellationToken)
+        protected override void OnDoWork(CancellationToken cancellationToken)
         {
             // Handle dispatched messages
             _entityManager.HandleDispatchedRenderResourcesMessages();

@@ -59,7 +59,7 @@ namespace BouncyBox.VorpalEngine.DebuggingGame.Scenes.Root
         protected override bool UpdateWhenSuspended { get; } = true;
         protected override bool RenderWhenSuspended { get; } = true;
 
-        protected override void OnUpdateGameState(in CancellationToken cancellationToken)
+        protected override void OnUpdateGameState(CancellationToken cancellationToken)
         {
             RootSceneGameState sceneGameState = _gameStateManager.GameState.SceneStates.Root!;
 
@@ -233,7 +233,7 @@ namespace BouncyBox.VorpalEngine.DebuggingGame.Scenes.Root
         protected override unsafe EntityRenderResult OnRender(
             in DirectXResources resources,
             in RootEntityRenderState renderState,
-            in CancellationToken cancellationToken)
+            CancellationToken cancellationToken)
         {
             resources.DXGIAdapter.GetDesc(out DXGI_ADAPTER_DESC dxgiAdapterDesc).ThrowIfFailed($"Failed to get {nameof(DXGI_ADAPTER_DESC)}.");
 

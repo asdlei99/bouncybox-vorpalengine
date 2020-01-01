@@ -66,7 +66,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         }
 
         /// <inheritdoc />
-        public EntityRenderResult Render(in DirectXResources resources, in CancellationToken cancellationToken)
+        public EntityRenderResult Render(in DirectXResources resources, CancellationToken cancellationToken)
         {
             Interfaces.ThreadManager.VerifyProcessThread(ProcessThread.Render);
 
@@ -104,7 +104,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         /// <param name="resources">DirectX resources.</param>
         /// <param name="cancellationToken">A cancellation token.</param>
         /// <returns>Returns the result of the entity's render attempt.</returns>
-        protected virtual EntityRenderResult OnRender(in DirectXResources resources, in CancellationToken cancellationToken)
+        protected virtual EntityRenderResult OnRender(in DirectXResources resources, CancellationToken cancellationToken)
         {
             return EntityRenderResult.FrameSkipped;
         }

@@ -70,7 +70,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
         }
 
         /// <inheritdoc />
-        protected override void OnDoWork(in CancellationToken cancellationToken)
+        protected override void OnDoWork(CancellationToken cancellationToken)
         {
             // If the render window is minimized then don't update the game state
             if (_isRenderWindowMinimized)

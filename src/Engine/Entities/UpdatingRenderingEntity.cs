@@ -131,7 +131,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         }
 
         /// <inheritdoc />
-        public EntityRenderResult Render(in DirectXResources resources, in CancellationToken cancellationToken)
+        public EntityRenderResult Render(in DirectXResources resources, CancellationToken cancellationToken)
         {
             Interfaces.ThreadManager.VerifyProcessThread(ProcessThread.Render);
 
@@ -189,7 +189,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         ///     Thrown when the thread executing this method is not the
         ///     <see cref="Threads.ProcessThread.Update" /> thread.
         /// </exception>
-        public void UpdateGameState(in CancellationToken cancellationToken)
+        public void UpdateGameState(CancellationToken cancellationToken)
         {
             Interfaces.ThreadManager.VerifyProcessThread(ProcessThread.Update);
 
@@ -224,7 +224,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         }
 
         /// <inheritdoc cref="UpdateGameState" />
-        protected virtual void OnUpdateGameState(in CancellationToken cancellationToken)
+        protected virtual void OnUpdateGameState(CancellationToken cancellationToken)
         {
         }
 
@@ -257,7 +257,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         /// <param name="renderState">The render state to render.</param>
         /// <param name="cancellationToken">A cancellation token.</param>
         /// <returns>Returns the result of the entity's render attempt.</returns>
-        protected virtual EntityRenderResult OnRender(in DirectXResources resources, in TRenderState renderState, in CancellationToken cancellationToken)
+        protected virtual EntityRenderResult OnRender(in DirectXResources resources, in TRenderState renderState, CancellationToken cancellationToken)
         {
             return EntityRenderResult.FrameSkipped;
         }

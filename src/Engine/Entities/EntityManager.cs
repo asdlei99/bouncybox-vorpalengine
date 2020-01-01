@@ -152,7 +152,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         ///     Thrown when the thread executing this method is not the
         ///     <see cref="Threads.ProcessThread.Update" /> thread.
         /// </exception>
-        public void Update(in CancellationToken cancellationToken)
+        public void Update(CancellationToken cancellationToken)
         {
             _interfaces.ThreadManager.VerifyProcessThread(ProcessThread.Update);
 
@@ -195,7 +195,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         ///     Thrown when the thread executing this method is not the
         ///     <see cref="ProcessThread.RenderResources" /> thread.
         /// </exception>
-        public void ReleaseRenderResources(in CancellationToken cancellationToken)
+        public void ReleaseRenderResources(CancellationToken cancellationToken)
         {
             _interfaces.ThreadManager.VerifyProcessThread(ProcessThread.RenderResources);
 
@@ -207,7 +207,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         ///     Thrown when the thread executing this method is not the
         ///     <see cref="ProcessThread.Render" /> thread.
         /// </exception>
-        public unsafe (RenderResult result, TimeSpan frametime) Render(in CancellationToken cancellationToken)
+        public unsafe (RenderResult result, TimeSpan frametime) Render(CancellationToken cancellationToken)
         {
             _interfaces.ThreadManager.VerifyProcessThread(ProcessThread.Render);
 
