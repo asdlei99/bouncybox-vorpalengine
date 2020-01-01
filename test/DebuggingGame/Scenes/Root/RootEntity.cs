@@ -249,7 +249,7 @@ namespace BouncyBox.VorpalEngine.DebuggingGame.Scenes.Root
                 .AppendLine($"UPS : {Math.Round(renderState.UpdatesPerSecond ?? 0, 2, MidpointRounding.AwayFromZero)}")
                 .AppendLine($"FPS : {Math.Round(renderState.FramesPerSecond ?? 0, 2, MidpointRounding.AwayFromZero)}")
                 .AppendLine(
-                    $"FT  : Mean = {renderState.MeanFrametime?.TotalMilliseconds ?? 0:F3} ms; Min = {renderState.MinimumFrametime?.TotalMilliseconds:F3} ms; {renderState.MaximumFrametime?.TotalMilliseconds:F3} ms")
+                    $"FT  : Mean = {renderState.MeanFrametime?.TotalMilliseconds ?? 0:F3} ms; Min = {renderState.MinimumFrametime?.TotalMilliseconds:F3} ms; Max = {renderState.MaximumFrametime?.TotalMilliseconds:F3} ms")
                 .AppendLine()
                 .AppendLine($"State counter      : {renderState.Counter}")
                 .AppendLine($"Frame count        : {renderState.FrameCount ?? 0}")
