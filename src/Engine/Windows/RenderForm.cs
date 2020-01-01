@@ -11,7 +11,6 @@ using BouncyBox.VorpalEngine.Engine.Messaging;
 using BouncyBox.VorpalEngine.Engine.Messaging.GlobalMessages;
 using BouncyBox.VorpalEngine.Engine.Threads;
 using TerraFX.Interop;
-using User32 = TerraFX.Interop.User32;
 
 namespace BouncyBox.VorpalEngine.Engine.Windows
 {
@@ -480,7 +479,7 @@ namespace BouncyBox.VorpalEngine.Engine.Windows
                 throw Win32ExceptionHelper.GetException();
             }
 
-            string deviceString = new ReadOnlySpan<char>(displayDeviceW.DeviceString, 128).ToString();
+            var deviceString = new ReadOnlySpan<char>(displayDeviceW.DeviceString, 128).ToString();
 
             _serilogLogger.LogInformation("Display changed to {DeviceName} (0x{MonitorHandle})", deviceString, monitorHandle.ToString("X8"));
 

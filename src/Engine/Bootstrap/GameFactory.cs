@@ -94,7 +94,7 @@ namespace BouncyBox.VorpalEngine.Engine.Bootstrap
             // Register default components
 
             var containerBuilder = new ContainerBuilder();
-            Thread mainThread = Thread.CurrentThread;
+            var mainThread = Thread.CurrentThread;
 
             containerBuilder.RegisterInstance(serilogLogger).As<ISerilogLogger>().SingleInstance();
             containerBuilder.RegisterType<TGame>().AsSelf().SingleInstance();
@@ -154,7 +154,7 @@ namespace BouncyBox.VorpalEngine.Engine.Bootstrap
                     {
                         serilogLogger.LogDebug("Showing unhandled exception window");
 
-                        using ErrorForm errorForm = ErrorForm.CreateForUnhandledException(exception);
+                        using var errorForm = ErrorForm.CreateForUnhandledException(exception);
 
                         errorForm.ShowDialog();
                     }

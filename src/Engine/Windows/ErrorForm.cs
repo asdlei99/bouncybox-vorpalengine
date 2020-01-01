@@ -98,7 +98,7 @@ namespace BouncyBox.VorpalEngine.Engine.Windows
             parserResult.WithNotParsed(
                 errors =>
                 {
-                    SentenceBuilder sentenceBuilder = SentenceBuilder.Create();
+                    var sentenceBuilder = SentenceBuilder.Create();
                     var stringBuilder = new StringBuilder();
 
                     stringBuilder

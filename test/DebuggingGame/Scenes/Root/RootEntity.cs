@@ -237,7 +237,7 @@ namespace BouncyBox.VorpalEngine.DebuggingGame.Scenes.Root
         {
             resources.DXGIAdapter.GetDesc(out DXGI_ADAPTER_DESC dxgiAdapterDesc).ThrowIfFailed($"Failed to get {nameof(DXGI_ADAPTER_DESC)}.");
 
-            string adapter = new ReadOnlySpan<char>(dxgiAdapterDesc.Description, 128).ToString();
+            var adapter = new ReadOnlySpan<char>(dxgiAdapterDesc.Description, 128).ToString();
 
             _stringBuilder
                 .Clear()

@@ -7,6 +7,6 @@
         FrameRendered,
 
         /// <summary>The entity was skipped.</summary>
-        FrameSkipped,
+        FrameSkipped
     }
 }

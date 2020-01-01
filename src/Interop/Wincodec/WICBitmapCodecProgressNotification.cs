@@ -9,7 +9,7 @@ namespace BouncyBox.VorpalEngine.Interop.Wincodec
 {
     /// <summary>Proxies the <see cref="IWICBitmapCodecProgressNotification" /> COM interface.</summary>
     [SuppressMessage("ReSharper", "InconsistentNaming")]
-    public unsafe partial class WICBitmapCodecProgressNotification : ComObject
+    public unsafe class WICBitmapCodecProgressNotification : ComObject
     {
         /// <summary>Initializes a new instance of the <see cref="WICBitmapCodecProgressNotification" /> type.</summary>
         /// <param name="pointer">A COM object pointer.</param>

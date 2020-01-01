@@ -255,7 +255,7 @@ namespace BouncyBox.VorpalEngine.Engine.Threads
             [Conditional("DEBUG")]
             public void Verify()
             {
-                Thread actualThread = Thread.CurrentThread;
+                var actualThread = Thread.CurrentThread;
 
                 if (actualThread != _thread)
                 {
