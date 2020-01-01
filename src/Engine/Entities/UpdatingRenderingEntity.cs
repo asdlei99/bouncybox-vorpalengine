@@ -140,7 +140,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
                 return EntityRenderResult.FrameSkipped;
             }
 
-            Debug.Assert(!(renderState is null));
+            Debug.Assert(renderState is object);
 
             return OnRender(resources, renderState.Value, cancellationToken);
         }

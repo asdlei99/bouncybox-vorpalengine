@@ -42,7 +42,7 @@ namespace BouncyBox.VorpalEngine.Engine.Input.XInput
                     return UpdateResult.Success;
             }
 
-            Debug.Assert(!(keystroke is null));
+            Debug.Assert(keystroke is object);
 
             // No complex state management for repeating keys, since they are moments in time
             _repeatKeys.Clear();

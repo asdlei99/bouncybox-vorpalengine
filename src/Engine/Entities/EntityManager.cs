@@ -240,7 +240,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
                     entities = _entities.OrderedByRenderOrder.ToImmutableArray();
                 }
 
-                Debug.Assert(!(_clientSize is null));
+                Debug.Assert(_clientSize is object);
 
                 // Frametime measurements should start only after a render state is retrieved
                 long startTimestamp = Stopwatch.GetTimestamp();

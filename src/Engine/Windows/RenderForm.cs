@@ -259,7 +259,7 @@ namespace BouncyBox.VorpalEngine.Engine.Windows
         {
             _isUserMovingOrResizing = false;
 
-            if (!(_sizeMessage is null))
+            if (_sizeMessage is object)
             {
                 Message message = _sizeMessage.Value;
 

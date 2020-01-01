@@ -12,7 +12,6 @@ namespace BouncyBox.VorpalEngine.Common
     public class ContextFlag : IDisposable
     {
         private int _counter;
-        private bool _isDisposed;
 
         /// <summary>
         ///     Gets a value determining if the flag is set. The flag is considered set when the the number of <see cref="Set" /> calls are
@@ -22,10 +21,10 @@ namespace BouncyBox.VorpalEngine.Common
 
         private string DebuggerDisplay => "Flag = " + Flag;
 
-        /// <summary>Decrements the counter by one.</summary>
+        /// <summary>Safely decrements the counter by one.</summary>
         public void Dispose()
         {
-            DisposeHelper.Dispose(() => { _counter = System.Math.Max(0, _counter - 1); }, ref _isDisposed);
+            _counter = Math.Max(0, _counter - 1);
         }
 
         /// <summary>
@@ -33,7 +32,7 @@ namespace BouncyBox.VorpalEngine.Common
         ///     <para>It is intended to call this method from within a using block.</para>
         /// </summary>
         /// <returns>Returns this object.</returns>
-        public IDisposable Set()
+        public ContextFlag Set()
         {
             _counter++;
 
