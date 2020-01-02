@@ -38,6 +38,8 @@ See the [docs](docs/readme.md) folder.
 
 `DebuggingGame` is used mainly to exercise the `Game` class and to report engine statistics. This project has proven very useful to help me visualize what's going on inside the engine.
 
+![Debugging Game Screenshot](docs/images/debugging-game.png "Debugging Game Screenshot")
+
 ### `SampleGame`
 
 `SampleGame` is intended to be a "real" game in the sense that it exercises more of the engine's capabilities than `DebuggingGame`.
