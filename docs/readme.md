@@ -4,14 +4,14 @@ For more information on a particular topic, click a link below.
 
 ## Development platform and practices
 
-- [C# 8/.NET Core 3.1](csharp-8-dotnet-core-3.1.md)
+- [C# 8 and .NET Core 3.1](csharp-8-dotnet-core-3.1.md)
 - [NuGet Packages](nuget-packages.md)
 - [Unit Testing](unit-testing.md)
 
 ## Engine architecture
 
 - [Audio](audio.md)
-- [Entity Management](entity-management.md)
+- [Entities](entity-management.md)
 - [Exception Handling](exception-handling.md)
 - [Games](games.md)
 - [Graphics](graphics.md)
