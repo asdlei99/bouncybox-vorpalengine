@@ -12,7 +12,7 @@ For more information on a particular topic, click a link below.
 
 - [Audio](audio.md)
 - [Command Line Parameters](command-line-parameters.md)
-- [Entities](entity-management.md)
+- [Entities](entities.md)
 - [Exception Handling](exception-handling.md)
 - [Games](games.md)
 - [Image Processing](image-processing.md)
