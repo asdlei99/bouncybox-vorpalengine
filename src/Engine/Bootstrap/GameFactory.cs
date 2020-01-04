@@ -65,14 +65,11 @@ namespace BouncyBox.VorpalEngine.Engine.Bootstrap
             }
             if (Environment.OSVersion.Version < WindowsVersion.MinimumVersion)
             {
-                throw new PlatformNotSupportedException("Only Platform Update for Microsoft Windows 7 or newer is supported.");
+                throw new PlatformNotSupportedException("Only Windows 10 1903 or newer is supported.");
             }
 
-            if (Environment.OSVersion.Version >= WindowsVersion.Windows10Version1803)
-            {
-                // C# Discord says it's safe to ignore errors from this function
-                DXGI.DXGIDeclareAdapterRemovalSupport();
-            }
+            // C# Discord says it's safe to ignore errors from this function
+            DXGI.DXGIDeclareAdapterRemovalSupport();
 
             // Parse command line arguments
 
@@ -82,7 +79,7 @@ namespace BouncyBox.VorpalEngine.Engine.Bootstrap
 
             if (programOptions is null)
             {
-                ErrorForm.CreateForInvalidCommandLineArguments(parserResult).ShowDialog();
+                ErrorForm.CreateForNotParsedResult(parserResult).ShowDialog();
 
                 return ExitCodesByRunResult[RunResult.InvalidCommandLineArguments];
             }
