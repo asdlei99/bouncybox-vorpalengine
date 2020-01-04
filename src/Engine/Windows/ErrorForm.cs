@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
@@ -83,7 +84,7 @@ namespace BouncyBox.VorpalEngine.Engine.Windows
         ///     Thrown when <paramref name="parserResult" /> indicates the command line parameters were
         ///     successfully parsed.
         /// </exception>
-        public static ErrorForm CreateForInvalidCommandLineArguments<TOptions>(ParserResult<TOptions> parserResult, string windowCaption = "Vorpal Engine")
+        public static ErrorForm CreateForNotParsedResult<TOptions>(ParserResult<TOptions> parserResult, string windowCaption = "Vorpal Engine")
         {
             if (parserResult.Tag == ParserResultType.Parsed)
             {
@@ -91,7 +92,7 @@ namespace BouncyBox.VorpalEngine.Engine.Windows
             }
 
             ErrorForm? errorForm = null;
-            var helpText = new HelpText { Heading = "Options:" };
+            var helpText = new HelpText { AutoVersion = false };
 
             helpText.AddOptions(parserResult);
 
@@ -100,14 +101,15 @@ namespace BouncyBox.VorpalEngine.Engine.Windows
                 {
                     var sentenceBuilder = SentenceBuilder.Create();
                     var stringBuilder = new StringBuilder();
+                    ErrorType[] ignoredErrorTypes = { ErrorType.HelpRequestedError, ErrorType.HelpVerbRequestedError, ErrorType.VersionRequestedError };
+                    ImmutableArray<string> formattedErrors =
+                        errors.Where(a => Array.IndexOf(ignoredErrorTypes, a.Tag) == -1).Select(sentenceBuilder.FormatError).ToImmutableArray();
 
                     stringBuilder
-                        .AppendJoin(Environment.NewLine, errors.Select(sentenceBuilder.FormatError))
-                        .AppendLine()
-                        .AppendLine()
+                        .AppendJoin(Environment.NewLine, formattedErrors)
                         .AppendLine(helpText);
 
-                    errorForm = new ErrorForm(windowCaption, "Invalid command line arguments. &Details:", stringBuilder.ToString());
+                    errorForm = new ErrorForm(windowCaption, "Command line &options:", stringBuilder.ToString().Trim('\r', '\n'));
                 });
 
             Debug.Assert(errorForm is object);
