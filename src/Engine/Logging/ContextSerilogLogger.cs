@@ -118,7 +118,7 @@ namespace BouncyBox.VorpalEngine.Engine.Logging
         /// <returns>Returns the new message template.</returns>
         private string FormatMessageTemplate(string? messageTemplate)
         {
-            return $"[{_context.BuildString()}] {messageTemplate}";
+            return $"[{_context.Context}] {messageTemplate}";
         }
     }
 }

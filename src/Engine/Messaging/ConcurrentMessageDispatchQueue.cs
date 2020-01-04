@@ -25,7 +25,7 @@ namespace BouncyBox.VorpalEngine.Engine.Messaging
         /// <param name="context">A nested context.</param>
         public ConcurrentMessageDispatchQueue(ISerilogLogger serilogLogger, NestedContext context)
         {
-            _context = context.CopyAndPush(nameof(ConcurrentMessageDispatchQueue<TMessageBase>));
+            _context = context.Push(nameof(ConcurrentMessageDispatchQueue<TMessageBase>));
             _serilogLogger = new ContextSerilogLogger(serilogLogger, _context);
         }
 
@@ -62,7 +62,7 @@ namespace BouncyBox.VorpalEngine.Engine.Messaging
 
             if (shouldLogMessage)
             {
-                _serilogLogger.LogDebug("{Context} will handle {MessageType}", _context.BuildString(), messageType.Name);
+                _serilogLogger.LogDebug("{Context} will handle {MessageType}", _context.Context ?? "An unknown context", messageType.Name);
             }
 
             return this;

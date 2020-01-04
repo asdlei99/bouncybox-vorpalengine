@@ -28,7 +28,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
         /// <param name="entityManager">An <see cref="IEntityManager{TGameState}" /> implementation.</param>
         /// <param name="context">A nested context.</param>
         public RenderWorker(IInterfaces interfaces, IEntityManager<TGameState> entityManager, NestedContext context)
-            : base(interfaces, EngineThread.Render, context.CopyAndPush(nameof(RenderWorker<TGameState>)))
+            : base(interfaces, EngineThread.Render, context.Push(nameof(RenderWorker<TGameState>)))
         {
             _entityManager = entityManager;
 

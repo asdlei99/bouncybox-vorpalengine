@@ -26,7 +26,7 @@ namespace BouncyBox.VorpalEngine.Engine.Scenes
         /// <param name="context">A nested context.</param>
         protected Scene(IInterfaces interfaces, IEntityManager<TGameState> entityManager, TSceneKey key, NestedContext context)
         {
-            context = context.CopyAndPush(nameof(Scene<TGameState, TSceneKey>));
+            context = context.Push(nameof(Scene<TGameState, TSceneKey>));
 
             _interfaces = interfaces;
             _entityManager = entityManager;

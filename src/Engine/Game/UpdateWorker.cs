@@ -35,11 +35,11 @@ namespace BouncyBox.VorpalEngine.Engine.Game
         /// <param name="sceneManager">An <see cref="ISceneManager" /> implementation.</param>
         /// <param name="context">A nested context.</param>
         public UpdateWorker(IInterfaces interfaces, IEntityManager<TGameState> entityManager, ISceneManager sceneManager, NestedContext context)
-            : base(interfaces, EngineThread.Update, context.CopyAndPush(nameof(UpdateWorker<TGameState>)))
+            : base(interfaces, EngineThread.Update, context.Push(nameof(UpdateWorker<TGameState>)))
         {
             _entityManager = entityManager;
             _sceneManager = sceneManager;
-            _serilogLogger = new ContextSerilogLogger(interfaces.SerilogLogger, context);
+            _serilogLogger = new ContextSerilogLogger(interfaces.SerilogLogger, Context);
         }
 
         /// <summary>Initializes a new instance of the <see cref="UpdateWorker{TGameState}" /> type.</summary>

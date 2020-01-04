@@ -29,7 +29,7 @@ namespace BouncyBox.VorpalEngine.Engine.Threads
         /// </exception>
         public ThreadManager(ISerilogLogger serilogLogger, Thread mainThread, NestedContext context)
         {
-            context = context.CopyAndPush(nameof(ThreadManager));
+            context = context.Push(nameof(ThreadManager));
 
             _serilogLogger = new ContextSerilogLogger(serilogLogger, context);
 

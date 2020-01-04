@@ -48,7 +48,7 @@ namespace BouncyBox.VorpalEngine.Engine.Windows
         /// <exception>Thrown when <see cref="TerraFX.Interop.User32.RegisterRawInputDevices" /> failed.</exception>
         public unsafe RenderForm(IInterfaces interfaces, ProgramOptions programOptions, NestedContext context)
         {
-            context = context.CopyAndPush(nameof(RenderForm));
+            context = context.Push(nameof(RenderForm));
 
             _serilogLogger = new ContextSerilogLogger(interfaces.SerilogLogger, context);
             _interfaces = interfaces;

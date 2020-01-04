@@ -23,7 +23,7 @@ namespace BouncyBox.VorpalEngine.Engine.Timelines
         /// <param name="timelineName">The name of the timeline, to be included in the nested context.</param>
         public Timeline(ISerilogLogger serilogLogger, NestedContext context, string? timelineName = null)
         {
-            context = context.CopyAndPush(timelineName ?? nameof(Timeline));
+            context = context.Push(timelineName ?? nameof(Timeline));
 
             _serilogLogger = new ContextSerilogLogger(serilogLogger, context);
         }

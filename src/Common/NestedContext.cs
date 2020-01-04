@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace BouncyBox.VorpalEngine.Common
@@ -11,131 +9,51 @@ namespace BouncyBox.VorpalEngine.Common
     ///         As nested contexts are passed further down the call stack, other objects may "push" their own context onto the nested
     ///         context, creating a "bread crumb" trail that can make log messages more useful.
     ///     </para>
-    ///     <para>
-    ///         Objects should mostly call <see cref="CopyAndPush(BouncyBox.VorpalEngine.Common.NestedContext)" /> rather than
-    ///         <see cref="Push(BouncyBox.VorpalEngine.Common.NestedContext)" /> since calling
-    ///         <see cref="Push(BouncyBox.VorpalEngine.Common.NestedContext)" /> modifies the caller's nested context.
-    ///     </para>
     /// </summary>
     [DebuggerStepThrough]
     [DebuggerDisplay("{" + nameof(DebuggerDisplay) + "}")]
-    public class NestedContext : IEnumerable<string>
+    public readonly struct NestedContext
     {
-        private readonly List<string> _contexts = new List<string>();
-
-        /// <summary>Initializes a new instance of the <see cref="NestedContext" /> type.</summary>
-        private NestedContext()
-        {
-        }
+        private readonly string _separator;
 
         /// <summary>Initializes a new instance of the <see cref="NestedContext" /> type.</summary>
         /// <param name="context">A context.</param>
-        public NestedContext(string context)
+        /// <param name="separator">The separator to use for all derived contexts.</param>
+        public NestedContext(string? context = null, string separator = "->") : this("", context, separator)
         {
-            Push(context);
         }
 
         /// <summary>Initializes a new instance of the <see cref="NestedContext" /> type.</summary>
-        /// <param name="context">A context type.</param>
-        /// <param name="fullTypeName">A value that determines whether the full or short type name is used for the context.</param>
-        public NestedContext(Type context, bool fullTypeName = false)
+        /// <param name="existingContext">An existing context.</param>
+        /// <param name="newContext">The new context to push.</param>
+        /// <param name="separator">The separator to use for all derived contexts.</param>
+        private NestedContext(string? existingContext, string? newContext, string separator)
         {
-            Push(context, fullTypeName);
+            _separator = separator;
+
+            Context = $"{existingContext}{(!string.IsNullOrEmpty(existingContext) && !string.IsNullOrEmpty(newContext) ? separator : "")}{newContext}";
         }
 
-        /// <summary>Gets a value indicating whether the context is empty.</summary>
-        public bool IsEmpty => _contexts.Count == 0;
+        /// <summary>Gets the context.</summary>
+        public string? Context { get; }
 
-        private string DebuggerDisplay => $"Context = {BuildString()}";
+        private string DebuggerDisplay => $"Context = {Context}";
 
-        /// <inheritdoc />
-        public IEnumerator<string> GetEnumerator()
-        {
-            return _contexts.GetEnumerator();
-        }
-
-        /// <inheritdoc />
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-
-        /// <summary>Pushes a context onto the list.</summary>
-        /// <param name="context">A context.</param>
-        public void Push(string context)
-        {
-            _contexts.Add(context);
-        }
-
-        /// <summary>Pushes a context onto the list.</summary>
-        /// <param name="context">A context type.</param>
-        /// <param name="fullTypeName">A value that determines whether the full or short type name is used for the context.</param>
-        public void Push(Type context, bool fullTypeName = false)
-        {
-            _contexts.Add((fullTypeName ? context.FullName : context.Name) ?? "Unknown type");
-        }
-
-        /// <summary>Pushes another nested context onto the list.</summary>
-        public void Push(NestedContext context)
-        {
-            _contexts.AddRange(context._contexts);
-        }
-
-        /// <summary>Copies the nested context to a new nested context.</summary>
+        /// <summary>Returns a new nested context containing the current context and the new context.</summary>
+        /// <param name="context">The new context to push.</param>
         /// <returns>Returns the new nested context.</returns>
-        public NestedContext Copy()
+        public NestedContext Push(string context)
         {
-            var nestedContext = new NestedContext();
-
-            nestedContext._contexts.AddRange(_contexts);
-
-            return nestedContext;
+            return new NestedContext(Context, context, _separator);
         }
 
-        /// <summary>Copies the nested context to a new nested context, then pushes the specified context.</summary>
-        /// <param name="context">A context.</param>
-        /// <returns>Returns the new nested context.</returns>
-        public NestedContext CopyAndPush(string context)
-        {
-            NestedContext nestedContext = Copy();
-
-            nestedContext.Push(context);
-
-            return nestedContext;
-        }
-
-        /// <summary>Copies the nested context to a new nested context, then pushes the specified context.</summary>
+        /// <summary>Returns a new nested context containing the current context and a new context derived from a type.</summary>
         /// <param name="context">A context type.</param>
         /// <param name="fullTypeName">A value that determines whether the full or short type name is used for the context.</param>
         /// <returns>Returns the new nested context.</returns>
-        public NestedContext CopyAndPush(Type context, bool fullTypeName = false)
+        public NestedContext Push(Type context, bool fullTypeName = false)
         {
-            NestedContext nestedContext = Copy();
-
-            nestedContext.Push(context, fullTypeName);
-
-            return nestedContext;
-        }
-
-        /// <summary>Copies the nested context to a new nested context, then pushes the specified nested context.</summary>
-        /// <param name="context">A nested context.</param>
-        /// <returns>Returns the new nested context.</returns>
-        public NestedContext CopyAndPush(NestedContext context)
-        {
-            NestedContext nestedContext = Copy();
-
-            nestedContext.Push(context);
-
-            return this;
-        }
-
-        /// <summary>Builds a string from the list of contexts.</summary>
-        /// <param name="separator">The separator that separates each context in the string.</param>
-        /// <param name="unknownContext">The phrase to use when the context is unknown.</param>
-        /// <returns>Returns the concatenated contexts.</returns>
-        public string BuildString(string separator = "->", string unknownContext = "UnknownContext")
-        {
-            return _contexts.Count == 0 ? unknownContext : string.Join(separator, _contexts);
+            return Push((fullTypeName ? context.FullName : context.Name) ?? "Unknown type");
         }
 
         /// <inheritdoc />
@@ -146,9 +64,9 @@ namespace BouncyBox.VorpalEngine.Common
 
         /// <summary>Creates a new nested context with no context.</summary>
         /// <returns>Returns the new nested context.</returns>
-        public static NestedContext None()
+        public static NestedContext None(string separator = "->")
         {
-            return new NestedContext();
+            return new NestedContext(null, separator);
         }
     }
 }

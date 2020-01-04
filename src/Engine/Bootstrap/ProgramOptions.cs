@@ -20,7 +20,7 @@ namespace BouncyBox.VorpalEngine.Engine.Bootstrap
         public LogEventLevel MinimumLogLevel { get; set; }
 
         /// <summary>Gets or sets a value that indicates whether Windows messages sent to the render window are logged.</summary>
-        [Option("logwindowsmessages", HelpText = "Determines whether to log Windows messages sent to the render window2.", Default = false)]
+        [Option("logwindowsmessages", HelpText = "Determines whether to log Windows messages sent to the render window.", Default = false)]
         public bool LogWindowsMessages { get; set; }
     }
 }

@@ -138,7 +138,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
 
             TRenderState? renderState = GetRenderState();
 
-            return renderState != null ? OnRender(resources, renderState.Value, cancellationToken) : EntityRenderResult.FrameSkipped;
+            return renderState is object ? OnRender(resources, renderState.Value, cancellationToken) : EntityRenderResult.FrameSkipped;
         }
 
         /// <inheritdoc />

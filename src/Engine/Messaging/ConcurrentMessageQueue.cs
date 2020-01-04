@@ -30,7 +30,7 @@ namespace BouncyBox.VorpalEngine.Engine.Messaging
         /// <param name="context">A nested context.</param>
         public ConcurrentMessageQueue(ISerilogLogger serilogLogger, NestedContext context)
         {
-            _context = context.CopyAndPush(nameof(ConcurrentMessageQueue<TMessageBase>));
+            _context = context.Push(nameof(ConcurrentMessageQueue<TMessageBase>));
             _serilogLogger = new ContextSerilogLogger(serilogLogger, _context);
         }
 
@@ -86,7 +86,7 @@ namespace BouncyBox.VorpalEngine.Engine.Messaging
 
             if (MessageLogFilter.ShouldLogMessageTypeDelegate(messageType))
             {
-                _serilogLogger.LogDebug("{Context} subscribed to {MessageType}", context.BuildString(), messageType.Name);
+                _serilogLogger.LogDebug("{Context} subscribed to {MessageType}", context.Context ?? "An unknown context", messageType.Name);
             }
 
             return subscriptionToken;
@@ -108,7 +108,7 @@ namespace BouncyBox.VorpalEngine.Engine.Messaging
 
                 if (MessageLogFilter.ShouldLogMessageTypeDelegate(token.MessageType))
                 {
-                    _serilogLogger.LogDebug("{Context} unsubscribed from {MessageType}", context.BuildString(), token.MessageType.Name);
+                    _serilogLogger.LogDebug("{Context} unsubscribed from {MessageType}", context.Context ?? "An unknown context", token.MessageType.Name);
                 }
             }
         }

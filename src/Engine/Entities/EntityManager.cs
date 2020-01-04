@@ -73,7 +73,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         /// <param name="context">A nested context.</param>
         public EntityManager(IInterfaces interfaces, IGameExecutionStateManager gameExecutionStateManager, NestedContext context)
         {
-            context = context.CopyAndPush(nameof(EntityManager<TGameState>));
+            context = context.Push(nameof(EntityManager<TGameState>));
 
             _updateGlobalMessagePublisherSubscriber =
                 ConcurrentMessagePublisherSubscriber<IGlobalMessage>

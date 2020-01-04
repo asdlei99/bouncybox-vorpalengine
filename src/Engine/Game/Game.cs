@@ -50,7 +50,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
             ProgramOptions programOptions,
             NestedContext context)
         {
-            context = context.CopyAndPush(nameof(Game<TGameState, TSceneKey>));
+            context = context.Push(nameof(Game<TGameState, TSceneKey>));
 
             Interfaces = interfaces;
             _gameExecutionStateManager = gameExecutionStateManager;

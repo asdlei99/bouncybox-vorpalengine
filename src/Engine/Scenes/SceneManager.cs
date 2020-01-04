@@ -34,7 +34,7 @@ namespace BouncyBox.VorpalEngine.Engine.Scenes
         /// <param name="context">A nested context.</param>
         public SceneManager(IInterfaces interfaces, ISceneFactory<TSceneKey> sceneFactory, NestedContext context)
         {
-            context = context.CopyAndPush(nameof(SceneManager<TGameState, TSceneKey>));
+            context = context.Push(nameof(SceneManager<TGameState, TSceneKey>));
 
             _interfaces = interfaces;
             _sceneFactory = sceneFactory;

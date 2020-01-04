@@ -25,7 +25,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
         /// <param name="context">A nested context.</param>
         public GameExecutionStateManager(IInterfaces interfaces, NestedContext context)
         {
-            context = context.CopyAndPush(nameof(GameExecutionStateManager));
+            context = context.Push(nameof(GameExecutionStateManager));
 
             _serilogLogger = new ContextSerilogLogger(interfaces.SerilogLogger, context);
             _globalMessagePublisherSubscriber =
