@@ -11,6 +11,7 @@ using System.Threading;
 using Autofac;
 using BouncyBox.Common.NetStandard21.Logging;
 using BouncyBox.VorpalEngine.Common;
+using BouncyBox.VorpalEngine.Engine.DirectX;
 using BouncyBox.VorpalEngine.Engine.Entities;
 using BouncyBox.VorpalEngine.Engine.Game;
 using BouncyBox.VorpalEngine.Engine.Input.Keyboard;
@@ -95,6 +96,7 @@ namespace BouncyBox.VorpalEngine.Engine.Bootstrap
 
             containerBuilder.RegisterInstance(serilogLogger).As<ISerilogLogger>().SingleInstance();
             containerBuilder.RegisterType<TGame>().AsSelf().SingleInstance();
+            containerBuilder.RegisterType<DirectXResourceManager<TGameState>>().As<IDirectXResourceManager<TGameState>>().SingleInstance();
             containerBuilder.RegisterType<EntityManager<TGameState>>().As<IEntityManager<TGameState>>().SingleInstance();
             containerBuilder.Register(a => new GameExecutionStateManager(a.Resolve<IInterfaces>())).As<IGameExecutionStateManager>().SingleInstance();
             containerBuilder

@@ -4,9 +4,9 @@
     public enum EntityRenderResult
     {
         /// <summary>The entity was rendered.</summary>
-        FrameRendered,
+        Rendered,
 
-        /// <summary>The entity was skipped.</summary>
-        FrameSkipped
+        /// <summary>The entity was not rendered.</summary>
+        NotRendered
     }
 }

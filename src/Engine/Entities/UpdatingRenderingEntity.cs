@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Drawing;
 using System.Threading;
 using BouncyBox.VorpalEngine.Common;
@@ -7,8 +6,8 @@ using BouncyBox.VorpalEngine.Engine.DirectX;
 using BouncyBox.VorpalEngine.Engine.Input.Keyboard;
 using BouncyBox.VorpalEngine.Engine.Input.XInput;
 using BouncyBox.VorpalEngine.Engine.Messaging;
+using BouncyBox.VorpalEngine.Engine.Threads;
 using TerraFX.Interop;
-using ProcessThread = BouncyBox.VorpalEngine.Engine.Threads.ProcessThread;
 
 namespace BouncyBox.VorpalEngine.Engine.Entities
 {
@@ -138,7 +137,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
 
             TRenderState? renderState = GetRenderState();
 
-            return renderState is object ? OnRender(resources, renderState.Value, cancellationToken) : EntityRenderResult.FrameSkipped;
+            return renderState is object ? OnRender(resources, renderState.Value, cancellationToken) : EntityRenderResult.NotRendered;
         }
 
         /// <inheritdoc />
@@ -254,7 +253,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         /// <returns>Returns the result of the entity's render attempt.</returns>
         protected virtual EntityRenderResult OnRender(in DirectXResources resources, in TRenderState renderState, CancellationToken cancellationToken)
         {
-            return EntityRenderResult.FrameSkipped;
+            return EntityRenderResult.NotRendered;
         }
 
         /// <inheritdoc />

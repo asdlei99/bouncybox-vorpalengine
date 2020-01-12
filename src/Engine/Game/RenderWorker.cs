@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Threading;
 using BouncyBox.VorpalEngine.Common;
 using BouncyBox.VorpalEngine.Engine.Calculators;
-using BouncyBox.VorpalEngine.Engine.Entities;
+using BouncyBox.VorpalEngine.Engine.DirectX;
 using BouncyBox.VorpalEngine.Engine.Messaging.GlobalMessages;
 using BouncyBox.VorpalEngine.Engine.Threads;
 
@@ -13,9 +13,9 @@ namespace BouncyBox.VorpalEngine.Engine.Game
     internal sealed class RenderWorker<TGameState> : EngineThreadWorker
         where TGameState : class
     {
+        private readonly IDirectXResourceManager<TGameState> _directXResourceManager;
         private readonly TimeSpan _engineStatsFrequency = TimeSpan.FromSeconds(1);
         private readonly Stopwatch _engineStatsStopwatch = Stopwatch.StartNew();
-        private readonly IEntityManager<TGameState> _entityManager;
         private readonly EventFrequencyCalculator _fpsCalculator = new EventFrequencyCalculator(true);
         private readonly TimeSpanAccumulator _frametimeAccumulator = new TimeSpanAccumulator(10000);
         private readonly TimeSpan _throttledRenderPeriod = TimeSpan.FromSeconds(1) / 30; // 30 Hz
@@ -25,12 +25,12 @@ namespace BouncyBox.VorpalEngine.Engine.Game
 
         /// <summary>Initializes a new instance of the <see cref="RenderWorker{TGameState}" /> type.</summary>
         /// <param name="interfaces">An <see cref="IInterfaces" /> implementation.</param>
-        /// <param name="entityManager">An <see cref="IEntityManager{TGameState}" /> implementation.</param>
+        /// <param name="directXResourceManager">An <see cref="IDirectXResourceManager{TGameState}" /> implementation.</param>
         /// <param name="context">A nested context.</param>
-        public RenderWorker(IInterfaces interfaces, IEntityManager<TGameState> entityManager, NestedContext context)
+        public RenderWorker(IInterfaces interfaces, IDirectXResourceManager<TGameState> directXResourceManager, NestedContext context)
             : base(interfaces, EngineThread.Render, context.Push(nameof(RenderWorker<TGameState>)))
         {
-            _entityManager = entityManager;
+            _directXResourceManager = directXResourceManager;
 
             GlobalMessagePublisherSubscriber
                 .Subscribe<RenderWindowActivatedMessage>(HandleRenderWindowActivatedMessage)
@@ -41,9 +41,9 @@ namespace BouncyBox.VorpalEngine.Engine.Game
 
         /// <summary>Initializes a new instance of the <see cref="RenderWorker{TGameState}" /> type.</summary>
         /// <param name="interfaces">An <see cref="IInterfaces" /> implementation.</param>
-        /// <param name="entityManager">An <see cref="IEntityManager{TGameState}" /> implementation.</param>
-        public RenderWorker(IInterfaces interfaces, IEntityManager<TGameState> entityManager)
-            : this(interfaces, entityManager, NestedContext.None())
+        /// <param name="directXResourceManager">An <see cref="IDirectXResourceManager{TGameState}" /> implementation.</param>
+        public RenderWorker(IInterfaces interfaces, IDirectXResourceManager<TGameState> directXResourceManager)
+            : this(interfaces, directXResourceManager, NestedContext.None())
         {
         }
 
@@ -53,7 +53,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
         {
             long timestamp = Stopwatch.GetTimestamp();
 
-            (RenderResult result, TimeSpan frametime) = _entityManager.Render(cancellationToken);
+            (RenderResult result, TimeSpan frametime) = _directXResourceManager.Render(cancellationToken);
 
             switch (result)
             {
@@ -74,7 +74,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
             // Throttle rendering as necessary
             if (!_isRenderWindowActivated || _isRenderWindowMinimized)
             {
-                TimeSpan sleepDuration = TimeSpan.FromTicks(Stopwatch.GetTimestamp() - timestamp) - _throttledRenderPeriod;
+                TimeSpan sleepDuration = _throttledRenderPeriod - TimeSpan.FromTicks(Stopwatch.GetTimestamp() - timestamp);
 
                 if (sleepDuration > TimeSpan.Zero)
                 {

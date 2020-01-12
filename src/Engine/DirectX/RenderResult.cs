@@ -1,4 +1,4 @@
-﻿namespace BouncyBox.VorpalEngine.Engine.Entities
+﻿namespace BouncyBox.VorpalEngine.Engine.DirectX
 {
     /// <summary>The result of a render attempt.</summary>
     public enum RenderResult

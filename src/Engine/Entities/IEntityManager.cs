@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
+using BouncyBox.VorpalEngine.Engine.DirectX;
+using TerraFX.Interop;
 
 namespace BouncyBox.VorpalEngine.Engine.Entities
 {
@@ -32,18 +34,25 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         /// <param name="cancellationToken">A cancellation token.</param>
         void Update(CancellationToken cancellationToken);
 
-        /// <summary>Initialized render resources.</summary>
-        void ReleaseRenderResources(CancellationToken cancellationToken);
+        /// <summary>Initializes render resources.</summary>
+        /// <param name="resources">DirectX resources.</param>
+        void InitializeRenderResources(in DirectXResources resources);
+
+        /// <summary>Resizes render resources to account for the new render window client size.</summary>
+        /// <param name="resources">DirectX resources.</param>
+        /// <param name="clientSize">The size of the render window's client area.</param>
+        void ResizeRenderResources(in DirectXResources resources, D2D_SIZE_U clientSize);
+
+        /// <summary>Releases render resources.</summary>
+        void ReleaseRenderResources();
 
         /// <summary>Renders a render state.</summary>
+        /// <param name="resources">DirectX resources.</param>
         /// <param name="cancellationToken">A cancellation token.</param>
-        /// <returns>Returns a tuple containing the result of the render attempt and a frametime if a frame was rendered.</returns>
-        (RenderResult result, TimeSpan frametime) Render(CancellationToken cancellationToken);
+        /// <returns>Returns the number of entities rendered.</returns>
+        int Render(in DirectXResources resources, CancellationToken cancellationToken);
 
         /// <summary>Handles dispatched update messages.</summary>
         void HandleDispatchedUpdateMessages();
-
-        /// <summary>Handles dispatched render resources messages.</summary>
-        void HandleDispatchedRenderResourcesMessages();
     }
 }

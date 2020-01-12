@@ -302,7 +302,7 @@ namespace BouncyBox.VorpalEngine.DebuggingGame.Scenes.Root
                 cancellationToken.WaitHandle.WaitOne((int)renderState.RenderDelayInMilliseconds);
             }
 
-            return EntityRenderResult.FrameRendered;
+            return EntityRenderResult.Rendered;
         }
 
         private void HandleEngineUpdateStatsMessage(EngineUpdateStatsMessage message)

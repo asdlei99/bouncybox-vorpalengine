@@ -70,7 +70,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         {
             Interfaces.ThreadManager.VerifyProcessThread(ProcessThread.Render);
 
-            return ShouldRender() ? OnRender(resources, cancellationToken) : EntityRenderResult.FrameSkipped;
+            return ShouldRender() ? OnRender(resources, cancellationToken) : EntityRenderResult.NotRendered;
         }
 
         /// <inheritdoc />
@@ -106,7 +106,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         /// <returns>Returns the result of the entity's render attempt.</returns>
         protected virtual EntityRenderResult OnRender(in DirectXResources resources, CancellationToken cancellationToken)
         {
-            return EntityRenderResult.FrameSkipped;
+            return EntityRenderResult.NotRendered;
         }
 
         /// <summary>Determines if the entity should render.</summary>

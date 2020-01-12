@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using BouncyBox.VorpalEngine.Common;
 using BouncyBox.VorpalEngine.Engine.Bootstrap;
+using BouncyBox.VorpalEngine.Engine.DirectX;
 using BouncyBox.VorpalEngine.Engine.Entities;
 using BouncyBox.VorpalEngine.Engine.Logging;
 using BouncyBox.VorpalEngine.Engine.Messaging;
@@ -21,6 +22,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
         where TGameState : class
         where TSceneKey : struct, Enum
     {
+        private readonly IDirectXResourceManager<TGameState> _directXResourceManager;
         private readonly IEntityManager<TGameState> _entityManager;
         private readonly ManualResetEventSlim _exitManualResetEvent = new ManualResetEventSlim();
         private readonly IGameExecutionStateManager _gameExecutionStateManager;
@@ -39,6 +41,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
         /// <param name="interfaces">An <see cref="IInterfaces" /> implementation.</param>
         /// <param name="gameExecutionStateManager">An <see cref="IGameExecutionStateManager" /> implementation.</param>
         /// <param name="entityManager">An <see cref="IEntityManager{TGameState}" /> implementation.</param>
+        /// <param name="directXResourceManager">An <see cref="IDirectXResourceManager{TGameState}" /> implementation.</param>
         /// <param name="sceneManager">An <see cref="ISceneManager" /> implementation.</param>
         /// <param name="programOptions">Parsed command line arguments.</param>
         /// <param name="context">A nested context.</param>
@@ -46,6 +49,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
             IInterfaces interfaces,
             IGameExecutionStateManager gameExecutionStateManager,
             IEntityManager<TGameState> entityManager,
+            IDirectXResourceManager<TGameState> directXResourceManager,
             ISceneManager sceneManager,
             ProgramOptions programOptions,
             NestedContext context)
@@ -55,6 +59,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
             Interfaces = interfaces;
             _gameExecutionStateManager = gameExecutionStateManager;
             _entityManager = entityManager;
+            _directXResourceManager = directXResourceManager;
             _sceneManager = sceneManager;
             _programOptions = programOptions;
             _serilogLogger = new ContextSerilogLogger(interfaces.SerilogLogger, context);
@@ -70,15 +75,17 @@ namespace BouncyBox.VorpalEngine.Engine.Game
         /// <param name="interfaces">An <see cref="IInterfaces" /> implementation.</param>
         /// <param name="gameExecutionStateManager">An <see cref="IGameExecutionStateManager" /> implementation.</param>
         /// <param name="entityManager">An <see cref="IEntityManager{TGameState}" /> implementation.</param>
+        /// <param name="directXResourceManager">An <see cref="IDirectXResourceManager{TGameState}" /> implementation.</param>
         /// <param name="sceneManager">An <see cref="ISceneManager" /> implementation.</param>
         /// <param name="programOptions">Parsed command line arguments.</param>
         protected Game(
             IInterfaces interfaces,
             IGameExecutionStateManager gameExecutionStateManager,
             IEntityManager<TGameState> entityManager,
+            IDirectXResourceManager<TGameState> directXResourceManager,
             ISceneManager sceneManager,
             ProgramOptions programOptions)
-            : this(interfaces, gameExecutionStateManager, entityManager, sceneManager, programOptions, NestedContext.None())
+            : this(interfaces, gameExecutionStateManager, entityManager, directXResourceManager, sceneManager, programOptions, NestedContext.None())
         {
         }
 
@@ -105,9 +112,9 @@ namespace BouncyBox.VorpalEngine.Engine.Game
         public RunResult Run(TSceneKey initialSceneKey)
         {
             var updateWorker = new UpdateWorker<TGameState>(Interfaces, _entityManager, _sceneManager);
-            var renderWorker = new RenderWorker<TGameState>(Interfaces, _entityManager);
+            var renderWorker = new RenderWorker<TGameState>(Interfaces, _directXResourceManager);
             var updateResourcesWorker = new UpdateResourcesWorker(Interfaces);
-            var renderResourcesWorker = new RenderResourcesWorker<TGameState>(Interfaces, _entityManager);
+            var renderResourcesWorker = new RenderResourcesWorker<TGameState>(Interfaces, _directXResourceManager);
             // The main thread increments the count by 1
             var countdownEvent = new CountdownEvent(1);
 
