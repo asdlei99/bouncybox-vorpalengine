@@ -17,7 +17,7 @@ namespace BouncyBox.VorpalEngine.Engine.Windows
     /// <summary>A window used as a rendering target.</summary>
     internal sealed class RenderForm : Form
     {
-        private readonly ConcurrentMessagePublisherSubscriber<IGlobalMessage> _globalMessagePublisherSubscriber;
+        private readonly GlobalMessageQueueHelper _globalMessageQueue;
         private readonly ContextFlag _ignoreWmSize = new ContextFlag();
         private readonly IInterfaces _interfaces;
         private readonly ProgramOptions _programOptions;
@@ -53,9 +53,9 @@ namespace BouncyBox.VorpalEngine.Engine.Windows
             _serilogLogger = new ContextSerilogLogger(interfaces.SerilogLogger, context);
             _interfaces = interfaces;
             _programOptions = programOptions;
-            _globalMessagePublisherSubscriber =
-                ConcurrentMessagePublisherSubscriber<IGlobalMessage>
-                    .Create(interfaces, context)
+            _globalMessageQueue =
+                new GlobalMessageQueueHelper(interfaces.GlobalMessageQueue, context)
+                    .WithThread(ProcessThread.Main)
                     .Subscribe<ResolutionRequestedMessage>(HandleResolutionRequestedMessage)
                     .Subscribe<WindowedModeRequestedMessage>(HandleWindowedModeRequestedMessage);
 
@@ -73,7 +73,7 @@ namespace BouncyBox.VorpalEngine.Engine.Windows
                 SetResolution(interfaces.CommonGameSettings.RequestedResolution, false);
             }
 
-            _globalMessagePublisherSubscriber.Publish(new RenderWindowHandleCreatedMessage(Handle));
+            _globalMessageQueue.Publish(new RenderWindowHandleCreatedMessage(Handle));
 
             SetMonitorHandle();
 
@@ -114,18 +114,6 @@ namespace BouncyBox.VorpalEngine.Engine.Windows
         public RenderForm(IInterfaces interfaces, ProgramOptions programOptions)
             : this(interfaces, programOptions, NestedContext.None())
         {
-        }
-
-        /// <summary>Instructs the global message publisher/subscriber to handle messages to which this object subscribed.</summary>
-        /// <exception cref="InvalidOperationException">
-        ///     Thrown when the thread executing this method is not the
-        ///     <see cref="ProcessThread.Main" /> thread.
-        /// </exception>
-        public void HandleDispatchedMessages()
-        {
-            _interfaces.ThreadManager.VerifyProcessThread(ProcessThread.Main);
-
-            _globalMessagePublisherSubscriber.HandleDispatched();
         }
 
         /// <inheritdoc />
@@ -209,12 +197,12 @@ namespace BouncyBox.VorpalEngine.Engine.Windows
             if (message.WParam.ToInt32() != 0)
             {
                 _isActivated = true;
-                _globalMessagePublisherSubscriber.Publish<RenderWindowActivatedMessage>();
+                _globalMessageQueue.Publish<RenderWindowActivatedMessage>();
             }
             else
             {
                 _isActivated = false;
-                _globalMessagePublisherSubscriber.Publish<RenderWindowDeactivatedMessage>();
+                _globalMessageQueue.Publish<RenderWindowDeactivatedMessage>();
             }
 
             // Reset keyboard state to prevent "key up" messages with no earlier "key down" message
@@ -230,7 +218,7 @@ namespace BouncyBox.VorpalEngine.Engine.Windows
             // Hide the window while waiting for engine threads to terminate
             Visible = false;
 
-            _globalMessagePublisherSubscriber.Publish<RenderWindowClosingMessage>();
+            _globalMessageQueue.Publish<RenderWindowClosingMessage>();
 
             return HandleResult.Return;
         }
@@ -238,7 +226,7 @@ namespace BouncyBox.VorpalEngine.Engine.Windows
         /// <summary>Handles the <see cref="User32.WM_DESTROY" /> message.</summary>
         private void HandleWindowDestruction()
         {
-            _globalMessagePublisherSubscriber.Dispose();
+            _globalMessageQueue.Dispose();
         }
 
         /// <summary>Handles the <see cref="User32.WM_DISPLAYCHANGE" /> message.</summary>
@@ -388,14 +376,14 @@ namespace BouncyBox.VorpalEngine.Engine.Windows
                     if (!_isMinimized)
                     {
                         _isMinimized = true;
-                        _globalMessagePublisherSubscriber.Publish(new RenderWindowMinimizedMessage());
+                        _globalMessageQueue.Publish(new RenderWindowMinimizedMessage());
                     }
                     break;
                 case User32.SIZE_RESTORED:
                     if (_isMinimized)
                     {
                         _isMinimized = false;
-                        _globalMessagePublisherSubscriber.Publish(new RenderWindowRestoredMessage());
+                        _globalMessageQueue.Publish(new RenderWindowRestoredMessage());
                     }
 
                     // If the user resizes the window then treat it as a requested resolution change
@@ -483,7 +471,7 @@ namespace BouncyBox.VorpalEngine.Engine.Windows
 
             _serilogLogger.LogInformation("Display changed to {DeviceName} (0x{MonitorHandle})", deviceString, monitorHandle.ToString("X8"));
 
-            _globalMessagePublisherSubscriber.Publish(new DisplayChangedMessage(monitorHandle));
+            _globalMessageQueue.Publish(new DisplayChangedMessage(monitorHandle));
         }
 
         /// <summary>
@@ -527,7 +515,7 @@ namespace BouncyBox.VorpalEngine.Engine.Windows
                 ClientSize.Width,
                 ClientSize.Height);
 
-            _globalMessagePublisherSubscriber.Publish(new ResolutionChangedMessage(ClientSize));
+            _globalMessageQueue.Publish(new ResolutionChangedMessage(ClientSize));
         }
 
         /// <summary>

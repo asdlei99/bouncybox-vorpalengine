@@ -15,7 +15,7 @@ namespace BouncyBox.VorpalEngine.Engine.Scenes
     {
         private readonly HashSet<IEntity> _entities = new HashSet<IEntity>();
         private readonly IEntityManager<TGameState> _entityManager;
-        private readonly ConcurrentMessagePublisherSubscriber<IGlobalMessage> _globalMessagePublisherSubscriber;
+        private readonly GlobalMessageQueueHelper _globalMessageQueue;
         private readonly IInterfaces _interfaces;
         private bool _isDisposed;
 
@@ -32,7 +32,7 @@ namespace BouncyBox.VorpalEngine.Engine.Scenes
             _entityManager = entityManager;
             Key = key;
 
-            _globalMessagePublisherSubscriber = ConcurrentMessagePublisherSubscriber<IGlobalMessage>.Create(interfaces, context);
+            _globalMessageQueue = new GlobalMessageQueueHelper(interfaces.GlobalMessageQueue, context);
         }
 
         /// <summary>Initializes a new instance of the <see cref="Scene{TGameState,TSceneKey}" /> type.</summary>
@@ -78,7 +78,7 @@ namespace BouncyBox.VorpalEngine.Engine.Scenes
         /// <inheritdoc />
         public void Dispose()
         {
-            _interfaces.ThreadManager.DisposeHelper(() => { _globalMessagePublisherSubscriber?.Dispose(); }, ref _isDisposed, ProcessThread.Main);
+            _interfaces.ThreadManager.DisposeHelper(() => { _globalMessageQueue?.Dispose(); }, ref _isDisposed, ProcessThread.Main);
         }
 
         /// <inheritdoc cref="IScene{TSceneKey}.Load" />

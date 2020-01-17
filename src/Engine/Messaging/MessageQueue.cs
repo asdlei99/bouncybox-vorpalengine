@@ -5,8 +5,6 @@ using System.Linq;
 using BouncyBox.Common.NetStandard21.Logging;
 using BouncyBox.VorpalEngine.Common;
 using BouncyBox.VorpalEngine.Engine.Logging;
-using Subscriptions = System.Collections.Generic.Dictionary<BouncyBox.VorpalEngine.Engine.Messaging.SubscriptionToken, (System.Delegate handlerDelegate,
-    BouncyBox.VorpalEngine.Common.NestedContext context)>;
 
 namespace BouncyBox.VorpalEngine.Engine.Messaging
 {
@@ -17,9 +15,8 @@ namespace BouncyBox.VorpalEngine.Engine.Messaging
     public class MessageQueue<TMessageBase> : IMessageQueue<TMessageBase>
         where TMessageBase : IMessage
     {
-        private readonly NestedContext _context;
         private readonly ContextSerilogLogger _serilogLogger;
-        private readonly Dictionary<Type, Subscriptions> _subscriptionsByMessageType = new Dictionary<Type, Subscriptions>();
+        private readonly Dictionary<Type, HashSet<Subscription>> _subscriptionsByMessageType = new Dictionary<Type, HashSet<Subscription>>();
 
         /// <summary>Initializes a new instance of the <see cref="MessageQueue{TMessageBase}" /> type.</summary>
         /// <param name="serilogLogger">An <see cref="ISerilogLogger" /> implementation.</param>
@@ -27,8 +24,7 @@ namespace BouncyBox.VorpalEngine.Engine.Messaging
         /// <param name="queueName">The name of the queue, to be included in the nested context.</param>
         public MessageQueue(ISerilogLogger serilogLogger, NestedContext context, string queueName = nameof(MessageQueue<TMessageBase>))
         {
-            _context = context.Push(queueName);
-            _serilogLogger = new ContextSerilogLogger(serilogLogger, _context);
+            _serilogLogger = new ContextSerilogLogger(serilogLogger, context.Push(queueName));
         }
 
         /// <summary>Initializes a new instance of the <see cref="MessageQueue{TMessageBase}" /> type.</summary>
@@ -43,39 +39,39 @@ namespace BouncyBox.VorpalEngine.Engine.Messaging
         public void Publish<TMessage>(TMessage message, NestedContext context)
             where TMessage : TMessageBase
         {
-            if (!_subscriptionsByMessageType.TryGetValue(message.GetType(), out Subscriptions? subscriptions))
+            Type messageType = typeof(TMessage);
+
+            if (!_subscriptionsByMessageType.TryGetValue(messageType, out HashSet<Subscription>? subscriptions))
             {
                 // No subscribers for the message type
                 return;
             }
 
-            bool shouldLogMessage = message.ShouldLog();
-            string? sourceContext = context.Context;
-            string messageType = typeof(TMessage).Name;
+            bool shouldLog = message.ShouldLog();
 
-            foreach ((Delegate handlerDelegate, NestedContext subscriptionContext) in subscriptions.Values)
+            if (shouldLog)
             {
-                string? destinationContext = subscriptionContext.Context;
+                _serilogLogger.LogDebug("{Context} is publishing {MessageType}", context.Context ?? "An unknown context", messageType.Name);
+            }
 
-                if (shouldLogMessage)
+            foreach (Subscription subscription in subscriptions)
+            {
+                if (shouldLog)
                 {
-                    _serilogLogger.LogDebug(
-                        "{SourceContext} is dispatching {MessageType} to {DestinationContext}",
-                        sourceContext ?? "An unknown context",
-                        messageType,
-                        destinationContext ?? "An unknown context");
+                    _serilogLogger.LogDebug("{Context} is handling {MessageType}", subscription.Context.Context ?? "An unknown context", messageType.Name);
                 }
 
-                ((Action<TMessage>)handlerDelegate)(message);
+                ((Action<TMessage>)subscription.HandlerDelegate)(message);
 
-                if (shouldLogMessage)
+                if (shouldLog)
                 {
-                    _serilogLogger.LogVerbose(
-                        "{SourceContext} dispatched {MessageType} to {DestinationContext}",
-                        sourceContext ?? "An unknown context",
-                        messageType,
-                        destinationContext ?? "An unknown context");
+                    _serilogLogger.LogVerbose("{Context} handled {MessageType}", subscription.Context.Context ?? "An unknown context", messageType.Name);
                 }
+            }
+
+            if (shouldLog)
+            {
+                _serilogLogger.LogVerbose("{Context published {MessageType}", context.Context ?? "An unknown context", messageType.Name);
             }
         }
 
@@ -101,69 +97,72 @@ namespace BouncyBox.VorpalEngine.Engine.Messaging
         }
 
         /// <inheritdoc />
-        public SubscriptionToken Subscribe<TMessage>(Action<TMessage> handlerDelegate, NestedContext context)
+        public ISubscriptionReceipt Subscribe<TMessage>(Action<TMessage> handlerDelegate, NestedContext context)
             where TMessage : TMessageBase
         {
             Type messageType = typeof(TMessage);
-            var subscriptionToken = new SubscriptionToken(messageType);
+            var subscription = new Subscription(messageType, handlerDelegate, context);
 
-            if (!_subscriptionsByMessageType.TryGetValue(messageType, out Subscriptions? subscriptions))
+            if (!_subscriptionsByMessageType.TryGetValue(messageType, out HashSet<Subscription>? subscriptions))
             {
-                _subscriptionsByMessageType.Add(messageType, subscriptions = new Subscriptions());
+                _subscriptionsByMessageType.Add(messageType, subscriptions = new HashSet<Subscription>());
             }
 
-            subscriptions.Add(subscriptionToken, (handlerDelegate, context));
+            subscriptions.Add(subscription);
 
             if (MessageLogFilter.ShouldLogMessageTypeDelegate(messageType))
             {
                 _serilogLogger.LogDebug("{Context} subscribed to {MessageType}", context.Context ?? "An unknown context", messageType.Name);
             }
 
-            return subscriptionToken;
+            return subscription;
         }
 
         /// <inheritdoc />
-        public SubscriptionToken Subscribe<TMessage>(Action<TMessage> handlerDelegate)
+        public ISubscriptionReceipt Subscribe<TMessage>(Action<TMessage> handlerDelegate)
             where TMessage : TMessageBase
         {
             return Subscribe(handlerDelegate, NestedContext.None());
         }
 
         /// <inheritdoc />
-        public void Unsubscribe(IEnumerable<SubscriptionToken> tokens, NestedContext context)
+        public void Unsubscribe(IEnumerable<ISubscriptionReceipt> subscriptionReceipts)
         {
-            tokens = tokens.ToImmutableArray();
+            ImmutableArray<Subscription> subscriptions = subscriptionReceipts.OfType<Subscription>().ToImmutableArray();
 
-            foreach (Subscriptions subscriptions in _subscriptionsByMessageType.Values)
+            foreach (HashSet<Subscription> hashSet in _subscriptionsByMessageType.Values)
+            foreach (Subscription subscription in subscriptions)
             {
-                foreach (SubscriptionToken token in tokens)
-                {
-                    subscriptions.Remove(token);
-                }
+                hashSet.Remove(subscription);
             }
 
-            foreach (SubscriptionToken token in tokens.Where(a => MessageLogFilter.ShouldLogMessageTypeDelegate(a.MessageType)))
+            foreach (Subscription subscription in subscriptions.Where(a => MessageLogFilter.ShouldLogMessageTypeDelegate(a.MessageType)))
             {
-                _serilogLogger.LogDebug("{Context} unsubscribed from {MessageType}", context.Context ?? "An unknown context", token.MessageType.Name);
+                _serilogLogger.LogDebug(
+                    "{Context} unsubscribed from {MessageType}",
+                    subscription.Context.Context ?? "An unknown context",
+                    subscription.MessageType.Name);
             }
         }
 
         /// <inheritdoc />
-        public void Unsubscribe(IEnumerable<SubscriptionToken> tokens)
+        public void Unsubscribe(params ISubscriptionReceipt[] subscriptionReceipts)
         {
-            Unsubscribe(tokens, NestedContext.None());
+            Unsubscribe((IEnumerable<ISubscriptionReceipt>)subscriptionReceipts);
         }
 
-        /// <inheritdoc />
-        public void Unsubscribe(NestedContext context, params SubscriptionToken[] tokens)
+        private class Subscription : ISubscriptionReceipt
         {
-            Unsubscribe(tokens, context);
-        }
+            public Subscription(Type messageType, Delegate handlerDelegate, NestedContext context)
+            {
+                MessageType = messageType;
+                HandlerDelegate = handlerDelegate;
+                Context = context;
+            }
 
-        /// <inheritdoc />
-        public void Unsubscribe(params SubscriptionToken[] tokens)
-        {
-            Unsubscribe(tokens, _context);
+            public Type MessageType { get; }
+            public Delegate HandlerDelegate { get; }
+            public NestedContext Context { get; }
         }
     }
 }

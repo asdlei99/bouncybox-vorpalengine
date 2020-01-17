@@ -7,8 +7,8 @@ using BouncyBox.VorpalEngine.Engine.Entities;
 using BouncyBox.VorpalEngine.Engine.Input.XInput;
 using BouncyBox.VorpalEngine.Engine.Logging;
 using BouncyBox.VorpalEngine.Engine.Messaging.GlobalMessages;
-using BouncyBox.VorpalEngine.Engine.Scenes;
 using BouncyBox.VorpalEngine.Engine.Threads;
+using ProcessThread = BouncyBox.VorpalEngine.Engine.Threads.ProcessThread;
 
 namespace BouncyBox.VorpalEngine.Engine.Game
 {
@@ -22,7 +22,6 @@ namespace BouncyBox.VorpalEngine.Engine.Game
         private readonly IEntityManager<TGameState> _entityManager;
         private readonly TimeSpan _minimizedRenderWindowSleepDuration = TimeSpan.FromMilliseconds(100);
         private readonly TimeSpan _renderWindowDeactivatedUpdatePeriod = TimeSpan.FromSeconds(1) / (30 * UpdatesPerSecondMultiplier);
-        private readonly ISceneManager _sceneManager;
         private readonly ContextSerilogLogger _serilogLogger;
         private readonly EventFrequencyCalculator _upsCalculator = new EventFrequencyCalculator(true);
         private bool _isRenderWindowActivated;
@@ -32,22 +31,19 @@ namespace BouncyBox.VorpalEngine.Engine.Game
         /// <summary>Initializes a new instance of the <see cref="UpdateWorker{TGameState}" />.</summary>
         /// <param name="interfaces">An <see cref="IInterfaces" /> implementation.</param>
         /// <param name="entityManager">An <see cref="IEntityManager{TGameState}" /> implementation.</param>
-        /// <param name="sceneManager">An <see cref="ISceneManager" /> implementation.</param>
         /// <param name="context">A nested context.</param>
-        public UpdateWorker(IInterfaces interfaces, IEntityManager<TGameState> entityManager, ISceneManager sceneManager, NestedContext context)
+        public UpdateWorker(IInterfaces interfaces, IEntityManager<TGameState> entityManager, NestedContext context)
             : base(interfaces, EngineThread.Update, context.Push(nameof(UpdateWorker<TGameState>)))
         {
             _entityManager = entityManager;
-            _sceneManager = sceneManager;
             _serilogLogger = new ContextSerilogLogger(interfaces.SerilogLogger, Context);
         }
 
         /// <summary>Initializes a new instance of the <see cref="UpdateWorker{TGameState}" /> type.</summary>
         /// <param name="interfaces">An <see cref="IInterfaces" /> implementation.</param>
         /// <param name="entityManager">An <see cref="IEntityManager{TGameState}" /> implementation.</param>
-        /// <param name="sceneManager">An <see cref="ISceneManager" /> implementation.</param>
-        public UpdateWorker(IInterfaces interfaces, IEntityManager<TGameState> entityManager, ISceneManager sceneManager)
-            : this(interfaces, entityManager, sceneManager, NestedContext.None())
+        public UpdateWorker(IInterfaces interfaces, IEntityManager<TGameState> entityManager)
+            : this(interfaces, entityManager, NestedContext.None())
         {
         }
 
@@ -61,7 +57,8 @@ namespace BouncyBox.VorpalEngine.Engine.Game
         /// </remarks>
         protected override void OnPrepare()
         {
-            GlobalMessagePublisherSubscriber
+            GlobalMessageQueue
+                .WithThread(ProcessThread.Update)
                 .Subscribe<RefreshPeriodChangedMessage>(HandleRefreshRateChangedMessage)
                 .Subscribe<RenderWindowActivatedMessage>(HandleRenderWindowActivatedMessage)
                 .Subscribe<RenderWindowDeactivatedMessage>(HandleRenderWindowDeactivatedMessage)
@@ -81,11 +78,6 @@ namespace BouncyBox.VorpalEngine.Engine.Game
             }
 
             long timestamp = Stopwatch.GetTimestamp();
-
-            // Handle dispatched messages
-
-            _sceneManager.HandleDispatchedMessages();
-            _entityManager.HandleDispatchedUpdateMessages();
 
             // Update the game state
             _entityManager.Update(cancellationToken);
@@ -109,7 +101,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
             }
 
             // Publish engine stats
-            GlobalMessagePublisherSubscriber.Publish(new EngineUpdateStatsMessage(_upsCalculator.GetFrequency()));
+            GlobalMessageQueue.Publish(new EngineUpdateStatsMessage(_upsCalculator.GetFrequency()));
 
             // Reset engine stats
 

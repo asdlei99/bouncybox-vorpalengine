@@ -14,8 +14,5 @@ namespace BouncyBox.VorpalEngine.Engine.DirectX
         /// <param name="cancellationToken">A cancellation token.</param>
         /// <returns>Returns a tuple containing the result of the render attempt and a frametime if a frame was rendered.</returns>
         (RenderResult result, TimeSpan frametime) Render(CancellationToken cancellationToken);
-
-        /// <summary>Handles dispatched render resources messages.</summary>
-        void HandleDispatchedRenderResourcesMessages();
     }
 }

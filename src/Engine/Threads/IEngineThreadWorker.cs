@@ -14,8 +14,5 @@ namespace BouncyBox.VorpalEngine.Engine.Threads
 
         /// <summary>Performs post-work clean-up.</summary>
         void CleanUp();
-
-        /// <summary>Handles dispatched messages.</summary>
-        void HandleDispatchedMessages();
     }
 }

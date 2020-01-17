@@ -18,7 +18,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
             Interfaces = interfaces;
             Context = context;
 
-            GlobalMessagePublisherSubscriber = ConcurrentMessagePublisherSubscriber<IGlobalMessage>.Create(interfaces, context);
+            GlobalMessageQueue = new GlobalMessageQueueHelper(interfaces.GlobalMessageQueue, context);
         }
 
         /// <summary>Initializes a new instance of the <see cref="Entity" /></summary>
@@ -34,11 +34,11 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         protected NestedContext Context { get; }
 
         /// <summary>
-        ///     <para>Gets the global message publisher/subscriber.</para>
+        ///     <para>Gets the global message queue.</para>
         ///     <para>Use the global message queue to publish or subscribe to messages intended to be processed globally.</para>
         ///     <para>Do not use the global message queue to send update-queue-specific messages.</para>
         /// </summary>
-        protected ConcurrentMessagePublisherSubscriber<IGlobalMessage> GlobalMessagePublisherSubscriber { get; }
+        protected GlobalMessageQueueHelper GlobalMessageQueue { get; }
 
         /// <summary>Gets a value indicating if the entity is neither paused nor suspended.</summary>
         protected bool IsRunning => !IsPaused && !IsSuspended;
@@ -52,7 +52,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         /// <inheritdoc />
         /// <exception cref="InvalidOperationException">
         ///     Thrown when the thread executing this method is not the
-        ///     <see cref="Threads.ProcessThread.Update" /> thread.
+        ///     <see cref="ProcessThread.Update" /> thread.
         /// </exception>
         public void Pause()
         {
@@ -126,16 +126,16 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         }
 
         /// <inheritdoc />
-        /// <exception cref="InvalidOperationException">
-        ///     Thrown when the thread executing this method is not the
-        ///     <see cref="ProcessThread.Update" /> thread.
-        /// </exception>
         public void Dispose()
         {
-            Interfaces.ThreadManager.VerifyProcessThread(ProcessThread.Update);
-
-            Dispose(true);
-            GC.SuppressFinalize(this);
+            Interfaces.ThreadManager.DisposeHelper(
+                () =>
+                {
+                    Dispose(true);
+                    GC.SuppressFinalize(this);
+                },
+                ref _isDisposed,
+                ProcessThread.Main);
         }
 
         /// <inheritdoc cref="Pause" />
@@ -162,7 +162,10 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         /// <param name="disposing">A value indicating whether managed resources should be disposed.</param>
         protected virtual void Dispose(bool disposing)
         {
-            DisposeHelper.Dispose(GlobalMessagePublisherSubscriber.Dispose, ref _isDisposed);
+            if (disposing)
+            {
+                GlobalMessageQueue.Dispose();
+            }
         }
     }
 }

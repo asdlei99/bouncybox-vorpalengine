@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using BouncyBox.VorpalEngine.Common;
+using BouncyBox.VorpalEngine.Engine.Threads;
 
 namespace BouncyBox.VorpalEngine.Engine.Messaging
 {
     /// <summary>Represents an in-memory thread-safe message queue.</summary>
-    public interface IConcurrentMessageQueue<TMessageBase>
+    public interface IConcurrentMessageQueue<in TMessageBase>
         where TMessageBase : IGlobalMessage
     {
         /// <summary>Queues a message for dispatch in a subsequent call to <see cref="DispatchQueued" />.</summary>
@@ -28,37 +30,30 @@ namespace BouncyBox.VorpalEngine.Engine.Messaging
             where TMessage : TMessageBase, new();
 
         /// <summary>Subscribes to a message and provides a handler delegate that will process published messages of the specified type.</summary>
-        /// <param name="messageDispatchQueue">The concurrent message dispatch queue to where published messages will be dispatched.</param>
+        /// <param name="handlerDelegate">The delegate to execute when a message with the specified type is published.</param>
+        /// <param name="thread">The thread that will handle published message of the specified type.</param>
         /// <param name="context">A nested context.</param>
-        /// <returns>Returns a subscription token that may be used later to unsubscribe.</returns>
-        SubscriptionToken Subscribe<TMessage>(ConcurrentMessageDispatchQueue<TMessageBase> messageDispatchQueue, NestedContext context)
+        /// <returns>Returns a subscription receipt that may be used later to unsubscribe.</returns>
+        ISubscriptionReceipt Subscribe<TMessage>(Action<TMessage> handlerDelegate, ProcessThread thread, NestedContext context)
             where TMessage : TMessageBase;
 
         /// <summary>Subscribes to a message and provides a handler delegate that will process published messages of the specified type.</summary>
-        /// <param name="messageDispatchQueue">The concurrent message dispatch queue to where published messages will be dispatched.</param>
-        /// <returns>Returns a subscription token that may be used later to unsubscribe.</returns>
-        SubscriptionToken Subscribe<TMessage>(ConcurrentMessageDispatchQueue<TMessageBase> messageDispatchQueue)
+        /// <param name="handlerDelegate">The delegate to execute when a message with the specified type is published.</param>
+        /// <param name="thread">The thread that will handle published message of the specified type.</param>
+        /// <returns>Returns a subscription receipt that may be used later to unsubscribe.</returns>
+        ISubscriptionReceipt Subscribe<TMessage>(Action<TMessage> handlerDelegate, ProcessThread thread)
             where TMessage : TMessageBase;
 
-        /// <summary>Unsubscribes a subscription.</summary>
-        /// <param name="tokens">Subscription tokens to unsubscribe.</param>
-        /// <param name="context">A nested context.</param>
-        void Unsubscribe(IEnumerable<SubscriptionToken> tokens, NestedContext context);
+        /// <summary>Unsubscribes subscriptions.</summary>
+        /// <param name="subscriptionReceipts">Subscriptions to unsubscribe.</param>
+        void Unsubscribe(IEnumerable<ISubscriptionReceipt> subscriptionReceipts);
 
-        /// <summary>Unsubscribes a subscription.</summary>
-        /// <param name="tokens">Subscription tokens to unsubscribe.</param>
-        void Unsubscribe(IEnumerable<SubscriptionToken> tokens);
+        /// <summary>Unsubscribes subscriptions.</summary>
+        /// <param name="subscriptionReceipts">Subscriptions to unsubscribe.</param>
+        void Unsubscribe(params ISubscriptionReceipt[] subscriptionReceipts);
 
-        /// <summary>Unsubscribes a subscription.</summary>
-        /// <param name="context">A nested context.</param>
-        /// <param name="tokens">Subscription tokens to unsubscribe.</param>
-        void Unsubscribe(NestedContext context, params SubscriptionToken[] tokens);
-
-        /// <summary>Unsubscribes a subscription.</summary>
-        /// <param name="tokens">Subscription tokens to unsubscribe.</param>
-        void Unsubscribe(params SubscriptionToken[] tokens);
-
-        /// <summary>Dequeues all queued messages, dispatching each message to its associated concurrent message dispatch queue.</summary>
-        void DispatchQueued();
+        /// <summary>Dispatches all published messages for the specified thread.</summary>
+        /// <param name="thread">The thread whose subscriptions will receive published messages.</param>
+        void DispatchQueued(ProcessThread thread);
     }
 }

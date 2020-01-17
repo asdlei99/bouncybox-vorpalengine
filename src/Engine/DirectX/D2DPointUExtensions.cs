@@ -10,12 +10,7 @@ namespace BouncyBox.VorpalEngine.Engine.DirectX
         /// <returns>Returns the value converted to a <see cref="D2D_POINT_2F" />.</returns>
         public static D2D_POINT_2F ToD2DPoint2F(this D2D_POINT_2U value)
         {
-            return
-                new D2D_POINT_2F
-                {
-                    x = value.x,
-                    y = value.y
-                };
+            return new D2D_POINT_2F(value.x, value.y);
         }
     }
 }

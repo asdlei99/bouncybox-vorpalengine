@@ -115,7 +115,7 @@ namespace BouncyBox.VorpalEngine.Engine.Bootstrap
             containerBuilder.RegisterType<SceneManager<TGameState, TSceneKey>>().As<ISceneManager>().SingleInstance();
             containerBuilder.RegisterType<StatefulGamepad>().As<IStatefulGamepad>().SingleInstance();
             containerBuilder.Register(a => new ThreadManager(a.Resolve<ISerilogLogger>(), mainThread)).As<IThreadManager>().SingleInstance();
-            containerBuilder.RegisterInstance(programOptions).AsSelf().SingleInstance();
+            containerBuilder.RegisterInstance(programOptions).AsSelf();
 
             // Register custom components
             componentRegistrationDelegate?.Invoke(containerBuilder);

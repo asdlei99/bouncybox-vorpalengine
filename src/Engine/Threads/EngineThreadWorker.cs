@@ -21,7 +21,7 @@ namespace BouncyBox.VorpalEngine.Engine.Threads
             Interfaces = interfaces;
             _thread = Enums.Parse<ProcessThread>(thread.AsString());
 
-            GlobalMessagePublisherSubscriber = ConcurrentMessagePublisherSubscriber<IGlobalMessage>.Create(interfaces, context);
+            GlobalMessageQueue = new GlobalMessageQueueHelper(interfaces.GlobalMessageQueue, context);
         }
 
         /// <summary>Initializes a new instance of the <see cref="EngineThreadWorker" /> type.</summary>
@@ -37,8 +37,8 @@ namespace BouncyBox.VorpalEngine.Engine.Threads
         /// <summary>Gets the nested context.</summary>
         protected NestedContext Context { get; }
 
-        /// <summary>Gets the global message publisher/subscriber.</summary>
-        protected ConcurrentMessagePublisherSubscriber<IGlobalMessage> GlobalMessagePublisherSubscriber { get; }
+        /// <summary>Gets the global message queue.</summary>
+        protected GlobalMessageQueueHelper GlobalMessageQueue { get; }
 
         /// <inheritdoc />
         /// <exception cref="InvalidOperationException">Thrown when the thread executing this method is not the correct thread.</exception>
@@ -55,6 +55,9 @@ namespace BouncyBox.VorpalEngine.Engine.Threads
         {
             Interfaces.ThreadManager.VerifyProcessThread(_thread);
 
+            // Dispatch messages queued on the worker's thread
+            GlobalMessageQueue.DispatchQueued(_thread);
+
             OnDoWork(cancellationToken);
         }
 
@@ -66,16 +69,7 @@ namespace BouncyBox.VorpalEngine.Engine.Threads
 
             OnCleanUp();
 
-            GlobalMessagePublisherSubscriber.Dispose();
-        }
-
-        /// <inheritdoc />
-        /// <exception cref="InvalidOperationException">Thrown when the thread executing this method is not the correct thread.</exception>
-        public void HandleDispatchedMessages()
-        {
-            Interfaces.ThreadManager.VerifyProcessThread(_thread);
-
-            GlobalMessagePublisherSubscriber.HandleDispatched();
+            GlobalMessageQueue.Dispose();
         }
 
         /// <inheritdoc cref="IEngineThreadWorker.DoWork" />

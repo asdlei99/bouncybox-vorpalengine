@@ -10,14 +10,7 @@ namespace BouncyBox.VorpalEngine.Engine.DirectX
         /// <returns>Returns the value converted to a <see cref="D2D_RECT_F" />.</returns>
         public static D2D_RECT_F ToD2DRectF(this in D2D_RECT_U value)
         {
-            return
-                new D2D_RECT_F
-                {
-                    left = value.left,
-                    top = value.top,
-                    right = value.right,
-                    bottom = value.bottom
-                };
+            return new D2D_RECT_F(value.left, value.top, value.right, value.bottom);
         }
     }
 }

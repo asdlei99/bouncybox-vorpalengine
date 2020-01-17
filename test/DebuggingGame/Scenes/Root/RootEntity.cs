@@ -14,6 +14,7 @@ using BouncyBox.VorpalEngine.Engine.Game;
 using BouncyBox.VorpalEngine.Engine.Input.Keyboard;
 using BouncyBox.VorpalEngine.Engine.Input.XInput;
 using BouncyBox.VorpalEngine.Engine.Messaging.GlobalMessages;
+using BouncyBox.VorpalEngine.Engine.Threads;
 using BouncyBox.VorpalEngine.Interop.D2D1;
 using BouncyBox.VorpalEngine.Interop.DWrite;
 using TerraFX.Interop;
@@ -46,7 +47,8 @@ namespace BouncyBox.VorpalEngine.DebuggingGame.Scenes.Root
         {
             _gameStateManager = gameStateManager;
 
-            GlobalMessagePublisherSubscriber
+            GlobalMessageQueue
+                .WithThread(ProcessThread.Update)
                 .Subscribe<EngineUpdateStatsMessage>(HandleEngineUpdateStatsMessage)
                 .Subscribe<EngineRenderStatsMessage>(HandleEngineRenderStatsMessage);
         }
@@ -92,7 +94,7 @@ namespace BouncyBox.VorpalEngine.DebuggingGame.Scenes.Root
 
                 Game.CommonGameSettings.RequestedResolution = Resolutions[index];
 
-                GlobalMessagePublisherSubscriber.Publish(new ResolutionRequestedMessage(Game.CommonGameSettings.RequestedResolution));
+                GlobalMessageQueue.Publish(new ResolutionRequestedMessage(Game.CommonGameSettings.RequestedResolution));
             }
             if (downKeys.Contains(User32.VirtualKey.VK_OEM_MINUS))
             {
@@ -100,7 +102,7 @@ namespace BouncyBox.VorpalEngine.DebuggingGame.Scenes.Root
 
                 Game.CommonGameSettings.RequestedResolution = Resolutions[index];
 
-                GlobalMessagePublisherSubscriber.Publish(new ResolutionRequestedMessage(Game.CommonGameSettings.RequestedResolution));
+                GlobalMessageQueue.Publish(new ResolutionRequestedMessage(Game.CommonGameSettings.RequestedResolution));
             }
             if (downKeys.Contains(User32.VirtualKey.V))
             {
@@ -113,11 +115,11 @@ namespace BouncyBox.VorpalEngine.DebuggingGame.Scenes.Root
                 {
                     case WindowedMode.BorderedWindowed:
                         Game.CommonGameSettings.WindowedMode = WindowedMode.BorderlessWindowed;
-                        GlobalMessagePublisherSubscriber.Publish(new WindowedModeRequestedMessage(WindowedMode.BorderlessWindowed));
+                        GlobalMessageQueue.Publish(new WindowedModeRequestedMessage(WindowedMode.BorderlessWindowed));
                         break;
                     case WindowedMode.BorderlessWindowed:
                         Game.CommonGameSettings.WindowedMode = WindowedMode.BorderedWindowed;
-                        GlobalMessagePublisherSubscriber.Publish(new WindowedModeRequestedMessage(WindowedMode.BorderedWindowed));
+                        GlobalMessageQueue.Publish(new WindowedModeRequestedMessage(WindowedMode.BorderedWindowed));
                         break;
                 }
             }
@@ -125,27 +127,27 @@ namespace BouncyBox.VorpalEngine.DebuggingGame.Scenes.Root
             {
                 if (IsPaused)
                 {
-                    GlobalMessagePublisherSubscriber.Publish<UnpauseGameMessage>();
+                    GlobalMessageQueue.Publish<UnpauseGameMessage>();
                 }
                 else
                 {
-                    GlobalMessagePublisherSubscriber.Publish<PauseGameMessage>();
+                    GlobalMessageQueue.Publish<PauseGameMessage>();
                 }
             }
             if (downKeys.Contains(User32.VirtualKey.S))
             {
                 if (IsSuspended)
                 {
-                    GlobalMessagePublisherSubscriber.Publish<ResumeGameMessage>();
+                    GlobalMessageQueue.Publish<ResumeGameMessage>();
                 }
                 else
                 {
-                    GlobalMessagePublisherSubscriber.Publish<SuspendGameMessage>();
+                    GlobalMessageQueue.Publish<SuspendGameMessage>();
                 }
             }
             if (downKeys.Contains(User32.VirtualKey.U))
             {
-                GlobalMessagePublisherSubscriber.Publish(new UnloadSceneMessage<SceneKey>(SceneKey.Root));
+                GlobalMessageQueue.Publish(new UnloadSceneMessage<SceneKey>(SceneKey.Root));
             }
 
             _previousKeyboardSnapshot = currentKeyboardSnapshot;
@@ -205,7 +207,7 @@ namespace BouncyBox.VorpalEngine.DebuggingGame.Scenes.Root
 
         protected override unsafe void OnInitializeRenderResources(in DirectXResources resources)
         {
-            DXGI_RGBA brushColor = DXGIFactory.CreateRgba(1, 1, 1, 1);
+            var brushColor = new DXGI_RGBA(1f, 1f, 1f);
 
             resources.D2D1DeviceContext.CreateSolidColorBrush(&brushColor, out _brush).ThrowIfFailed($"Failed to create {nameof(D2D1SolidColorBrush)}.");
             resources

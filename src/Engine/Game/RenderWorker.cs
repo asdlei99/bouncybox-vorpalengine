@@ -6,6 +6,7 @@ using BouncyBox.VorpalEngine.Engine.Calculators;
 using BouncyBox.VorpalEngine.Engine.DirectX;
 using BouncyBox.VorpalEngine.Engine.Messaging.GlobalMessages;
 using BouncyBox.VorpalEngine.Engine.Threads;
+using ProcessThread = BouncyBox.VorpalEngine.Engine.Threads.ProcessThread;
 
 namespace BouncyBox.VorpalEngine.Engine.Game
 {
@@ -31,12 +32,6 @@ namespace BouncyBox.VorpalEngine.Engine.Game
             : base(interfaces, EngineThread.Render, context.Push(nameof(RenderWorker<TGameState>)))
         {
             _directXResourceManager = directXResourceManager;
-
-            GlobalMessagePublisherSubscriber
-                .Subscribe<RenderWindowActivatedMessage>(HandleRenderWindowActivatedMessage)
-                .Subscribe<RenderWindowDeactivatedMessage>(HandleRenderWindowDeactivatedMessage)
-                .Subscribe<RenderWindowMinimizedMessage>(HandleRenderWindowMinimizedMessage)
-                .Subscribe<RenderWindowRestoredMessage>(HandleRenderWindowRestoredMessage);
         }
 
         /// <summary>Initializes a new instance of the <see cref="RenderWorker{TGameState}" /> type.</summary>
@@ -45,6 +40,17 @@ namespace BouncyBox.VorpalEngine.Engine.Game
         public RenderWorker(IInterfaces interfaces, IDirectXResourceManager<TGameState> directXResourceManager)
             : this(interfaces, directXResourceManager, NestedContext.None())
         {
+        }
+
+        /// <inheritdoc />
+        protected override void OnPrepare()
+        {
+            GlobalMessageQueue
+                .WithThread(ProcessThread.Render)
+                .Subscribe<RenderWindowActivatedMessage>(HandleRenderWindowActivatedMessage)
+                .Subscribe<RenderWindowDeactivatedMessage>(HandleRenderWindowDeactivatedMessage)
+                .Subscribe<RenderWindowMinimizedMessage>(HandleRenderWindowMinimizedMessage)
+                .Subscribe<RenderWindowRestoredMessage>(HandleRenderWindowRestoredMessage);
         }
 
         /// <inheritdoc />
@@ -89,7 +95,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
             }
 
             // Publish engine stats
-            GlobalMessagePublisherSubscriber.Publish(
+            GlobalMessageQueue.Publish(
                 new EngineRenderStatsMessage(
                     _fpsCalculator.GetFrequency(),
                     _frameCount,
@@ -102,6 +108,12 @@ namespace BouncyBox.VorpalEngine.Engine.Game
             _fpsCalculator.Restart();
             _frametimeAccumulator.Reset();
             _engineStatsStopwatch.Restart();
+        }
+
+        /// <inheritdoc />
+        protected override void OnCleanUp()
+        {
+            _directXResourceManager.ReleaseRenderResources(CancellationToken.None);
         }
 
         /// <summary>Handles the <see cref="RenderWindowActivatedMessage" /> global message.</summary>

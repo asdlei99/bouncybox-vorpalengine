@@ -14,7 +14,7 @@ namespace BouncyBox.VorpalEngine.Engine.Scenes
         where TGameState : class
         where TSceneKey : struct, Enum
     {
-        private readonly ConcurrentMessagePublisherSubscriber<IGlobalMessage> _globalMessagePublisherSubscriber;
+        private readonly GlobalMessageQueueHelper _globalMessageQueue;
         private readonly IInterfaces _interfaces;
         private readonly ISceneFactory<TSceneKey> _sceneFactory;
 
@@ -39,9 +39,9 @@ namespace BouncyBox.VorpalEngine.Engine.Scenes
             _interfaces = interfaces;
             _sceneFactory = sceneFactory;
             _serilogLogger = new ContextSerilogLogger(interfaces.SerilogLogger, context);
-            _globalMessagePublisherSubscriber =
-                ConcurrentMessagePublisherSubscriber<IGlobalMessage>
-                    .Create(interfaces, context)
+            _globalMessageQueue =
+                new GlobalMessageQueueHelper(interfaces.GlobalMessageQueue, context)
+                    .WithThread(ProcessThread.Update)
                     .Subscribe<LoadSceneMessage<TSceneKey>>(HandleLoadSceneMessage)
                     .Subscribe<UnloadSceneMessage<TSceneKey>>(HandleUnloadSceneMessage);
         }
@@ -59,25 +59,9 @@ namespace BouncyBox.VorpalEngine.Engine.Scenes
         }
 
         /// <inheritdoc />
-        /// <exception cref="InvalidOperationException">
-        ///     Thrown when the thread executing this method is not the
-        ///     <see cref="ProcessThread.Main" /> thread.
-        /// </exception>
-        public void HandleDispatchedMessages()
-        {
-            _interfaces.ThreadManager.VerifyProcessThread(ProcessThread.Update);
-
-            _globalMessagePublisherSubscriber.HandleDispatched();
-        }
-
-        /// <inheritdoc />
-        /// <exception cref="InvalidOperationException">
-        ///     Thrown when the thread executing this method is not the
-        ///     <see cref="ProcessThread.Main" /> thread.
-        /// </exception>
         public void Dispose()
         {
-            _interfaces.ThreadManager.DisposeHelper(() => { _globalMessagePublisherSubscriber?.Dispose(); }, ref _isDisposed, ProcessThread.Main);
+            _interfaces.ThreadManager.DisposeHelper(() => { _globalMessageQueue?.Dispose(); }, ref _isDisposed, ProcessThread.Main);
         }
 
         /// <summary>Handles the <see cref="LoadSceneMessage{TSceneKey}" /> global message.</summary>
@@ -124,7 +108,7 @@ namespace BouncyBox.VorpalEngine.Engine.Scenes
 
             _serilogLogger.LogDebug("Unloaded scene {Scene}", sceneKeyName);
 
-            _globalMessagePublisherSubscriber.Publish(new DisposeObjectMessage(scene));
+            _globalMessageQueue.Publish(new DisposeObjectMessage(scene));
         }
     }
 }

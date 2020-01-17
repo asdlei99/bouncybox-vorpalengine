@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Immutable;
+using System.Collections.Generic;
 using Autofac;
 using BouncyBox.VorpalEngine.DebuggingGame.Scenes;
 using BouncyBox.VorpalEngine.Engine.Bootstrap;
@@ -16,12 +16,13 @@ namespace BouncyBox.VorpalEngine.DebuggingGame
         private static int Main(string[] args)
         {
 #if DEBUG
-            ImmutableArray<Type> ignoredMessageTypes =
-                new[]
-                {
-                    typeof(EngineUpdateStatsMessage),
-                    typeof(EngineRenderStatsMessage)
-                }.ToImmutableArray();
+            var ignoredMessageTypes =
+                new HashSet<Type>(
+                    new[]
+                    {
+                        typeof(EngineUpdateStatsMessage),
+                        typeof(EngineRenderStatsMessage)
+                    });
 
             MessageLogFilter.ShouldLogMessageDelegate = a => !ignoredMessageTypes.Contains(a.GetType());
             MessageLogFilter.ShouldLogMessageTypeDelegate = a => !ignoredMessageTypes.Contains(a);

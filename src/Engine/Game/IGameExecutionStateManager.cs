@@ -7,8 +7,5 @@ namespace BouncyBox.VorpalEngine.Engine.Game
     {
         /// <summary>Gets the current game execution state.</summary>
         GameExecutionState GameExecutionState { get; }
-
-        /// <summary>Handles dispatched messages.</summary>
-        void HandleDispatchedMessages();
     }
 }

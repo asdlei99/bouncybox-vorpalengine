@@ -23,7 +23,7 @@ namespace BouncyBox.VorpalEngine.Engine
         ICommonGameSettings CommonGameSettings { get; }
 
         /// <summary>Gets the global <see cref="IConcurrentMessageQueue{TMessageBase}" /> implementation.</summary>
-        IConcurrentMessageQueue<IGlobalMessage> GlobalConcurrentMessageQueue { get; }
+        IConcurrentMessageQueue<IGlobalMessage> GlobalMessageQueue { get; }
 
         /// <summary>Gets the update <see cref="IMessageQueue{TMessageBase}" /> implementation.</summary>
         IMessageQueue<IUpdateMessage> UpdateMessageQueue { get; }

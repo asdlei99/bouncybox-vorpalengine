@@ -24,7 +24,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         {
             UpdateOrder = updateOrder;
 
-            UpdateMessagePublisherSubscriber = MessagePublisherSubscriber<IUpdateMessage>.Create(interfaces.UpdateMessageQueue, context);
+            UpdateMessageQueue = new UpdateMessageQueueHelper(interfaces.UpdateMessageQueue, context);
         }
 
         /// <summary>Initializes a new instance of the <see cref="Entity" /> type.</summary>
@@ -38,14 +38,13 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         }
 
         /// <summary>
-        ///     <para>Gets the update message publisher/subscriber.</para>
+        ///     <para>Gets the update message queue.</para>
         ///     <para>
         ///         Use the update message queue to publish or subscribe to messages intended to be processed only by entities while
         ///         updating the game state.
         ///     </para>
-        ///     <para>Do not use the global message queue to send global-queue-specific messages.</para>
         /// </summary>
-        protected MessagePublisherSubscriber<IUpdateMessage> UpdateMessagePublisherSubscriber { get; }
+        protected UpdateMessageQueueHelper UpdateMessageQueue { get; }
 
         /// <summary>
         ///     <para>Gets the <see cref="IKeyboard" /> implementation.</para>
@@ -71,7 +70,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         /// <inheritdoc />
         /// <exception cref="InvalidOperationException">
         ///     Thrown when the thread executing this method is not the
-        ///     <see cref="Threads.ProcessThread.Update" /> thread.
+        ///     <see cref="ProcessThread.Update" /> thread.
         /// </exception>
         public void InitializeUpdateResources()
         {
@@ -83,7 +82,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         /// <inheritdoc />
         /// <exception cref="InvalidOperationException">
         ///     Thrown when the thread executing this method is not the
-        ///     <see cref="Threads.ProcessThread.Update" /> thread.
+        ///     <see cref="ProcessThread.Update" /> thread.
         /// </exception>
         public void ResizeUpdateResources(Size clientSize)
         {
@@ -95,7 +94,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         /// <inheritdoc />
         /// <exception cref="InvalidOperationException">
         ///     Thrown when the thread executing this method is not the
-        ///     <see cref="Threads.ProcessThread.Update" /> thread.
+        ///     <see cref="ProcessThread.Update" /> thread.
         /// </exception>
         public void ReleaseUpdateResources()
         {
@@ -107,14 +106,11 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         /// <inheritdoc />
         /// <exception cref="InvalidOperationException">
         ///     Thrown when the thread executing this method is not the
-        ///     <see cref="Threads.ProcessThread.Update" /> thread.
+        ///     <see cref="ProcessThread.Update" /> thread.
         /// </exception>
         public void UpdateGameState(CancellationToken cancellationToken)
         {
             Interfaces.ThreadManager.VerifyProcessThread(ProcessThread.Update);
-
-            // Handle dispatched messages
-            GlobalMessagePublisherSubscriber.HandleDispatched();
 
             if (ShouldUpdateGameState())
             {
@@ -145,7 +141,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         /// <inheritdoc />
         protected override void Dispose(bool disposing)
         {
-            UpdateMessagePublisherSubscriber.Dispose();
+            UpdateMessageQueue.Dispose();
 
             base.Dispose(disposing);
         }

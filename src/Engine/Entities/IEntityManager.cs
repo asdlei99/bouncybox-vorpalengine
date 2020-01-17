@@ -51,8 +51,5 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         /// <param name="cancellationToken">A cancellation token.</param>
         /// <returns>Returns the number of entities rendered.</returns>
         int Render(in DirectXResources resources, CancellationToken cancellationToken);
-
-        /// <summary>Handles dispatched update messages.</summary>
-        void HandleDispatchedUpdateMessages();
     }
 }

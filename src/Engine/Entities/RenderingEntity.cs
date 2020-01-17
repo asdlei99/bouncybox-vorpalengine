@@ -44,11 +44,11 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         /// <inheritdoc />
         /// <exception cref="InvalidOperationException">
         ///     Thrown when the thread executing this method is not the
-        ///     <see cref="Threads.ProcessThread.RenderResources" /> thread.
+        ///     <see cref="ProcessThread.Render" /> thread.
         /// </exception>
         public void InitializeRenderResources(in DirectXResources resources)
         {
-            Interfaces.ThreadManager.VerifyProcessThread(ProcessThread.RenderResources);
+            Interfaces.ThreadManager.VerifyProcessThread(ProcessThread.Render);
 
             OnInitializeRenderResources(resources);
         }
@@ -56,11 +56,11 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         /// <inheritdoc />
         /// <exception cref="InvalidOperationException">
         ///     Thrown when the thread executing this method is not the
-        ///     <see cref="ProcessThread.RenderResources" /> thread.
+        ///     <see cref="ProcessThread.Render" /> thread.
         /// </exception>
         public void ReleaseRenderResources()
         {
-            Interfaces.ThreadManager.VerifyProcessThread(ProcessThread.RenderResources);
+            Interfaces.ThreadManager.VerifyProcessThread(ProcessThread.Render);
 
             OnReleaseRenderResources();
         }
@@ -76,11 +76,11 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         /// <inheritdoc />
         /// <exception cref="InvalidOperationException">
         ///     Thrown when the thread executing this method is not the
-        ///     <see cref="ProcessThread.RenderResources" /> thread.
+        ///     <see cref="ProcessThread.Render" /> thread.
         /// </exception>
         public void ResizeRenderResources(in DirectXResources resources, in D2D_SIZE_U clientSize)
         {
-            Interfaces.ThreadManager.VerifyProcessThread(ProcessThread.RenderResources);
+            Interfaces.ThreadManager.VerifyProcessThread(ProcessThread.Render);
 
             OnResizeRenderResources(resources, clientSize);
         }

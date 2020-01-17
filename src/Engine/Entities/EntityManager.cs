@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Threading;
+using BouncyBox.VorpalEngine.Common;
 using BouncyBox.VorpalEngine.Engine.DirectX;
 using BouncyBox.VorpalEngine.Engine.Game;
 using BouncyBox.VorpalEngine.Engine.Messaging;
@@ -18,9 +19,10 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         private readonly EntityCollection _entities = new EntityCollection();
         private readonly object _entitiesLockObject = new object();
         private readonly IGameExecutionStateManager _gameExecutionStateManager;
+        private readonly GlobalMessageQueueHelper _globalMessageQueue;
         private readonly IInterfaces _interfaces;
         private readonly object _renderLockObject = new object();
-        private readonly ConcurrentMessagePublisherSubscriber<IGlobalMessage> _updateGlobalMessagePublisherSubscriber;
+        private bool _isDisposed;
         private bool _shouldPause;
         private bool _shouldResume;
         private bool _shouldSuspend;
@@ -35,17 +37,32 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         /// </remarks>
         /// <param name="interfaces">An <see cref="IInterfaces" /> implementation.</param>
         /// <param name="gameExecutionStateManager">An <see cref="IGameExecutionStateManager" /> implementation.</param>
-        public EntityManager(IInterfaces interfaces, IGameExecutionStateManager gameExecutionStateManager)
+        /// <param name="context">A nested context.</param>
+        public EntityManager(IInterfaces interfaces, IGameExecutionStateManager gameExecutionStateManager, NestedContext context)
         {
-            _updateGlobalMessagePublisherSubscriber =
-                ConcurrentMessagePublisherSubscriber<IGlobalMessage>
-                    .Create(interfaces)
+            _globalMessageQueue =
+                new GlobalMessageQueueHelper(interfaces.GlobalMessageQueue, context.Push(nameof(EntityManager<TGameState>)))
+                    .WithThread(ProcessThread.Update)
                     .Subscribe<GamePausedMessage>(HandleGamePausedMessage)
                     .Subscribe<GameUnpausedMessage>(HandleGameUnpausedMessage)
                     .Subscribe<GameSuspendedMessage>(HandleGameSuspendedMessage)
                     .Subscribe<GameResumedMessage>(HandleGameResumedMessage);
             _interfaces = interfaces;
             _gameExecutionStateManager = gameExecutionStateManager;
+        }
+
+        /// <summary>Initializes a new instance of the <see cref="EntityManager{TGameState}" /> type.</summary>
+        /// <remarks>
+        ///     <para>Subscribes to the <see cref="GamePausedMessage" /> global message.</para>
+        ///     <para>Subscribes to the <see cref="GameUnpausedMessage" /> global message.</para>
+        ///     <para>Subscribes to the <see cref="GameSuspendedMessage" /> global message.</para>
+        ///     <para>Subscribes to the <see cref="GameResumedMessage" /> global message.</para>
+        /// </remarks>
+        /// <param name="interfaces">An <see cref="IInterfaces" /> implementation.</param>
+        /// <param name="gameExecutionStateManager">An <see cref="IGameExecutionStateManager" /> implementation.</param>
+        public EntityManager(IInterfaces interfaces, IGameExecutionStateManager gameExecutionStateManager)
+            : this(interfaces, gameExecutionStateManager, NestedContext.None())
+        {
         }
 
         /// <inheritdoc />
@@ -96,7 +113,7 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         /// <inheritdoc />
         /// <exception cref="InvalidOperationException">
         ///     Thrown when the thread executing this method is not the
-        ///     <see cref="Threads.ProcessThread.Update" /> thread.
+        ///     <see cref="ProcessThread.Update" /> thread.
         /// </exception>
         public void Update(CancellationToken cancellationToken)
         {
@@ -147,11 +164,11 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         /// <inheritdoc />
         /// <exception cref="InvalidOperationException">
         ///     Thrown when the thread executing this method is not the
-        ///     <see cref="ProcessThread.RenderResources" /> thread.
+        ///     <see cref="ProcessThread.Render" /> thread.
         /// </exception>
         public void InitializeRenderResources(in DirectXResources resources)
         {
-            _interfaces.ThreadManager.VerifyProcessThread(ProcessThread.RenderResources);
+            _interfaces.ThreadManager.VerifyProcessThread(ProcessThread.Render);
 
             ImmutableArray<IRenderingEntity> entities;
 
@@ -169,11 +186,11 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         /// <inheritdoc />
         /// <exception cref="InvalidOperationException">
         ///     Thrown when the thread executing this method is not the
-        ///     <see cref="ProcessThread.RenderResources" /> thread.
+        ///     <see cref="ProcessThread.Render" /> thread.
         /// </exception>
         public void ResizeRenderResources(in DirectXResources resources, D2D_SIZE_U clientSize)
         {
-            _interfaces.ThreadManager.VerifyProcessThread(ProcessThread.RenderResources);
+            _interfaces.ThreadManager.VerifyProcessThread(ProcessThread.Render);
 
             ImmutableArray<IRenderingEntity> entities;
 
@@ -191,11 +208,11 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
         /// <inheritdoc />
         /// <exception cref="InvalidOperationException">
         ///     Thrown when the thread executing this method is not the
-        ///     <see cref="ProcessThread.RenderResources" /> thread.
+        ///     <see cref="ProcessThread.Render" /> thread.
         /// </exception>
         public void ReleaseRenderResources()
         {
-            _interfaces.ThreadManager.VerifyProcessThread(ProcessThread.RenderResources);
+            _interfaces.ThreadManager.VerifyProcessThread(ProcessThread.Render);
 
             ImmutableArray<IRenderingEntity> entities;
 
@@ -239,26 +256,10 @@ namespace BouncyBox.VorpalEngine.Engine.Entities
             return entityRenderCount;
         }
 
-        /// <summary>Handles dispatched update messages.</summary>
-        /// <exception cref="InvalidOperationException">
-        ///     Thrown when the thread executing this method is not the
-        ///     <see cref="ProcessThread.Update" /> thread.
-        /// </exception>
-        public void HandleDispatchedUpdateMessages()
-        {
-            _updateGlobalMessagePublisherSubscriber.HandleDispatched();
-        }
-
         /// <inheritdoc />
-        /// <exception cref="InvalidOperationException">
-        ///     Thrown when the thread executing this method is not the
-        ///     <see cref="ProcessThread.Main" /> thread.
-        /// </exception>
         public void Dispose()
         {
-            _interfaces.ThreadManager.VerifyProcessThread(ProcessThread.Main);
-
-            _updateGlobalMessagePublisherSubscriber.Dispose();
+            _interfaces.ThreadManager.DisposeHelper(() => _globalMessageQueue.Dispose(), ref _isDisposed, ProcessThread.Main);
         }
 
         /// <summary>Prepares entities for adding by informing them of game execution state changes.</summary>

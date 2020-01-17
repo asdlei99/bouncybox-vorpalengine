@@ -28,11 +28,10 @@ namespace BouncyBox.VorpalEngine.Engine.DirectX
         private const DXGI_FORMAT DxgiFormat = DXGI_FORMAT.DXGI_FORMAT_B8G8R8A8_UNORM;
         private const int MaximumRenderResourcesInitializationAttempts = 3;
         private readonly IEntityManager<TGameState> _entityManager;
+        private readonly GlobalMessageQueueHelper _globalMessageQueueHelper;
         private readonly IInterfaces _interfaces;
         private readonly object _renderLockObject = new object();
-        private readonly ConcurrentMessagePublisherSubscriber<IGlobalMessage> _renderResourcesGlobalMessagePublisherSubscriber;
         private readonly ContextSerilogLogger _serilogLogger;
-        private readonly ConcurrentMessagePublisherSubscriber<IGlobalMessage> _updateGlobalMessagePublisherSubscriber;
         private D2D_SIZE_U? _clientSize;
         private D2D1Device? _d2d1Device;
         private D2D1DeviceContext? _d2d1DeviceContext;
@@ -44,6 +43,7 @@ namespace BouncyBox.VorpalEngine.Engine.DirectX
         private DXGIDebug? _dxgiDebug;
 #endif
         private DXGISwapChain1? _dxgiSwapChain1;
+        private bool _isDisposed;
         private TimeSpan? _refreshPeriod;
         private int _renderResourcesInitializationAttempts;
         private bool _renderResourcesInitialized;
@@ -65,11 +65,9 @@ namespace BouncyBox.VorpalEngine.Engine.DirectX
 
             _interfaces = interfaces;
             _entityManager = entityManager;
-
-            _updateGlobalMessagePublisherSubscriber = ConcurrentMessagePublisherSubscriber<IGlobalMessage>.Create(interfaces);
-            _renderResourcesGlobalMessagePublisherSubscriber =
-                ConcurrentMessagePublisherSubscriber<IGlobalMessage>
-                    .Create(interfaces)
+            _globalMessageQueueHelper =
+                new GlobalMessageQueueHelper(interfaces.GlobalMessageQueue, context)
+                    .WithThread(ProcessThread.Render)
                     .Subscribe<RenderWindowHandleCreatedMessage>(HandleRenderWindowHandleCreatedMessage)
                     .Subscribe<DisplayChangedMessage>(HandleDisplayChangedMessage)
                     .Subscribe<ResolutionChangedMessage>(HandleResolutionChangedMessage)
@@ -78,6 +76,12 @@ namespace BouncyBox.VorpalEngine.Engine.DirectX
         }
 
         /// <summary>Initializes a new instance of the <see cref="DirectXResourceManager{TGameState}" /> type.</summary>
+        /// <remarks>
+        ///     <para>Subscribes to the <see cref="RenderWindowHandleCreatedMessage" /> global message.</para>
+        ///     <para>Subscribes to the <see cref="DisplayChangedMessage" /> global message.</para>
+        ///     <para>Subscribes to the <see cref="ResolutionChangedMessage" /> global message.</para>
+        ///     <para>Subscribes to the <see cref="RecreateRenderTargetMessage" /> global message.</para>
+        /// </remarks>
         /// <param name="interfaces">An <see cref="IInterfaces" /> implementation.</param>
         /// <param name="entityManager">An <see cref="IEntityManager{TGameState}" /> implementation.</param>
         public DirectXResourceManager(IInterfaces interfaces, IEntityManager<TGameState> entityManager)
@@ -87,20 +91,18 @@ namespace BouncyBox.VorpalEngine.Engine.DirectX
 
         /// <inheritdoc />
         /// <exception cref="InvalidOperationException">
-        ///     Thrown when the thread executing this method is not the
-        ///     <see cref="Threads.ProcessThread.RenderResources" /> thread.
+        ///     Thrown when the thread executing this method is not the <see cref="ProcessThread.Render" /> thread.
         /// </exception>
         public void ReleaseRenderResources(CancellationToken cancellationToken)
         {
-            _interfaces.ThreadManager.VerifyProcessThread(ProcessThread.RenderResources);
+            _interfaces.ThreadManager.VerifyProcessThread(ProcessThread.Render);
 
             ReleaseRenderResources();
         }
 
         /// <inheritdoc />
         /// <exception cref="InvalidOperationException">
-        ///     Thrown when the thread executing this method is not the
-        ///     <see cref="ProcessThread.Render" /> thread.
+        ///     Thrown when the thread executing this method is not the <see cref="ProcessThread.Render" /> thread.
         /// </exception>
         public unsafe (RenderResult result, TimeSpan frametime) Render(CancellationToken cancellationToken)
         {
@@ -164,7 +166,7 @@ namespace BouncyBox.VorpalEngine.Engine.DirectX
                 {
                     _serilogLogger.LogWarning("Direct2D reports that the render target must be recreated");
 
-                    _renderResourcesGlobalMessagePublisherSubscriber.Publish<RecreateRenderTargetMessage>();
+                    _globalMessageQueueHelper.Publish<RecreateRenderTargetMessage>();
 
                     return (RenderResult.FrameSkipped, TimeSpan.Zero);
                 }
@@ -194,54 +196,23 @@ namespace BouncyBox.VorpalEngine.Engine.DirectX
             }
         }
 
-        /// <summary>Handles dispatched render resources messages.</summary>
-        /// <exception cref="InvalidOperationException">
-        ///     Thrown when the thread executing this method is not the
-        ///     <see cref="ProcessThread.RenderResources" /> thread.
-        /// </exception>
-        public void HandleDispatchedRenderResourcesMessages()
-        {
-            _interfaces.ThreadManager.VerifyProcessThread(ProcessThread.RenderResources);
-
-            _renderResourcesGlobalMessagePublisherSubscriber.HandleDispatched();
-        }
-
         /// <inheritdoc />
-        /// <exception cref="InvalidOperationException">
-        ///     Thrown when the thread executing this method is not the
-        ///     <see cref="ProcessThread.Main" /> thread.
-        /// </exception>
         public void Dispose()
         {
-            _interfaces.ThreadManager.VerifyProcessThread(ProcessThread.Main);
-
-            _updateGlobalMessagePublisherSubscriber.Dispose();
-            _renderResourcesGlobalMessagePublisherSubscriber.Dispose();
-            DisposeDirectXObjects();
-        }
-
-        /// <summary>Handles dispatched update messages.</summary>
-        /// <exception cref="InvalidOperationException">
-        ///     Thrown when the thread executing this method is not the
-        ///     <see cref="ProcessThread.Update" /> thread.
-        /// </exception>
-        public void HandleDispatchedUpdateMessages()
-        {
-            _updateGlobalMessagePublisherSubscriber.HandleDispatched();
+            _interfaces.ThreadManager.DisposeHelper(
+                () =>
+                {
+                    _globalMessageQueueHelper.Dispose();
+                    DisposeDirectXObjects();
+                },
+                ref _isDisposed,
+                ProcessThread.Main);
         }
 
         /// <summary>Initialized render resources.</summary>
-        /// <remarks>
-        ///     Publishes the <see cref="RefreshPeriodChangedMessage" /> global message.
-        /// </remarks>
-        /// <exception cref="InvalidOperationException">
-        ///     Thrown when the thread executing this method is not the
-        ///     <see cref="ProcessThread.RenderResources" /> thread.
-        /// </exception>
+        /// <remarks>Publishes the <see cref="RefreshPeriodChangedMessage" /> global message.</remarks>
         private unsafe void InitializeRenderResources()
         {
-            _interfaces.ThreadManager.VerifyProcessThread(ProcessThread.RenderResources);
-
             for (var i = 0; i < MaximumRenderResourcesInitializationAttempts; i++)
             {
                 // Wait for rendering to complete
@@ -385,7 +356,7 @@ namespace BouncyBox.VorpalEngine.Engine.DirectX
                             throw Win32ExceptionHelper.GetException();
                         }
 
-                        _clientSize = D2DFactory.CreateSizeU((uint)clientRect.right, (uint)clientRect.bottom);
+                        _clientSize = new D2D_SIZE_U((uint)clientRect.right, (uint)clientRect.bottom);
 
                         // Initialize all entities' render resources
 
@@ -571,7 +542,7 @@ namespace BouncyBox.VorpalEngine.Engine.DirectX
 
                 InitializeRenderTarget();
 
-                _clientSize = D2DFactory.CreateSizeU((uint)message.Resolution.Width, (uint)message.Resolution.Height);
+                _clientSize = new D2D_SIZE_U((uint)message.Resolution.Width, (uint)message.Resolution.Height);
 
                 // Resize all entities' render resources
 
@@ -622,7 +593,7 @@ namespace BouncyBox.VorpalEngine.Engine.DirectX
 
                 _refreshPeriod = refreshPeriod;
 
-                _updateGlobalMessagePublisherSubscriber.Publish(new RefreshPeriodChangedMessage(refreshPeriod, hz));
+                _globalMessageQueueHelper.Publish(new RefreshPeriodChangedMessage(refreshPeriod, hz));
             }
             finally
             {

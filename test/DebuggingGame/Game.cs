@@ -14,12 +14,11 @@ namespace BouncyBox.VorpalEngine.DebuggingGame
 
         public Game(
             IInterfaces interfaces,
-            IGameExecutionStateManager gameExecutionStateManager,
             IEntityManager<GameState> entityManager,
             IDirectXResourceManager<GameState> directXResourceManager,
             ISceneManager sceneManager,
             ProgramOptions programOptions)
-            : base(interfaces, gameExecutionStateManager, entityManager, directXResourceManager, sceneManager, programOptions)
+            : base(interfaces, entityManager, directXResourceManager, sceneManager, programOptions)
         {
         }
     }

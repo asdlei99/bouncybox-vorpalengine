@@ -17,7 +17,7 @@ namespace BouncyBox.VorpalEngine.Engine
         /// <param name="serilogLogger">An <see cref="ISerilogLogger" /> implementation.</param>
         /// <param name="threadManager">An <see cref="IThreadManager" /> implementation.</param>
         /// <param name="commonGameSettings">An <see cref="ICommonGameSettings" /> implementation.</param>
-        /// <param name="globalConcurrentMessageQueue">An <see cref="IConcurrentMessageQueue{TMessageBase}" /> implementation.</param>
+        /// <param name="globalMessageQueue">An <see cref="IConcurrentMessageQueue{TMessageBase}" /> implementation.</param>
         /// <param name="updateMessageQueue">An update <see cref="IMessageQueue{TMessageBase}" /> implementation.</param>
         /// <param name="keyboard">An <see cref="IKeyboard" /> implementation.</param>
         /// <param name="statefulGamepad">An <see cref="IStatefulGamepad" /> implementation.</param>
@@ -25,7 +25,7 @@ namespace BouncyBox.VorpalEngine.Engine
             ISerilogLogger serilogLogger,
             IThreadManager threadManager,
             ICommonGameSettings commonGameSettings,
-            IConcurrentMessageQueue<IGlobalMessage> globalConcurrentMessageQueue,
+            IConcurrentMessageQueue<IGlobalMessage> globalMessageQueue,
             IMessageQueue<IUpdateMessage> updateMessageQueue,
             IKeyboard keyboard,
             IStatefulGamepad statefulGamepad)
@@ -33,7 +33,7 @@ namespace BouncyBox.VorpalEngine.Engine
             SerilogLogger = serilogLogger;
             ThreadManager = threadManager;
             CommonGameSettings = commonGameSettings;
-            GlobalConcurrentMessageQueue = globalConcurrentMessageQueue;
+            GlobalMessageQueue = globalMessageQueue;
             UpdateMessageQueue = updateMessageQueue;
             Keyboard = keyboard;
             StatefulGamepad = statefulGamepad;
@@ -49,7 +49,7 @@ namespace BouncyBox.VorpalEngine.Engine
         public ICommonGameSettings CommonGameSettings { get; }
 
         /// <inheritdoc />
-        public IConcurrentMessageQueue<IGlobalMessage> GlobalConcurrentMessageQueue { get; }
+        public IConcurrentMessageQueue<IGlobalMessage> GlobalMessageQueue { get; }
 
         /// <inheritdoc />
         public IMessageQueue<IUpdateMessage> UpdateMessageQueue { get; }

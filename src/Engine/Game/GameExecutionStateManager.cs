@@ -1,14 +1,17 @@
-﻿using BouncyBox.VorpalEngine.Common;
+﻿using System;
+using BouncyBox.VorpalEngine.Common;
 using BouncyBox.VorpalEngine.Engine.Logging;
 using BouncyBox.VorpalEngine.Engine.Messaging;
 using BouncyBox.VorpalEngine.Engine.Messaging.GlobalMessages;
+using BouncyBox.VorpalEngine.Engine.Threads;
 
 namespace BouncyBox.VorpalEngine.Engine.Game
 {
     /// <summary>Manages game execution state changes.</summary>
     internal class GameExecutionStateManager : IGameExecutionStateManager
     {
-        private readonly ConcurrentMessagePublisherSubscriber<IGlobalMessage> _globalMessagePublisherSubscriber;
+        private readonly GlobalMessageQueueHelper _globalMessageQueue;
+        private readonly IInterfaces _interfaces;
         private readonly ContextSerilogLogger _serilogLogger;
         private bool _isDisposed;
         private bool _isPaused;
@@ -27,10 +30,11 @@ namespace BouncyBox.VorpalEngine.Engine.Game
         {
             context = context.Push(nameof(GameExecutionStateManager));
 
+            _interfaces = interfaces;
             _serilogLogger = new ContextSerilogLogger(interfaces.SerilogLogger, context);
-            _globalMessagePublisherSubscriber =
-                ConcurrentMessagePublisherSubscriber<IGlobalMessage>
-                    .Create(interfaces, context)
+            _globalMessageQueue =
+                new GlobalMessageQueueHelper(interfaces.GlobalMessageQueue, context)
+                    .WithThread(ProcessThread.Update)
                     .Subscribe<PauseGameMessage>(HandlePauseGameMessage)
                     .Subscribe<UnpauseGameMessage>(HandleUnpauseGameMessage)
                     .Subscribe<SuspendGameMessage>(HandleSuspendGameMessage)
@@ -54,15 +58,9 @@ namespace BouncyBox.VorpalEngine.Engine.Game
         public GameExecutionState GameExecutionState => new GameExecutionState(_isPaused, _isSuspended);
 
         /// <inheritdoc />
-        public void HandleDispatchedMessages()
-        {
-            _globalMessagePublisherSubscriber.HandleDispatched();
-        }
-
-        /// <inheritdoc />
         public void Dispose()
         {
-            DisposeHelper.Dispose(() => { _globalMessagePublisherSubscriber?.Dispose(); }, ref _isDisposed);
+            _interfaces.ThreadManager.DisposeHelper(_globalMessageQueue.Dispose, ref _isDisposed, ProcessThread.Main);
         }
 
         /// <summary>Handles the <see cref="PauseGameMessage" /> global message.</summary>
@@ -78,7 +76,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
             _serilogLogger.LogInformation("Game paused");
             _isPaused = true;
 
-            _globalMessagePublisherSubscriber.Publish<GamePausedMessage>();
+            _globalMessageQueue.Publish<GamePausedMessage>();
         }
 
         /// <summary>Handles the <see cref="UnpauseGameMessage" /> global message.</summary>
@@ -94,7 +92,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
             _serilogLogger.LogInformation("Game unpaused");
             _isPaused = false;
 
-            _globalMessagePublisherSubscriber.Publish<GameUnpausedMessage>();
+            _globalMessageQueue.Publish<GameUnpausedMessage>();
         }
 
         /// <summary>Handles the <see cref="SuspendGameMessage" /> global message.</summary>
@@ -110,7 +108,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
             _serilogLogger.LogInformation("Game suspended");
             _isSuspended = true;
 
-            _globalMessagePublisherSubscriber.Publish<GameSuspendedMessage>();
+            _globalMessageQueue.Publish<GameSuspendedMessage>();
         }
 
         /// <summary>Handles the <see cref="ResumeGameMessage" /> global message.</summary>
@@ -126,7 +124,7 @@ namespace BouncyBox.VorpalEngine.Engine.Game
             _serilogLogger.LogInformation("Game resumed");
             _isSuspended = false;
 
-            _globalMessagePublisherSubscriber.Publish<GameResumedMessage>();
+            _globalMessageQueue.Publish<GameResumedMessage>();
         }
     }
 }

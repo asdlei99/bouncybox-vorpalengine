@@ -212,9 +212,6 @@ namespace BouncyBox.VorpalEngine.Engine.Threads
 
                             while (!cancellationToken.IsCancellationRequested)
                             {
-                                // Handle dispatched messages
-                                threadWorker.HandleDispatchedMessages();
-
                                 // Perform the thread's work
                                 threadWorker.DoWork(cancellationToken);
                             }
@@ -237,7 +234,7 @@ namespace BouncyBox.VorpalEngine.Engine.Threads
                     });
             }
 
-            /// <summary>Gets the process thread type of the thread being wrapped.</summary>
+            /// <summary>Gets the thread type of the thread being wrapped.</summary>
             public ProcessThread ProcessThread { get; }
 
             /// <summary>Gets a tuple containing an unhandled exception and what engine thread it occurred on.</summary>

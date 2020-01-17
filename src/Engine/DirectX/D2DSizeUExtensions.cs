@@ -10,12 +10,7 @@ namespace BouncyBox.VorpalEngine.Engine.DirectX
         /// <returns>Returns the value converted to a <see cref="D2D_POINT_2F" />.</returns>
         public static D2D_SIZE_F ToD2DSizeF(this D2D_SIZE_U value)
         {
-            return
-                new D2D_SIZE_F
-                {
-                    width = value.width,
-                    height = value.height
-                };
+            return new D2D_SIZE_F(value.width, value.height);
         }
     }
 }
